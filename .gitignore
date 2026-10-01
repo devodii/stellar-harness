@@ -1,0 +1,16 @@
+node_modules
+.pnpm-store
+dist
+.next
+out
+coverage
+storybook-static
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+.DS_Store
+.vercel
+
+data/*
+REPORT.md
