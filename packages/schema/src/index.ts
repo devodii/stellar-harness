@@ -1,5 +1,6 @@
 export * from './actions';
 export * from './finding';
 export * from './plan';
+export * from './result';
 export * from './snapshot';
 export * from './summary';
