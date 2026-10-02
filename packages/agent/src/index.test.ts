@@ -1,3 +1,4 @@
+import { TOOL_NAMES } from '@harness/stellar-tools';
 import { describe, expect, it } from 'vitest';
 import { APPROVAL_NOTE, createAgentTools, planProtocol, systemPrompt } from './index';
 import { createTestContext } from './testing';
@@ -7,16 +8,8 @@ describe('@harness/agent', () => {
     expect(typeof systemPrompt).toBe('string');
     expect(APPROVAL_NOTE).toContain('passkey signature');
     const tools = createAgentTools(createTestContext());
-    expect(Object.keys(tools).sort()).toEqual([
-      'explainFailure',
-      'getContractTtl',
-      'getSummary',
-      'planFix',
-      'queryFindings',
-      'searchEcosystem',
-      'simulateExtendTtl',
-      'simulateRestore',
-    ]);
+    expect(Object.keys(tools).sort()).toEqual([...TOOL_NAMES].sort());
+    expect(Object.keys(tools)).toHaveLength(12);
   });
 
   it('exposes the plan protocol as one object', () => {
