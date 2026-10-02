@@ -1,3 +1,4 @@
+import type { NetworkSelection } from '@harness/stellar-tools';
 import {
   type AnchorProbeResult,
   type AnchorToml,
@@ -34,14 +35,20 @@ export const makeAnchorProbe = (
   {
     perHost = DEFAULT_PER_HOST,
     runAnchorTests = runSafeAnchorTests,
-  }: { perHost?: number; runAnchorTests?: RunAnchorTests } = {},
+    network,
+    networkPassphrase,
+  }: { perHost?: number; runAnchorTests?: RunAnchorTests } & NetworkSelection = {},
 ): ProbeDomain => {
   const fetch = limitFetchPerHost(ports.fetch, perHost);
   const testsLimit = keyedLimiter(perHost);
   const limitedTests: RunAnchorTests = (domain, seps) =>
     testsLimit(domain, () => runAnchorTests(domain, seps));
   return (domain, opts) =>
-    probeAnchor(domain, { fetch, horizon: ports.horizon, runAnchorTests: limitedTests }, opts);
+    probeAnchor(
+      domain,
+      { fetch, horizon: ports.horizon, runAnchorTests: limitedTests, network, networkPassphrase },
+      opts,
+    );
 };
 
 export const domainTags = (domain: AnchorDomain): string[] => [
