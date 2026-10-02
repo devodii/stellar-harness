@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-export const AccountId = z.string().regex(/^G[A-Z2-7]{55}$/, 'Expected a G... account id');
-export type AccountId = z.infer<typeof AccountId>;
+export const StellarAccountId = z.string().regex(/^G[A-Z2-7]{55}$/, 'Expected a G... account id');
+export type StellarAccountId = z.infer<typeof StellarAccountId>;
 
-export const TxHash = z
+export const TransactionHash = z
   .string()
   .regex(/^[0-9a-fA-F]{64}$/, 'Expected a 64 character hex transaction hash')
   .transform((hash) => hash.toLowerCase());
