@@ -4,8 +4,10 @@ import { LiveHeaderStrip } from './live-header-strip';
 import { QueryStory } from './query-story';
 
 const SCANNED: LiveResponse = {
+  network: 'mainnet',
   latestLedger: 1000001,
   closedAt: '2026-01-01T00:00:00Z',
+  ledgerSource: 'horizon',
   ledgerCloseSeconds: 5.9,
   window: { days: 7, txFailed: 120345, preventable: 49000, preventableShare: 0.41 },
   archivedContracts: 812,
@@ -40,6 +42,12 @@ export const Scanned: Story = {};
 
 export const NoScanData: Story = { args: { live: NO_SCAN } };
 
-export const HorizonDown: Story = {
-  args: { live: { ...NO_SCAN, latestLedger: null, horizonOk: false } },
+export const HorizonDownRpcUp: Story = {
+  args: { live: { ...NO_SCAN, network: 'testnet', ledgerSource: 'rpc', horizonOk: false } },
+};
+
+export const AllSourcesDown: Story = {
+  args: {
+    live: { ...NO_SCAN, latestLedger: null, closedAt: null, ledgerSource: null, horizonOk: false },
+  },
 };

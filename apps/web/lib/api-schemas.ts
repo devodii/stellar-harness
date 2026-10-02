@@ -1,5 +1,6 @@
-import { Finding, FindingType, Severity, Summary } from '@harness/schema';
+import { Finding, FindingType, Network, Severity, Summary } from '@harness/schema';
 import { z } from 'zod';
+import { LEDGER_SOURCES } from './latest-ledger';
 
 const listOf = <T extends z.ZodType>(item: T) =>
   z
@@ -35,8 +36,10 @@ export const SummaryResponse = z.object({ summary: Summary, scanned: z.boolean()
 export type SummaryResponse = z.infer<typeof SummaryResponse>;
 
 export const LiveResponse = z.object({
+  network: Network,
   latestLedger: z.number().int().nullable(),
   closedAt: z.iso.datetime().nullable(),
+  ledgerSource: z.enum(LEDGER_SOURCES).nullable(),
   ledgerCloseSeconds: z.number().positive().nullable(),
   window: z.object({
     days: z.number().int().nonnegative(),

@@ -11,16 +11,26 @@ const snapshot = {
   network: 'mainnet' as const,
 };
 
-const ledger = { sequence: 64723256, closedAt: '2026-10-02T00:47:42Z' };
+const ledger = { sequence: 64723256, closedAt: '2026-10-02T00:47:42Z', source: 'horizon' as const };
 
 describe('buildLive', () => {
   it('reports only the ledger when there is no scan', () => {
-    const live = buildLive(ledger, { summary: emptySummary(snapshot), scanned: false });
+    const live = buildLive('mainnet', ledger, { summary: emptySummary(snapshot), scanned: false });
     expect(LiveResponse.parse(live)).toEqual(live);
     expect(live.latestLedger).toBe(64723256);
     expect(live.window.txFailed).toBeNull();
     expect(live.ledgerCloseSeconds).toBeNull();
     expect(live.horizonOk).toBe(true);
+    expect(live.ledgerSource).toBe('horizon');
+    expect(live.network).toBe('mainnet');
+  });
+
+  it('marks an rpc fallback reading', () => {
+    const reading = { ...ledger, closedAt: null, source: 'rpc' as const };
+    const live = buildLive('testnet', reading, { summary: emptySummary(snapshot), scanned: false });
+    expect(LiveResponse.parse(live)).toEqual(live);
+    expect(live).toMatchObject({ network: 'testnet', latestLedger: 64723256, ledgerSource: 'rpc' });
+    expect(live.horizonOk).toBe(false);
   });
 
   it('combines scan window numbers with the ledger', () => {
@@ -35,9 +45,10 @@ describe('buildLive', () => {
         preventable: { total: 1, byCode: {} },
       },
     };
-    const live = buildLive(null, { summary, scanned: true });
+    const live = buildLive('mainnet', null, { summary, scanned: true });
     expect(live.window).toEqual({ days: 7, txFailed: 4, preventable: 1, preventableShare: 0.25 });
     expect(live.ledgerCloseSeconds).toBe(5.8);
     expect(live.horizonOk).toBe(false);
+    expect(live.ledgerSource).toBeNull();
   });
 });

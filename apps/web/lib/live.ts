@@ -1,20 +1,20 @@
+import type { Network } from '@harness/schema';
 import type { LiveResponse, SummaryResponse } from './api-schemas';
+import type { LedgerReading } from './latest-ledger';
 import { summaryMetrics } from './summary';
 
-export interface LedgerReading {
-  sequence: number;
-  closedAt: string;
-}
-
 export const buildLive = (
+  network: Network,
   ledger: LedgerReading | null,
   { summary, scanned }: SummaryResponse,
 ): LiveResponse => {
   const metrics = summaryMetrics(summary);
   const fromScan = <T>(value: T): T | null => (scanned ? value : null);
   return {
+    network,
     latestLedger: ledger?.sequence ?? null,
     closedAt: ledger?.closedAt ?? null,
+    ledgerSource: ledger?.source ?? null,
     ledgerCloseSeconds: fromScan(summary.snapshot.ledgerCloseSeconds),
     window: {
       days: scanned ? metrics.windowDays : 0,
@@ -25,6 +25,6 @@ export const buildLive = (
     archivedContracts: fromScan(metrics.archivedContracts),
     anchorsFailing: fromScan(metrics.anchorsFailing),
     scanned,
-    horizonOk: ledger !== null,
+    horizonOk: ledger?.source === 'horizon',
   };
 };
