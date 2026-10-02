@@ -34,7 +34,7 @@ const context = (
   ledgerCloseSeconds: 5,
 });
 
-const submitted = (ctx: { rpc: FakeRpc }) =>
+const simulatedTx = (ctx: { rpc: FakeRpc }) =>
   TransactionBuilder.fromXdr(ctx.rpc.calls.simulate[0] ?? '', Networks.PUBLIC) as Transaction;
 
 describe('simulateExtendTtl', () => {
@@ -58,9 +58,12 @@ describe('simulateExtendTtl', () => {
       'extendToLedgers',
       'footprint',
       'minResourceFeeStroops',
-      'unsignedXdr',
+      'operation',
     ]);
-    const tx = submitted(ctx);
+    expect(result.ok && result.data.operation).toBe(
+      'Extend the TTL of the contract instance and its wasm code to 365 days (ExtendFootprintTTL)',
+    );
+    const tx = simulatedTx(ctx);
     expect(tx.source).toBe(DEFAULT_SIMULATION_SOURCE);
     expect(tx.operations[0]).toMatchObject({ type: 'extendFootprintTtl', extendTo: 6_307_200 });
     expect(tx.signatures).toHaveLength(0);
@@ -85,7 +88,7 @@ describe('simulateExtendTtl', () => {
     };
     const result = await invokeTool(simulateExtendTtl, { contractId: archived.contractId }, ctx);
     expect(result.ok && result.data.minResourceFeeStroops).toBe(179_194_774);
-    expect(submitted(ctx).source).toBe(account.id);
+    expect(simulatedTx(ctx).source).toBe(account.id);
   });
 
   it('fails when the source account does not exist', async () => {
@@ -106,7 +109,7 @@ describe('simulateExtendTtl', () => {
     };
     const result = await invokeTool(simulateExtendTtl, { contractId: ROUTER }, ctx);
     expect(result.ok).toBe(true);
-    expect(submitted(ctx).source).toBe(SIMULATION_SOURCES.testnet);
+    expect(simulatedTx(ctx).source).toBe(SIMULATION_SOURCES.testnet);
   });
 });
 
@@ -120,11 +123,13 @@ describe('simulateRestore', () => {
         minResourceFeeStroops: 784_506,
         estimatedXlm: 0.0784606,
         entries: 'both',
+        operation:
+          'Restore the contract instance and its wasm code from the archive (RestoreFootprint)',
         footprint: { readOnly: [] },
       },
     });
     expect(result.ok && result.data.footprint.readWrite).toHaveLength(2);
-    expect(submitted(ctx).operations[0]).toMatchObject({ type: 'restoreFootprint' });
+    expect(simulatedTx(ctx).operations[0]).toMatchObject({ type: 'restoreFootprint' });
   });
 
   it('restores only the instance when asked', async () => {

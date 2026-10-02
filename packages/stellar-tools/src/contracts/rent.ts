@@ -19,6 +19,22 @@ export type SimulationSource = { accountId: string; sequence: string; networkPas
 
 export type FootprintAction = { kind: 'extend'; extendToLedgers: number } | { kind: 'restore' };
 
+export type FootprintEntries = 'instance' | 'code' | 'both';
+
+const ENTRY_LABELS: Record<FootprintEntries, string> = {
+  instance: 'the contract instance',
+  code: 'the contract wasm code',
+  both: 'the contract instance and its wasm code',
+};
+
+export const describeFootprintOperation = (
+  action: { kind: 'extend'; days: number } | { kind: 'restore' },
+  entries: FootprintEntries,
+): string =>
+  action.kind === 'extend'
+    ? `Extend the TTL of ${ENTRY_LABELS[entries]} to ${action.days} days (ExtendFootprintTTL)`
+    : `Restore ${ENTRY_LABELS[entries]} from the archive (RestoreFootprint)`;
+
 export const stroopsToXlm = (stroops: number): number => stroops / STROOPS_PER_XLM;
 
 const footprintFor = (keys: xdr.LedgerKey[], action: FootprintAction): Footprint => {
@@ -32,13 +48,11 @@ export const buildFootprintTransaction = (
   source: SimulationSource,
   keys: xdr.LedgerKey[],
   action: FootprintAction,
-  simulatedTransactionData?: string,
 ): Transaction => {
   const sorobanData =
-    simulatedTransactionData ??
-    (action.kind === 'extend'
+    action.kind === 'extend'
       ? new SorobanDataBuilder().setReadOnly(keys).build()
-      : new SorobanDataBuilder().setReadWrite(keys).build());
+      : new SorobanDataBuilder().setReadWrite(keys).build();
   const operation =
     action.kind === 'extend'
       ? Operation.extendFootprintTtl({ extendTo: action.extendToLedgers })
@@ -56,16 +70,6 @@ export const buildFootprintTransaction = (
 const parseStroops = (value: string | undefined): number | null => {
   if (value === undefined || !/^\d+$/.test(value)) return null;
   return Number(value);
-};
-
-// The transaction fee field is a uint32, so a resource fee above ~429 XLM cannot be assembled into
-// one transaction; the simulated fee is still the right estimate, so keep the unsimulated draft.
-const assembledXdr = (draft: Transaction, assemble: () => Transaction): string => {
-  try {
-    return assemble().toXdr();
-  } catch {
-    return draft.toXdr();
-  }
 };
 
 export const simulateFootprint = async (
@@ -90,9 +94,6 @@ export const simulateFootprint = async (
   return ok({
     minResourceFeeStroops,
     estimatedXlm: stroopsToXlm(minResourceFeeStroops + INCLUSION_FEE_STROOPS),
-    unsignedXdr: assembledXdr(draft, () =>
-      buildFootprintTransaction(source, keys, action, transactionData),
-    ),
     footprint: footprintFor(keys, action),
     restorePreamble: preambleFee === null ? null : { minResourceFeeStroops: preambleFee },
     latestLedger,

@@ -53,7 +53,6 @@ export type ContractExecutableKind = z.infer<typeof ContractExecutableKind>;
 export const RentEstimate = z.object({
   minResourceFeeStroops: count,
   estimatedXlm: z.number().nonnegative(),
-  unsignedXdr: z.string().min(1),
   footprint: Footprint,
   restorePreamble: z.object({ minResourceFeeStroops: count }).nullable(),
   latestLedger: count,
