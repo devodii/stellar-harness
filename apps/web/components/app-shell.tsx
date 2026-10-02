@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { AppSidebar } from '@/components/app-sidebar';
 import { LiveHeaderStrip } from '@/components/live-header-strip';
+import { NetworkTag } from '@/components/network-tag';
 import { TopBar } from '@/components/top-bar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
@@ -21,7 +22,7 @@ export function AppShell({ children, sidebar, strip }: AppShellProps) {
         </React.Suspense>
       )}
       <SidebarInset className="min-h-0 min-w-0">
-        <TopBar strip={strip ?? <LiveHeaderStrip />} />
+        <TopBar strip={strip ?? <LiveHeaderStrip />} badge={<NetworkTag />} />
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</div>
       </SidebarInset>
     </SidebarProvider>
