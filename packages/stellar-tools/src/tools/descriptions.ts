@@ -15,6 +15,8 @@ export const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
     'Query scanner findings by type, severity, subject or tags. Returns matching rows and the total.',
   getSummary:
     'Read the latest scan summary: contracts, failures, anchors, rent and GitHub numbers with the snapshot they were measured at.',
+  getNetworkStatus:
+    'Read the live network state now: latest ledger, its close time, protocol version, how many ledgers RPC keeps, and whether Horizon answers. Use this for any question about the current or latest ledger; the scan summary is a past snapshot.',
   searchEcosystem:
     'Search Stellar ecosystem projects and repositories (stellarlight.xyz, mainnet only). In the product, Raven (the SDF MCP server) is the fuller knowledge gateway and would be wired here.',
   simulateExtendTtl:
