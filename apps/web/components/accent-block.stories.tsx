@@ -18,8 +18,8 @@ export const Primary: Story = {};
 export const Warning: Story = {
   args: {
     tone: 'warning',
-    label: 'policy',
-    aside: <code className="font-mono text-xs">spend.xlm &lt;= 5</code>,
+    label: 'expiring',
+    aside: <code className="font-mono text-xs">ttl &lt;= 30d</code>,
   },
 };
 
