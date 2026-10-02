@@ -1,12 +1,19 @@
 import { PREVENTABLE_CODES } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
+import horizon from '../decode/horizon-codes.json';
 import { CodeInfo } from './code-info';
 import { isResultCode, lookupCode, OP_RESULT_CODES, RESULT_CODES, TX_RESULT_CODES } from './codes';
 
 describe('result code table', () => {
-  it('names every code in horizon snake case with the right prefix', () => {
+  it('names every code in horizon snake case', () => {
     for (const code of TX_RESULT_CODES) expect(code).toMatch(/^tx_[a-z_]+$/);
-    for (const code of OP_RESULT_CODES) expect(code).toMatch(/^op_[a-z_]+$/);
+    for (const code of OP_RESULT_CODES) expect(code).toMatch(/^[a-z]+(_[a-z]+)+$/);
+  });
+
+  it('explains every code horizon can emit', () => {
+    const emitted = new Set(Object.values(horizon.codes).flatMap((codes) => Object.values(codes)));
+    const missing = [...emitted].filter((code) => !(code in RESULT_CODES));
+    expect(missing).toEqual([]);
   });
 
   it('validates every entry', () => {
@@ -36,10 +43,10 @@ describe('result code table', () => {
       'op_has_sub_entries',
       'op_already_sponsored',
       'op_not_sponsored',
-      'op_trapped',
-      'op_resource_limit_exceeded',
-      'op_entry_archived',
-      'op_insufficient_refundable_fee',
+      'function_trapped',
+      'resource_limit_exceeded',
+      'entry_archived',
+      'insufficient_refundable_fee',
     ]) {
       expect(isResultCode(code)).toBe(true);
     }
