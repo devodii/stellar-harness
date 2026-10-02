@@ -5,6 +5,7 @@ import { Message, MessageContent, MessageResponse } from '@/components/ai-elemen
 import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ai-elements/reasoning';
 import { Source, Sources, SourcesContent, SourcesTrigger } from '@/components/ai-elements/sources';
 import { BracketTag } from '@/components/bracket-tag';
+import { ContextChip } from '@/components/context-chip';
 import { ToolCall } from '@/components/tool-call';
 import type { HarnessPart, HarnessUIMessage } from '@/lib/chat';
 
@@ -33,6 +34,7 @@ function MessagePart({
       </Reasoning>
     );
   }
+  if (part.type === 'data-context') return <ContextChip context={part.data} />;
   if (part.type === 'data-plan-approval') {
     return (
       <BracketTag
