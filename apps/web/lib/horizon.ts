@@ -11,7 +11,7 @@ const LedgersPage = z.object({
 
 export interface LatestLedger {
   sequence: number;
-  closedAt: string;
+  closedAt: string | null;
 }
 
 export const fetchLatestLedger = async (horizonUrl: string): Promise<LatestLedger> => {
