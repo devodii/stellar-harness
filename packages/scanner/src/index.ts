@@ -1,3 +1,4 @@
+export { DEFAULT_NETWORK, NETWORKS, type Network } from '@harness/schema';
 export * from './core/derived';
 export * from './core/findings';
 export * from './core/runner';
