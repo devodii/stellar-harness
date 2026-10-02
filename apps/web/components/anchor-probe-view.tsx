@@ -5,7 +5,7 @@ import { Address } from '@/components/address';
 import { BracketTag } from '@/components/bracket-tag';
 import { DataTable } from '@/components/data-table';
 import { KeyValueList } from '@/components/key-value-list';
-import { ResultCard } from '@/components/result-card';
+import { ResultSection } from '@/components/result-section';
 import { SeverityTag } from '@/components/severity-tag';
 import { StatLabel } from '@/components/stat';
 import { formatInt } from '@/lib/format';
@@ -68,7 +68,7 @@ export function AnchorProbeView({ probe }: { probe: AnchorProbeData }) {
     : [];
 
   return (
-    <ResultCard
+    <ResultSection
       title={probe.domain}
       aside={
         failed ? (
@@ -143,6 +143,6 @@ export function AnchorProbeView({ probe }: { probe: AnchorProbeData }) {
           </ul>
         </div>
       )}
-    </ResultCard>
+    </ResultSection>
   );
 }

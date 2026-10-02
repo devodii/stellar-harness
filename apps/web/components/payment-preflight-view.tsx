@@ -3,7 +3,7 @@
 import { cn } from 'cn';
 import { BracketTag } from '@/components/bracket-tag';
 import { PlanView, type PlanViewProps } from '@/components/plan-view';
-import { ResultCard } from '@/components/result-card';
+import { ResultSection } from '@/components/result-section';
 import { StatLabel } from '@/components/stat';
 import { TONE_TEXT } from '@/lib/tone';
 import type { PaymentPreflightView as PaymentPreflightData } from '@/lib/tool-views';
@@ -15,7 +15,7 @@ export interface PaymentPreflightViewProps extends Omit<PlanViewProps, 'plan' | 
 export function PaymentPreflightView({ preflight, ...planProps }: PaymentPreflightViewProps) {
   return (
     <div className="space-y-3">
-      <ResultCard
+      <ResultSection
         title="payment preflight"
         aside={
           preflight.ok ? (
@@ -61,7 +61,7 @@ export function PaymentPreflightView({ preflight, ...planProps }: PaymentPreflig
             </ul>
           </div>
         )}
-      </ResultCard>
+      </ResultSection>
       {preflight.alternative && <PlanView plan={preflight.alternative} {...planProps} />}
     </div>
   );
