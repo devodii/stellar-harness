@@ -58,7 +58,7 @@ export function ToolCall({ part }: { part: ToolCallPart }) {
         type={part.type}
         state={part.state}
         title={toolCallTitle(part)}
-        className="gap-2 px-0 py-1 font-mono text-muted-foreground [&_[data-slot=badge]]:bg-transparent [&_[data-slot=badge]]:px-0 [&_span]:font-mono [&_span]:text-xs"
+        className="gap-2 px-0 py-1 text-left font-mono text-muted-foreground [&>div]:min-w-0 [&>div>span:not([data-slot=badge])]:min-w-0 [&>div>span:not([data-slot=badge])]:truncate [&_[data-slot=badge]]:shrink-0 [&_[data-slot=badge]]:bg-transparent [&_[data-slot=badge]]:px-0 [&_span]:font-mono [&_span]:text-xs [&_svg]:shrink-0"
       />
       <ToolContent className="space-y-0 border-none p-0 pt-1">
         <ToolCallBody part={part} />
