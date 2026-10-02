@@ -112,3 +112,8 @@ Every call made without explicit direction is tagged `@decision` so it can be re
 - `@decision` Each census command writes its CSV exports, a 20-row preview and a run record (wall time, requests, network calls, cache hits, gaps, methodology) under `data/derived`; `harness-scan report` builds `summary.json` and `REPORT.md` from those files alone.
 - `@decision` DNS failures are retried for the configured infrastructure hosts (Horizon, RPC, stellar.expert, stellarlight) and fail fast for anchor domains. A local network outage during the first full run turned every request into `ENOTFOUND`; without this, a transient outage reads as hundreds of unreachable anchors.
 - `@decision` The rent census reads contract rows from the contracts census output, so `rent` requires `contracts` to have run on the same snapshot; `all` orders them that way.
+
+## Deploy
+
+- `@decision` Scan output stays out of git, including `data/public/`. A Vercel deploy is made with the Vercel CLI from a checkout where `pnpm refresh:public` has run: `.vercelignore` keeps raw scan output out of the upload while `data/public/` (summary plus findings trimmed under 5 MB, most severe first) is uploaded and traced into the functions. Set `HARNESS_DATA_DIR=../../data/public` on the Vercel project, whose root directory is `apps/web`.
+- `@decision` The web app resolves `HARNESS_DATA_DIR` from its own working directory and defaults to `../../data` (the repository's `data/`); Docker sets `/app/data`.
