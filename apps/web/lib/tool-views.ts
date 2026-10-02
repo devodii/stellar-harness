@@ -4,6 +4,7 @@ import {
   ExplainFailureOutput,
   GetAccountOutput,
   GetContractTtlOutput,
+  GetNetworkStatusOutput,
   GetTransactionOutput,
   ProbeAnchorOutput,
   ProbeStage,
@@ -45,6 +46,8 @@ export const ExtendTtlView = SimulateExtendTtlOutput;
 export type ExtendTtlView = z.infer<typeof ExtendTtlView>;
 export const RestoreView = SimulateRestoreOutput;
 export type RestoreView = z.infer<typeof RestoreView>;
+export const NetworkStatusView = GetNetworkStatusOutput;
+export type NetworkStatusView = z.infer<typeof NetworkStatusView>;
 export const PaymentPreflightView = BuildPaymentPreflightOutput;
 export type PaymentPreflightView = z.infer<typeof PaymentPreflightView>;
 
