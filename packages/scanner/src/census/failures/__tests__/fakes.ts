@@ -1,4 +1,4 @@
-import { appError, err } from '@harness/schema';
+import { appError, err, ok } from '@harness/schema';
 import type { RpcPort, RpcTransaction, Runner } from '../ports';
 
 export const sequentialRunner: Runner = async (tasks, worker) => {
@@ -22,6 +22,49 @@ export const fakeRpc = (overrides: Partial<RpcPort>): RpcPort => ({
   simulateTransaction: unimplemented,
   getTransactions: unimplemented,
   ...overrides,
+});
+
+export type PagedRpcCall = { startLedger?: number; cursor?: string; limit?: number };
+
+export const pagedRpc = (
+  transactions: RpcTransaction[],
+  bounds: { oldestLedger: number; latestLedger: number },
+) => {
+  const calls: PagedRpcCall[] = [];
+  const rpc = fakeRpc({
+    getTransactions: async (params) => {
+      calls.push(params);
+      const limit = params.limit ?? 200;
+      const from =
+        params.cursor !== undefined
+          ? Number(params.cursor)
+          : transactions.findIndex((tx) => tx.ledger >= (params.startLedger ?? 0));
+      const start = from === -1 ? transactions.length : from;
+      const page = transactions.slice(start, start + limit);
+      return ok({
+        transactions: page,
+        cursor: String(start + page.length),
+        oldestLedger: bounds.oldestLedger,
+        latestLedger: bounds.latestLedger,
+      });
+    },
+  });
+  return { rpc, calls };
+};
+
+export const syntheticTx = (
+  ledger: number,
+  order: number,
+  status: RpcTransaction['status'] = 'SUCCESS',
+): RpcTransaction => ({
+  txHash: `${ledger}-${order}`,
+  ledger,
+  status,
+  applicationOrder: order,
+  feeBump: false,
+  envelopeXdr: `env-${ledger}-${order}`,
+  resultXdr: `res-${ledger}-${order}`,
+  createdAt: ledger * 5,
 });
 
 type FixtureTransaction = Omit<RpcTransaction, 'status'> & { status: string };
