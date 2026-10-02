@@ -32,10 +32,11 @@ export interface TimelineProps<T> {
 const SKELETON_KEYS = ['one', 'two', 'three', 'four', 'five', 'six'];
 
 const DOT_CLASS: Record<TimelineTone, string> = {
-  done: 'bg-primary',
+  done: 'bg-primary dark:bg-[color:oklch(from_var(--primary)_calc(l_+_0.25)_c_h)]',
   pending: 'border border-muted-foreground/50 bg-background',
   blocked: 'bg-warning',
-  failed: 'bg-destructive',
+  failed:
+    'bg-destructive dark:bg-[color:oklch(from_var(--destructive)_calc(l_+_0.32)_calc(c_*_1.6)_h)]',
   muted: 'bg-muted-foreground/40',
 };
 
