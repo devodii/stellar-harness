@@ -35,6 +35,26 @@ describe('summary metrics', () => {
     expect(metrics.windowDays).toBe(7);
   });
 
+  it('separates archived contracts that matter from the raw total', () => {
+    const base = emptySummary(snapshot);
+    const summary = {
+      ...base,
+      contracts: {
+        ...base.contracts,
+        archivedInstances: 65_140,
+        archivedMeaningful: 240,
+        expiring30d: 900,
+        expiring30dMeaningful: 12,
+      },
+    };
+    expect(summaryMetrics(summary)).toMatchObject({
+      archivedContracts: 65_140,
+      archivedMeaningful: 240,
+      expiring30d: 900,
+      expiring30dMeaningful: 12,
+    });
+  });
+
   it('ranks codes by count', () => {
     expect(topCodes({ a: 1, b: 3, c: 2 }, 2)).toEqual([
       ['b', 3],
