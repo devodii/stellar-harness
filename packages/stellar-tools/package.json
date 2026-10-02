@@ -14,5 +14,8 @@
     "@harness/schema": "workspace:*",
     "@stellar/stellar-sdk": "17.2.1",
     "smol-toml": "1.9.0"
+  },
+  "devDependencies": {
+    "vitest": "5.0.3"
   }
 }

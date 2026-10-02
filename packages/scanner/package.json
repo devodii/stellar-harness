@@ -16,5 +16,8 @@
     "@stellar/stellar-sdk": "17.2.1",
     "smol-toml": "1.9.0",
     "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "vitest": "5.0.3"
   }
 }
