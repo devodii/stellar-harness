@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Footprint } from '../tools/schemas/simulate';
 
 export const ContractId = z
   .string()
@@ -49,35 +50,6 @@ export type ExpertContract = z.infer<typeof ExpertContract>;
 export const ContractExecutableKind = z.enum(['wasm', 'stellar_asset', 'external', 'unknown']);
 export type ContractExecutableKind = z.infer<typeof ContractExecutableKind>;
 
-export const GetContractTtlInput = z.object({ contractId: ContractId });
-export type GetContractTtlInput = z.infer<typeof GetContractTtlInput>;
-
-export const TtlEntry = z.object({
-  present: z.boolean(),
-  liveUntilLedgerSeq: count.nullable(),
-  ledgersLeft: z.number().int().nullable(),
-  daysLeft: z.number().nullable(),
-  archived: z.boolean(),
-});
-export type TtlEntry = z.infer<typeof TtlEntry>;
-
-export const GetContractTtlOutput = z.object({
-  contractId: ContractId,
-  wasmHash: WasmHash.nullable(),
-  instance: TtlEntry,
-  code: TtlEntry,
-  invocations: count.nullable(),
-  snapshotLedger: count,
-  ledgerCloseSeconds: z.number().positive(),
-});
-export type GetContractTtlOutput = z.infer<typeof GetContractTtlOutput>;
-
-export const Footprint = z.object({
-  readOnly: z.array(z.string()),
-  readWrite: z.array(z.string()),
-});
-export type Footprint = z.infer<typeof Footprint>;
-
 export const RentEstimate = z.object({
   minResourceFeeStroops: count,
   estimatedXlm: z.number().nonnegative(),
@@ -88,38 +60,15 @@ export const RentEstimate = z.object({
 });
 export type RentEstimate = z.infer<typeof RentEstimate>;
 
-export const MAX_EXTEND_DAYS = 730;
-
-export const SimulateExtendTtlInput = z.object({
-  contractId: ContractId,
-  days: z.number().int().positive().max(MAX_EXTEND_DAYS).default(365),
-});
-export type SimulateExtendTtlInput = z.infer<typeof SimulateExtendTtlInput>;
-
-export const RestoreEntries = z.enum(['instance', 'code', 'both']);
-export type RestoreEntries = z.infer<typeof RestoreEntries>;
-
-export const SimulateRestoreInput = z.object({
-  contractId: ContractId,
-  entries: RestoreEntries.default('both'),
-});
-export type SimulateRestoreInput = z.infer<typeof SimulateRestoreInput>;
-
-const SimulationResult = z.object({
-  contractId: ContractId,
-  minResourceFeeStroops: count,
-  estimatedXlm: z.number().nonnegative(),
-  unsignedXdr: z.string().min(1),
-  footprint: Footprint,
-});
-
-export const SimulateExtendTtlOutput = SimulationResult.extend({
-  days: z.number().int().positive(),
-  extendToLedgers: z.number().int().positive(),
-});
-export type SimulateExtendTtlOutput = z.infer<typeof SimulateExtendTtlOutput>;
-
-export const SimulateRestoreOutput = SimulationResult.extend({
-  entries: RestoreEntries,
-});
-export type SimulateRestoreOutput = z.infer<typeof SimulateRestoreOutput>;
+export {
+  Footprint,
+  GetContractTtlInput,
+  GetContractTtlOutput,
+  MAX_EXTEND_DAYS,
+  RestoreEntries,
+  SimulateExtendTtlInput,
+  SimulateExtendTtlOutput,
+  SimulateRestoreInput,
+  SimulateRestoreOutput,
+  TtlEntry,
+} from '../tools/schemas';
