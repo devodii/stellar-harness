@@ -4,8 +4,8 @@ import { CopyButton } from '@/components/copy-button';
 import { KeyValueList } from '@/components/key-value-list';
 import { ResultCard } from '@/components/result-card';
 import { Stat, StatLabel } from '@/components/stat';
+import { useExplorer } from '@/hooks/use-explorer';
 import { formatInt, formatXlm } from '@/lib/format';
-import { explorerUrl } from '@/lib/links';
 import type { ExtendTtlView, RestoreView } from '@/lib/tool-views';
 
 export type SimulationCostData = ExtendTtlView | RestoreView;
@@ -19,6 +19,7 @@ export interface SimulationCostViewProps {
 }
 
 export function SimulationCostView({ simulation, xlmUsd }: SimulationCostViewProps) {
+  const { explorerUrl } = useExplorer();
   const extend = isExtend(simulation);
   return (
     <ResultCard

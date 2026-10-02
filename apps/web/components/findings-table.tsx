@@ -9,11 +9,12 @@ import { BracketTag } from '@/components/bracket-tag';
 import { DataTable, type DataTablePagination } from '@/components/data-table';
 import { EmptyState } from '@/components/empty-state';
 import { SeverityTag } from '@/components/severity-tag';
-import { subjectHref } from '@/lib/links';
+import { useExplorer } from '@/hooks/use-explorer';
 
 const MAX_TAGS = 3;
 
 export function FindingSubject({ finding }: { finding: Finding }) {
+  const { subjectHref } = useExplorer();
   const href = subjectHref(finding.subjectKind, finding.subject);
   if (finding.subjectKind === 'account' || finding.subjectKind === 'contract') {
     return <Address value={finding.subject} href={href} />;

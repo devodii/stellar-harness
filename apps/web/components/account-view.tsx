@@ -3,8 +3,8 @@ import { BracketTag } from '@/components/bracket-tag';
 import { KeyValueList } from '@/components/key-value-list';
 import { ResultCard } from '@/components/result-card';
 import { StatLabel } from '@/components/stat';
+import { useExplorer } from '@/hooks/use-explorer';
 import { formatDecimal } from '@/lib/format';
-import { explorerUrl } from '@/lib/links';
 import type { AccountView as AccountViewData } from '@/lib/tool-views';
 
 const assetLabel = (asset: string) => {
@@ -20,6 +20,7 @@ const FLAG_LABELS: Record<keyof AccountViewData['flags'], string> = {
 };
 
 export function AccountView({ account }: { account: AccountViewData }) {
+  const { explorerUrl } = useExplorer();
   const flags = Object.entries(account.flags)
     .filter(([, on]) => on)
     .map(([flag]) => FLAG_LABELS[flag as keyof AccountViewData['flags']]);

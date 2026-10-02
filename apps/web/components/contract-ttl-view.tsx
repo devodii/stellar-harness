@@ -3,8 +3,8 @@ import { BracketTag } from '@/components/bracket-tag';
 import { KeyValueList } from '@/components/key-value-list';
 import { ResultCard } from '@/components/result-card';
 import { Stat } from '@/components/stat';
+import { useExplorer } from '@/hooks/use-explorer';
 import { formatDays, formatInt, formatSeconds } from '@/lib/format';
-import { explorerUrl } from '@/lib/links';
 import type { Tone } from '@/lib/tone';
 import type { ContractTtlView as ContractTtlData, TtlEntryView } from '@/lib/tool-views';
 
@@ -52,6 +52,7 @@ function TtlEntry({ label, entry }: { label: string; entry: TtlEntryView }) {
 }
 
 export function ContractTtlView({ ttl }: { ttl: ContractTtlData }) {
+  const { explorerUrl } = useExplorer();
   return (
     <ResultCard
       title={<Address value={ttl.contractId} href={explorerUrl('contract', ttl.contractId)} />}
