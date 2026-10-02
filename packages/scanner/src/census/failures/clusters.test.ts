@@ -139,6 +139,42 @@ describe('cluster evidence', () => {
     });
   });
 
+  it('reports the most frequent failing payment target for plan recipes', () => {
+    const usdc = 'USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN';
+    const rows = [
+      ...repeat(7, (i) =>
+        failedRow({
+          sourceAccount: ACCOUNT,
+          ledger: i + 1,
+          codes: ['tx_failed', 'op_no_trust'],
+          payment: { destination: 'GDEST1', asset: usdc, amount: '25.0000000' },
+        }),
+      ),
+      ...repeat(3, (i) =>
+        failedRow({
+          sourceAccount: ACCOUNT,
+          ledger: i + 20,
+          codes: ['tx_failed', 'op_no_trust'],
+          payment: { destination: 'GDEST2', asset: usdc, amount: '1.0000000' },
+        }),
+      ),
+    ];
+    const acc = new ClusterAccumulator();
+    acc.add(rows);
+    expect(acc.clusters()[0]?.evidence).toMatchObject({
+      topDestination: 'GDEST1',
+      topDestinationCount: 7,
+      asset: usdc,
+      sampleAmount: '25.0000000',
+    });
+  });
+
+  it('omits payment target evidence when rows carry no payment', () => {
+    const acc = new ClusterAccumulator();
+    acc.add(repeat(10, (i) => failedRow({ sourceAccount: ACCOUNT, ledger: i + 1 })));
+    expect(acc.clusters()[0]?.evidence).not.toHaveProperty('topDestination');
+  });
+
   it('tracks per-account operation mix for classification', () => {
     const acc = new ClusterAccumulator();
     acc.add([
