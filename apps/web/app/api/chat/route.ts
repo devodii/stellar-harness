@@ -2,7 +2,7 @@ import { createAnthropic } from '@ai-sdk/anthropic';
 import { appError } from '@harness/schema';
 import { convertToModelMessages, safeValidateUIMessages, stepCountIs, streamText } from 'ai';
 import { z } from 'zod';
-import { getAgentTools, systemPrompt } from '@/lib/agent';
+import { getAgentTools, systemPromptFor } from '@/lib/agent';
 import { apiHandler } from '@/lib/api-handler';
 import {
   dataPartSchemas,
@@ -12,6 +12,7 @@ import {
 } from '@/lib/chat';
 import { getChatEnv } from '@/lib/env';
 import { logger } from '@/lib/log';
+import { getRequestNetwork } from '@/lib/network';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -39,6 +40,8 @@ export const POST = apiHandler({
   rateLimit: { limit: 30, windowSeconds: 60 },
   handler: async ({ body, requestId }) => {
     const env = loadChatEnv();
+    const network = await getRequestNetwork();
+    logger.info({ requestId, network }, 'chat request');
 
     const validated = await safeValidateUIMessages<HarnessUIMessage>({
       messages: body.messages,
@@ -52,11 +55,11 @@ export const POST = apiHandler({
       logger.info({ requestId, decisions }, 'plan approval received');
     }
 
-    const tools = getAgentTools();
+    const tools = getAgentTools(network);
     const anthropic = createAnthropic({ apiKey: env.ANTHROPIC_API_KEY });
     const result = streamText({
       model: anthropic(env.AI_MODEL),
-      instructions: systemPrompt,
+      instructions: systemPromptFor(network),
       messages: await convertToModelMessages<HarnessUIMessage>(messages, {
         tools,
         convertDataPart: dataPartToModelText,
