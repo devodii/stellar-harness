@@ -80,6 +80,17 @@ describe('evaluatePreflight', () => {
     expect(codes(evaluation)).toEqual(['tx_insufficient_balance']);
   });
 
+  it('reports only op_no_destination for a credit payment to a missing destination', () => {
+    const evaluation = run(fundedHolder, null, USDC, '5');
+    expect(codes(evaluation)).toEqual(['op_no_destination']);
+    expect(evaluation.checks.filter((c) => !c.ok).map((c) => c.name)).toEqual([
+      'destination_exists',
+      'destination_trustline',
+      'destination_authorized',
+      'destination_limit',
+    ]);
+  });
+
   it('blocks a missing destination', () => {
     const evaluation = run(fundedHolder, null, 'XLM', '5');
     expect(codes(evaluation)).toEqual(['op_no_destination']);
