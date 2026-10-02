@@ -29,7 +29,7 @@ apps/web                Next.js chat demo
 
 ## Requirements
 
-Node 22, pnpm 10. Copy `.env.example` to `.env`; only `ANTHROPIC_API_KEY` is needed for the web agent and `GITHUB_TOKEN` for Census 5.
+Node 22, pnpm 10. Copy `.env.example` to `.env` at the repository root; both the scanner and the web app read it. `OPENAI_API_KEY` is the only required value (chat); `DATABASE_URL` switches storage from `data/` files to Postgres; `GITHUB_TOKEN` enables Census 5. Endpoint URLs (`HORIZON_URL`, `RPC_URL`, `STELLAR_EXPERT_URL`, `STELLARLIGHT_URL`, plus `TESTNET_` variants), `HARNESS_DATA_DIR`, `POLICY_SPEND_CAP_XLM`, `FAILURE_WINDOW` and `CONCURRENCY_*` have defaults and are optional overrides.
 
 ```bash
 pnpm install
@@ -71,7 +71,7 @@ docker compose run --rm scanner pnpm scan anchors --limit 20
 ## Running the web demo
 
 ```bash
-echo "ANTHROPIC_API_KEY=..." > apps/web/.env.local
+echo "OPENAI_API_KEY=..." >> .env
 pnpm dev                      # http://localhost:3000
 pnpm --filter web storybook   # component catalogue
 ```
@@ -90,7 +90,7 @@ The landing page is the chat. It renders without a scan; scan-derived numbers sh
 
 ## Deploying
 
-The Vercel project's root directory is `apps/web`. Run `pnpm refresh:public` to copy the latest summary and trimmed findings into `data/public/`, set `HARNESS_DATA_DIR=../../data/public` and `ANTHROPIC_API_KEY` on the project, then deploy with `vercel deploy` from the repository root. Scan data is never committed.
+The Vercel project's root directory is `apps/web`. Run `pnpm refresh:public` to copy the latest summary and trimmed findings into `data/public/`, set `HARNESS_DATA_DIR=../../data/public` and `OPENAI_API_KEY` on the project, then deploy with `vercel deploy` from the repository root. Scan data is never committed.
 
 ## Swapping storage
 

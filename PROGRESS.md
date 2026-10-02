@@ -12,12 +12,12 @@ Resume here: read this file and `DECISIONS.md` first.
 | M3 Census 1 contracts, Census 4 rent | Done. Full enumeration and TTL reads. |
 | M4 GitHub, report, CLI | Done. GitHub census is implemented and skipped until `GITHUB_TOKEN` is set. |
 | M5 tools and agent | Done. All 12 tools exposed to the agent; `planFix` produces a valid plan for every finding type. |
-| M6 web app | Done. Builds clean; renders without scan data; chat needs `ANTHROPIC_API_KEY`. The approve and decline round trip has not been exercised against a real model yet. |
+| M6 web app | Done. Builds clean; renders without scan data; chat needs `OPENAI_API_KEY`. The approve and decline round trip has not been exercised against a real model yet. |
 | M7 polish | Done: README, DEMO.md, Vercel config, `pnpm refresh:public`. |
 
 ## Next steps
 
-1. Set `ANTHROPIC_API_KEY` in `apps/web/.env.local`, run `pnpm dev`, and click through the six suggestions; adjust the system prompt if any workflow stops early.
+1. Set `OPENAI_API_KEY` in the root `.env`, run `pnpm dev`, and click through the six suggestions; adjust the system prompt if any workflow stops early.
 2. Set `GITHUB_TOKEN` and run `pnpm scan github && pnpm scan report` to fill Census 5.
 3. Optionally run `pnpm scan failures --window 7d` (about 120,000 RPC calls, five to six hours on the public endpoint) for the full window.
 
