@@ -18,7 +18,7 @@ export const GITHUB_NETWORK_SKIP =
 
 const skipGithub = async (ctx: ScanContext, reason: string) => {
   ctx.log(`[github] ${reason}; census 5 skipped`);
-  await writeCensusRecord(ctx.options.dataDir, {
+  await writeCensusRecord(ctx.persistence, {
     run: {
       census: 'github',
       wallMs: 0,
@@ -70,8 +70,8 @@ export const githubCommand = async (ctx: ScanContext) => {
     });
   });
 
-  await writeExport(options.dataDir, 'github_issues', rows, GITHUB_CSV_COLUMNS);
-  await writeCensusRecord(options.dataDir, {
+  await writeExport(ctx.persistence, 'github_issues', rows, GITHUB_CSV_COLUMNS);
+  await writeCensusRecord(ctx.persistence, {
     run,
     summary: summarizeGithub(rows),
     stats,

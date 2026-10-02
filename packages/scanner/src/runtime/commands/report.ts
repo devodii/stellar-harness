@@ -39,7 +39,7 @@ const summaryOf = <S extends z.ZodType>(
 };
 
 export const buildSummary = async (ctx: ScanContext): Promise<Summary> => {
-  const records = await readCensusRecords(ctx.options.dataDir);
+  const records = await readCensusRecords(ctx.persistence);
   const empty = emptySummary(ctx.snapshot);
   const { rows } = await ctx.sink.storage.queryFindings({ limit: 1, offset: 0 });
   const findingsCount: Summary['findingsCount'] = {};
@@ -69,10 +69,10 @@ const byOrder =
 export const reportCommand = async (ctx: ScanContext, reportPath: string) => {
   const summary = await buildSummary(ctx);
   await ctx.sink.storage.putSummary(summary);
-  const records = (await readCensusRecords(ctx.options.dataDir)).sort(
+  const records = (await readCensusRecords(ctx.persistence)).sort(
     byOrder(RUN_ORDER)((record) => record.run.census),
   );
-  const exports = (await readPreviews(ctx.options.dataDir)).sort(
+  const exports = (await readPreviews(ctx.persistence)).sort(
     byOrder(EXPORT_ORDER)((preview) => preview.name),
   );
   await writeFile(

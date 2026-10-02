@@ -1,5 +1,3 @@
-import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
 import { createPortDecoders } from '@harness/stellar-tools';
 import { ANCHOR_DOMAINS_FILE } from '../../census/anchors/census';
 import { runFailuresCensus } from '../../census/failures/census';
@@ -12,25 +10,29 @@ import {
 import { FailuresCheckpoint } from '../../census/failures/progress';
 import { writeCensusRecord, writeExport } from '../artifacts';
 import type { ScanContext } from '../context';
+import type { ScanPersistence } from '../persistence';
 import { measure } from './measure';
 
 const CENSUS = 'failures';
 
-const readAnchorDomains = async (dataDir: string): Promise<Set<string>> => {
-  try {
-    const domains = JSON.parse(
-      await readFile(join(dataDir, 'derived', ANCHOR_DOMAINS_FILE), 'utf8'),
-    ) as { domain: string }[];
-    return new Set(domains.map((entry) => entry.domain));
-  } catch {
-    return new Set();
-  }
+const readAnchorDomains = async (persistence: ScanPersistence): Promise<Set<string>> => {
+  const domains = await persistence.getArtifact(
+    'derived',
+    ANCHOR_DOMAINS_FILE.replace(/\.json$/, ''),
+  );
+  return new Set(
+    Array.isArray(domains)
+      ? domains.flatMap((entry) =>
+          entry && typeof entry === 'object' && 'domain' in entry ? [String(entry.domain)] : [],
+        )
+      : [],
+  );
 };
 
 export const failuresCommand = async (ctx: ScanContext) => {
   const { config, ports, snapshot, options } = ctx;
   const saved = FailuresCheckpoint.safeParse(await ctx.readCheckpoint(CENSUS));
-  const anchorDomains = await readAnchorDomains(options.dataDir);
+  const anchorDomains = await readAnchorDomains(ctx.persistence);
   const window = options.windowSeconds ?? options.env?.FAILURE_WINDOW ?? process.env.FAILURE_WINDOW;
 
   const { value: result, run } = await measure(ctx, CENSUS, () =>
@@ -64,18 +66,18 @@ export const failuresCommand = async (ctx: ScanContext) => {
 
   const { summary, findings, stats, gaps } = result.value;
   await writeExport(
-    options.dataDir,
+    ctx.persistence,
     'failed_tx_by_code',
     failedTxByCodeRows(summary.byCode, summary.txFailed),
     FAILED_TX_BY_CODE_COLUMNS,
   );
   await writeExport(
-    options.dataDir,
+    ctx.persistence,
     'failure_clusters',
     failureClusterRows(findings),
     FAILURE_CLUSTERS_COLUMNS,
   );
-  await writeCensusRecord(options.dataDir, {
+  await writeCensusRecord(ctx.persistence, {
     run,
     summary,
     stats: {

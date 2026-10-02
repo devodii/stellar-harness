@@ -34,25 +34,25 @@ export const contractsCommand = async (ctx: ScanContext) => {
   );
 
   await writeExport(
-    options.dataDir,
+    ctx.persistence,
     exportName(CONTRACT_EXPORT_FILES.archived),
     result.exports.archived,
     CONTRACT_EXPORT_COLUMNS,
   );
   await writeExport(
-    options.dataDir,
+    ctx.persistence,
     exportName(CONTRACT_EXPORT_FILES.expiring30d),
     result.exports.expiring30d,
     CONTRACT_EXPORT_COLUMNS,
   );
   await writeExport(
-    options.dataDir,
+    ctx.persistence,
     exportName(CONTRACT_EXPORT_FILES.scfFunded),
     result.exports.scfFunded,
     SCF_EXPORT_COLUMNS,
   );
 
-  await writeCensusRecord(options.dataDir, {
+  await writeCensusRecord(ctx.persistence, {
     run,
     summary: result.summary,
     stats: {

@@ -14,7 +14,7 @@ const readContractRows = async (ctx: ScanContext): Promise<ContractRow[]> => {
 };
 
 export const rentCommand = async (ctx: ScanContext) => {
-  const { config, ports, snapshot, options } = ctx;
+  const { config, ports, snapshot } = ctx;
   const contracts = await readContractRows(ctx);
   if (contracts.length === 0) {
     ctx.log('[rent] no contract rows found; run the contracts census first');
@@ -37,8 +37,8 @@ export const rentCommand = async (ctx: ScanContext) => {
     ),
   );
 
-  await writeExport(options.dataDir, 'rent_top100', result.top, RENT_TOP_COLUMNS);
-  await writeCensusRecord(options.dataDir, {
+  await writeExport(ctx.persistence, 'rent_top100', result.top, RENT_TOP_COLUMNS);
+  await writeCensusRecord(ctx.persistence, {
     run,
     summary: result.summary,
     stats: {
