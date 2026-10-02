@@ -88,3 +88,19 @@ export const DEMO_EXECUTABLE_KINDS: ReadonlySet<PlanStepKind> = new Set(['read',
 
 export const demoExecutableSteps = (plan: Plan): PlanStep[] =>
   plan.steps.filter((step) => DEMO_EXECUTABLE_KINDS.has(step.kind));
+
+export const PasskeyAuthEntrySignature = z.object({
+  credentialId: z.string().min(1),
+  authenticatorData: z.string().min(1),
+  clientDataJson: z.string().min(1),
+  signature: z.string().min(1),
+});
+export type PasskeyAuthEntrySignature = z.infer<typeof PasskeyAuthEntrySignature>;
+
+export interface PlanApprovalHooks {
+  onApprove(planId: string, signature?: PasskeyAuthEntrySignature): Promise<void> | void;
+  onDecline?(planId: string): Promise<void> | void;
+}
+
+export const APPROVAL_NOTE =
+  "demo: approvals are a UI gesture; in the product this is a passkey signature on an auth entry against the organisation's smart account policy. nothing is signed or broadcast here.";
