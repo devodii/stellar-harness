@@ -1,7 +1,8 @@
 import { appError, err, ok, type Result } from '@harness/schema';
+import type { DecodedResultCodes, EnvelopeSummary } from '@harness/stellar-tools';
 import { readFeeCharged } from '@harness/stellar-tools';
 import type { DecodeEnvelopeSummary, DecodeResultCodes, RpcTransaction } from './ports';
-import type { FailedTx } from './rows';
+import type { FailedPayment, FailedTx } from './rows';
 
 export type Decoders = {
   decodeResultCodes: DecodeResultCodes;
@@ -9,6 +10,20 @@ export type Decoders = {
 };
 
 export type ExtractError = { hash: string; ledger: number; message: string };
+
+const SUCCESS_OP = 'op_success';
+
+export const failingPayment = (
+  codes: DecodedResultCodes,
+  envelope: EnvelopeSummary,
+): FailedPayment | undefined => {
+  const operations = envelope.operations ?? [];
+  const failingIndex = codes.ops.findIndex((code) => code !== SUCCESS_OP);
+  const target =
+    failingIndex >= 0 ? operations[failingIndex] : operations.find((op) => op.destination);
+  if (!target?.destination) return undefined;
+  return { destination: target.destination, asset: target.asset, amount: target.amount };
+};
 
 export const extractFailedTx = (tx: RpcTransaction, decoders: Decoders): Result<FailedTx> => {
   try {
@@ -25,6 +40,7 @@ export const extractFailedTx = (tx: RpcTransaction, decoders: Decoders): Result<
       feeBump: codes.feeBump || envelope.feeBump || tx.feeBump,
       memoType: envelope.memoType,
       opTypes: envelope.opTypes,
+      payment: failingPayment(codes, envelope),
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
