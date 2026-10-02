@@ -90,7 +90,7 @@ describe('simulateFootprint', () => {
       restorePreamble: null,
       latestLedger: 64_722_853,
     });
-    expect(result.value).not.toHaveProperty('unsignedXdr');
+    expect(Object.keys(result.value).filter((key) => /xdr/i.test(key))).toEqual([]);
     expect(rpc.calls.simulate).toHaveLength(1);
   });
 
