@@ -2,13 +2,8 @@ import { z } from 'zod';
 import { toFinding } from '../anchors/finding';
 import { type AnchorProbePorts, probeAnchor } from '../anchors/probe';
 import type { AnchorProbeResult, AnchorToml } from '../anchors/schemas';
-import { defineTool } from '../tool';
-import {
-  ProbeAnchorInput,
-  ProbeAnchorOutput,
-  type TomlEndpoints,
-  type TomlSummary,
-} from './probe-anchor.schema';
+import { defineNamedTool } from './define';
+import type { ProbeAnchorOutput, TomlEndpoints, TomlSummary } from './schemas';
 
 export type ProbeAnchorContext = AnchorProbePorts & {
   latestLedger: () => Promise<number>;
@@ -59,16 +54,12 @@ export const toProbeAnchorOutput = (
     : {}),
 });
 
-export const probeAnchorTool = defineTool({
-  name: 'probeAnchor',
-  description:
-    'Probe an anchor domain for conformance: stellar.toml, accounts, SEP endpoints, /info, SEP-10, SEP-38, SEP-31, CORS and optionally stellar-anchor-tests. Read only.',
-  input: ProbeAnchorInput,
-  output: ProbeAnchorOutput,
-  run: async ({ domain, runAnchorTests }, ctx: ProbeAnchorContext) => {
+export const probeAnchorTool = defineNamedTool(
+  'probeAnchor',
+  async ({ domain, runAnchorTests }, ctx: ProbeAnchorContext) => {
     const result = await probeAnchor(domain, ctx, { runAnchorTests });
     const snapshotLedger = await ctx.latestLedger();
     const observedAt = (ctx.now?.() ?? new Date()).toISOString();
     return toProbeAnchorOutput(result, { snapshotLedger, observedAt });
   },
-});
+);
