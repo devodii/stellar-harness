@@ -9,7 +9,6 @@ import {
   type NetworkConfig,
   NoCache,
   networkSelection,
-  type Policy,
   type TransactionToolContext,
 } from '@harness/stellar-tools';
 import { DEFAULT_LEDGER_CLOSE_SECONDS } from '@harness/stellar-tools/contracts';
@@ -25,7 +24,6 @@ export const createLiveClients = (
 export type AgentContextOptions = {
   clients: NetworkClients;
   storage: Storage;
-  policy: Policy;
   snapshotLedger?: number;
   ledgerCloseSeconds?: number;
 };
@@ -54,7 +52,6 @@ export const createLatestLedger =
 export const createAgentContext = ({
   clients,
   storage,
-  policy,
   snapshotLedger,
   ledgerCloseSeconds = DEFAULT_LEDGER_CLOSE_SECONDS,
 }: AgentContextOptions): AgentToolContext => {
@@ -71,7 +68,6 @@ export const createAgentContext = ({
     ...networkSelection(clients.config),
     ecosystemDirectory: clients.config.ECOSYSTEM_DIRECTORY,
     storage,
-    policy,
     getTransaction: async (hash) => {
       const { resultCodes } = await getTransaction.run({ hash }, transactions);
       return { resultCodes };

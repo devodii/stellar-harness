@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { type Finding, SUGGESTED_ACTION } from '@harness/schema';
+import { type Finding, ROADMAP_NOTE, SUGGESTED_ACTION } from '@harness/schema';
 import { type ProbeAnchorOutput, TOOL_DESCRIPTIONS, TOOL_NAMES } from '@harness/stellar-tools';
 import { MemoryStorage } from '@harness/storage';
 import { generateText, stepCountIs } from 'ai';
@@ -38,7 +38,10 @@ describe('createAgentTools', () => {
     const result = await tools.planFix.execute({ findingId: finding.findingId }, options);
     expect(result).toMatchObject({
       ok: true,
-      data: { planId: `plan_${finding.findingId.slice(0, 12)}`, requiresApproval: true },
+      data: {
+        planId: `plan_${finding.findingId.slice(0, 12)}`,
+        handoff: { roadmapNote: ROADMAP_NOTE },
+      },
       meta: { tool: 'planFix' },
     });
   });

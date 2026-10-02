@@ -8,7 +8,6 @@ export const TEST_LEDGER = 59_000_000;
 
 export const createTestContext = (overrides: Partial<AgentToolContext> = {}): AgentToolContext => ({
   storage: new MemoryStorage(),
-  policy: { spendCapXlm: 5 },
   stellarlight: { get: async () => ({}) },
   rpc: fakeRpc({ latestLedger: TEST_LEDGER }),
   horizon: fakeHorizon(),

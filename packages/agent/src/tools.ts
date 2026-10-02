@@ -11,7 +11,6 @@ import {
   getTransaction,
   invokeTool,
   type NetworkStatusContext,
-  type PolicyContext,
   type ProbeAnchorContext,
   planFix,
   probeAnchorTool,
@@ -60,7 +59,6 @@ export const toAiTool = <TInput extends z.ZodType, TOutput extends z.ZodType, TC
   });
 
 export type AgentToolContext = StorageContext &
-  PolicyContext &
   DecodeContext &
   StellarlightContext &
   ContractToolContext &

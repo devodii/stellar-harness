@@ -53,7 +53,6 @@ const setup = (options: { snapshotLedger?: number } = {}) => {
   const ctx = createAgentContext({
     clients,
     storage: new MemoryStorage(),
-    policy: { spendCapXlm: 5 },
     ...options,
   });
   return { ctx, calls };
@@ -138,7 +137,6 @@ describe('createAgentContext on testnet', () => {
     const ctx = createAgentContext({
       clients,
       storage: new MemoryStorage(),
-      policy: { spendCapXlm: 5 },
     });
     return { ctx, calls };
   };
