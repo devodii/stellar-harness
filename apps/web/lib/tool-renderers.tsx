@@ -28,9 +28,9 @@ export interface ToolRenderer {
   render: (output: unknown, ctx: RenderContext) => React.ReactNode | null;
 }
 
-export const defineRenderer = <TOutput,>(
-  schema: z.ZodType<TOutput>,
-  View: React.ComponentType<{ data: TOutput; ctx: RenderContext }>,
+export const defineRenderer = <TSchema extends z.ZodType>(
+  schema: TSchema,
+  View: React.ComponentType<{ data: z.output<TSchema>; ctx: RenderContext }>,
 ): ToolRenderer => ({
   render: (output, ctx) => {
     const parsed = schema.safeParse(output);
