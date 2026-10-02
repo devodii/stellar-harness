@@ -15,6 +15,15 @@ import { ContextChipList } from '@/components/context-chip';
 import { NetworkSwitch } from '@/components/network-switch';
 import type { ChatContext } from '@/lib/chat-context';
 
+export const CHAT_INPUT_ID = 'chat-input';
+
+const CONTEXT_PLACEHOLDER: Record<ChatContext['kind'], string> = {
+  finding: 'Ask about the attached finding…',
+  reply: 'Reply…',
+};
+
+export const focusChatInput = () => document.getElementById(CHAT_INPUT_ID)?.focus();
+
 export interface ChatComposerProps {
   onSubmit: (text: string) => void;
   onStop?: () => void;
@@ -52,7 +61,8 @@ export function ChatComposer({
       )}
       <PromptInputBody>
         <PromptInputTextarea
-          placeholder={attached ? 'Ask about the attached finding…' : placeholder}
+          id={CHAT_INPUT_ID}
+          placeholder={contexts[0] ? CONTEXT_PLACEHOLDER[contexts[0].kind] : placeholder}
           disabled={disabled}
         />
       </PromptInputBody>
