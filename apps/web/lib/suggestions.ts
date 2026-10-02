@@ -42,17 +42,23 @@ const subjectsFrom = (summary: Summary | null, network: Network) => {
   };
 };
 
+export const SCF_LIFETIME_QUESTION =
+  'Which SCF-funded contracts are archived or expiring within 30 days, and what would restoring them cost?';
+
+const SIMULATE_THEN_HAND_OFF =
+  'Simulate the restore or TTL extension for the most active one, then say who would have to act and what it would cost.';
+
 const contractLifetimeSuggestion = (network: Network, contract: string): ChatSuggestion =>
   network === 'mainnet'
     ? {
         id: 'scf-archival',
-        label: 'SCF contracts archived or expiring in 30d',
-        prompt: 'Which SCF-funded contracts are archived or expiring within 30 days?',
+        label: SCF_LIFETIME_QUESTION,
+        prompt: `${SCF_LIFETIME_QUESTION} ${SIMULATE_THEN_HAND_OFF}`,
       }
     : {
         id: 'ttl-expiry',
         label: `Does ${truncateMiddle(contract)} expire within 30d?`,
-        prompt: `Check the TTL of ${network} contract ${contract}. Is it archived or expiring within 30 days?`,
+        prompt: `Check the TTL of ${network} contract ${contract}. Is it archived or expiring within 30 days, and what would extending it cost? Simulate it, then say who would have to act.`,
       };
 
 export const buildSuggestions = (
