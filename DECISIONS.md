@@ -146,3 +146,5 @@ Every call made without explicit direction is tagged `@decision` so it can be re
 - `@decision` Simulation source accounts are per network: Circle's USDC issuer on mainnet and Circle's testnet USDC issuer on testnet.
 - `@decision` A 365-day extension whose resource fee exceeds the uint32 transaction fee field (about 429 XLM) cannot be assembled into one transaction; the simulated fee is kept as the estimate and the unsimulated draft is shown as the XDR.
 - `@decision` With `DATABASE_URL` set, the scanner reads and writes snapshots, findings, derived rows, previews, run records and the HTTP cache in Postgres; checkpoints and CSV exports stay on disk. A mainnet report rebuilt from Postgres matches the file-based report.
+
+- `@decision` The chat model comes from a provider registry (`AI_PROVIDER` = `openai` or `anthropic`, default `openai`; `AI_MODEL` overrides the default `gpt-5.5` or `claude-sonnet-5`). Only the selected provider's key is required.
