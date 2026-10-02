@@ -1,56 +1,37 @@
 'use client';
 
-import type { ColumnDef } from '@tanstack/react-table';
 import { Address } from '@/components/address';
 import { BracketTag } from '@/components/bracket-tag';
-import { DataTable } from '@/components/data-table';
 import { KeyValueList } from '@/components/key-value-list';
 import { ResultSection } from '@/components/result-section';
 import { SeverityTag } from '@/components/severity-tag';
 import { StatLabel } from '@/components/stat';
+import { Timeline, type TimelineEntry, type TimelineTone } from '@/components/timeline';
 import { formatInt } from '@/lib/format';
 import { TONE_TEXT } from '@/lib/tone';
 import type { AnchorProbeView as AnchorProbeData, ProbeStageView } from '@/lib/tool-views';
 
-const stageColumns: ColumnDef<ProbeStageView>[] = [
-  { accessorKey: 'stage', header: 'stage', size: 90 },
-  {
-    accessorKey: 'ok',
-    header: 'result',
-    size: 70,
-    cell: ({ row }) =>
-      row.original.ok ? (
-        <BracketTag label="pass" tone="success" />
-      ) : (
-        <BracketTag label="fail" tone="destructive" emphasis />
-      ),
-  },
-  {
-    accessorKey: 'status',
-    header: 'http',
-    size: 60,
-    cell: ({ row }) => row.original.status ?? 'n/a',
-  },
-  {
-    accessorKey: 'ms',
-    header: 'ms',
-    size: 70,
-    cell: ({ row }) => formatInt(row.original.ms),
-  },
-  {
-    accessorKey: 'error',
-    header: 'error',
-    enableSorting: false,
-    cell: ({ row }) => (
-      <span
-        className="block max-w-xs truncate text-muted-foreground"
-        title={row.original.error ?? ''}
-      >
-        {row.original.error ?? ''}
-      </span>
-    ),
-  },
-];
+const isSkipped = (stage: ProbeStageView) => !stage.ok && !!stage.error?.startsWith('skipped');
+
+const stageTone = (stage: ProbeStageView): TimelineTone => {
+  if (stage.ok) return 'done';
+  return isSkipped(stage) ? 'muted' : 'failed';
+};
+
+const stageEntry = (stage: ProbeStageView): TimelineEntry => ({
+  key: stage.stage,
+  title: stage.stage,
+  meta: isSkipped(stage)
+    ? 'skipped'
+    : [stage.status ?? 'n/a', `${formatInt(stage.ms)} ms`].join(' · '),
+  tone: stageTone(stage),
+  content:
+    stage.error && !stage.ok ? (
+      <p className={isSkipped(stage) ? 'text-xs text-muted-foreground' : 'text-xs text-foreground'}>
+        {stage.error}
+      </p>
+    ) : undefined,
+});
 
 const ENDPOINT_LABELS: Record<string, string> = {
   transferServer: 'sep6',
@@ -78,12 +59,7 @@ export function AnchorProbeView({ probe }: { probe: AnchorProbeData }) {
         )
       }
     >
-      <DataTable
-        columns={stageColumns}
-        data={probe.stages}
-        getRowId={(stage) => stage.stage}
-        emptyState={<p className="text-xs text-muted-foreground">No stages ran.</p>}
-      />
+      <Timeline items={probe.stages} renderItem={stageEntry} emptyMessage="No stages ran." />
       {probe.toml && (
         <KeyValueList
           items={[
