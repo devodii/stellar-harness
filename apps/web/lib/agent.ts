@@ -16,16 +16,11 @@ export const getLiveClients = memoBy((network: Network) =>
   createLiveClients(getNetworkConfig(network)),
 );
 
-// TEMP(patch-01): only for branches where @harness/agent still requires a policy option; the
-// lead deletes this constant and its spread when the packages change merges.
-const PRE_MERGE_CONTEXT = { policy: { spendCapXlm: 0 } };
-
 export const getAgentTools = memoBy((network: Network) =>
   createAgentTools(
     createAgentContext({
       clients: getLiveClients(network),
       storage: getStorage(network),
-      ...PRE_MERGE_CONTEXT,
     }),
   ),
 );
