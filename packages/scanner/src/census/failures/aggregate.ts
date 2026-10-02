@@ -1,10 +1,9 @@
 import { isPreventableCode } from '@harness/schema';
-import type { ResultCodes } from '@harness/stellar-tools';
-import type { FailedTx, LedgerTotal } from './rows';
+import type { FailedTx, FailedTxCodes, LedgerTotal } from './rows';
 
 const SUCCESS_CODES = new Set(['op_success', 'tx_success']);
 
-export const failureCodes = (codes: ResultCodes): string[] => {
+export const failureCodes = (codes: FailedTxCodes): string[] => {
   const all = [codes.tx];
   if (codes.tx === 'tx_failed') {
     for (const op of codes.ops) if (!SUCCESS_CODES.has(op)) all.push(op);
@@ -12,7 +11,7 @@ export const failureCodes = (codes: ResultCodes): string[] => {
   return [...new Set(all)];
 };
 
-export const isPreventableFailure = (codes: ResultCodes): boolean =>
+export const isPreventableFailure = (codes: FailedTxCodes): boolean =>
   failureCodes(codes).some(isPreventableCode);
 
 export type LedgerSeriesPoint = LedgerTotal & { preventableCount: number };
