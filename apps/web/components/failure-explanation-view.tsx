@@ -1,0 +1,39 @@
+import { BracketTag } from '@/components/bracket-tag';
+import { ResultCard } from '@/components/result-card';
+import { ResultCodes } from '@/components/result-codes';
+import { StatLabel } from '@/components/stat';
+import type { FailureExplanationView as FailureExplanationData } from '@/lib/tool-views';
+
+export function FailureExplanationView({ explanation }: { explanation: FailureExplanationData }) {
+  return (
+    <ResultCard
+      title="failure explanation"
+      aside={
+        explanation.preventable ? (
+          <BracketTag label="preventable" tone="warning" emphasis />
+        ) : (
+          <BracketTag label="not preventable" tone="muted" />
+        )
+      }
+    >
+      <ResultCodes codes={explanation.codes} />
+      <p className="text-sm leading-relaxed text-foreground">{explanation.explanation}</p>
+      {explanation.perCode.length > 0 && (
+        <dl className="space-y-1.5">
+          {explanation.perCode.map((entry) => (
+            <div key={entry.code} className="grid gap-x-3 sm:grid-cols-[12rem_1fr]">
+              <dt className="font-mono text-xs text-foreground">{entry.code}</dt>
+              <dd className="text-xs text-muted-foreground">
+                <span className="text-foreground">{entry.title}.</span> {entry.explanation}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      <div className="space-y-1 rounded-md border border-primary/40 bg-primary/5 p-2.5">
+        <StatLabel>suggested action</StatLabel>
+        <p className="text-sm text-foreground">{explanation.suggestedAction}</p>
+      </div>
+    </ResultCard>
+  );
+}
