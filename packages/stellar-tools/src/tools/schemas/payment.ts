@@ -21,6 +21,7 @@ export const PREFLIGHT_CHECKS = [
   'destination_limit',
 ] as const;
 export const PreflightCheckName = z.enum(PREFLIGHT_CHECKS);
+export type PreflightCheckName = z.infer<typeof PreflightCheckName>;
 
 export const PreflightCheck = z.object({
   name: PreflightCheckName,
