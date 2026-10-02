@@ -6,12 +6,14 @@ import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ai-e
 import { Source, Sources, SourcesContent, SourcesTrigger } from '@/components/ai-elements/sources';
 import { BracketTag } from '@/components/bracket-tag';
 import { ContextChip } from '@/components/context-chip';
+import { SwipeToReply } from '@/components/swipe-to-reply';
 import { ToolCall } from '@/components/tool-call';
 import type { HarnessPart, HarnessUIMessage } from '@/lib/chat';
 
 export interface ChatMessageProps {
   message: HarnessUIMessage;
   streaming?: boolean;
+  onReply?: () => void;
 }
 
 function MessagePart({
@@ -47,13 +49,13 @@ function MessagePart({
   return null;
 }
 
-export function ChatMessage({ message, streaming = false }: ChatMessageProps) {
+export function ChatMessage({ message, streaming = false, onReply }: ChatMessageProps) {
   const sources = message.parts.filter((part) => part.type === 'source-url');
   const parts = message.parts
     .map((part, index) => ({ part, key: `${message.id}-${index}` }))
     .filter(({ part }) => part.type !== 'source-url' && part.type !== 'step-start');
 
-  return (
+  const body = (
     <Message
       from={message.role}
       className={message.role === 'assistant' ? 'max-w-full' : undefined}
@@ -81,5 +83,12 @@ export function ChatMessage({ message, streaming = false }: ChatMessageProps) {
         </Sources>
       )}
     </Message>
+  );
+
+  if (!onReply || message.role !== 'assistant') return body;
+  return (
+    <SwipeToReply onReply={onReply} disabled={streaming}>
+      {body}
+    </SwipeToReply>
   );
 }
