@@ -49,7 +49,7 @@ export function SwipeToReply({ onReply, disabled, children, className }: SwipeTo
           type="button"
           onClick={onReply}
           aria-label="Reply to this message"
-          className="absolute -top-1 right-0 hidden size-7 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-foreground focus-visible:opacity-100 group-hover/reply:opacity-100 md:inline-flex"
+          className="absolute top-0 -right-9 hidden size-7 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-opacity hover:bg-accent hover:text-foreground focus-visible:opacity-100 group-hover/reply:opacity-100 md:inline-flex"
         >
           <ArrowBendUpLeftIcon className="size-4" />
         </button>
