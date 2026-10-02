@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!**/node_modules", "!**/.next", "!**/dist", "!**/storybook-static", "!data"]
+    "includes": ["**", "!**/node_modules", "!**/.next", "!**/dist", "!data"]
   },
   "formatter": {
     "enabled": false
@@ -47,13 +47,5 @@
         "organizeImports": "on"
       }
     }
-  },
-  "overrides": [
-    {
-      "includes": ["apps/web/components/ui/**", "apps/web/components/ai-elements/**"],
-      "formatter": { "enabled": false },
-      "linter": { "enabled": false },
-      "assist": { "enabled": false }
-    }
-  ]
+  }
 }
