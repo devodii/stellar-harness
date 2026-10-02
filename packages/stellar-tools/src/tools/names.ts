@@ -6,6 +6,7 @@ export const TOOL_NAMES = [
   'probeAnchor',
   'queryFindings',
   'getSummary',
+  'getNetworkStatus',
   'searchEcosystem',
   'simulateExtendTtl',
   'simulateRestore',

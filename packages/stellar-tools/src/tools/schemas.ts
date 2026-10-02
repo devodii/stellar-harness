@@ -11,6 +11,7 @@ import {
   QueryFindingsInput,
   QueryFindingsOutput,
 } from './schemas/findings';
+import { GetNetworkStatusInput, GetNetworkStatusOutput } from './schemas/network';
 import { BuildPaymentPreflightInput, BuildPaymentPreflightOutput } from './schemas/payment';
 import { PlanFixInput, PlanFixOutput } from './schemas/plan';
 import {
@@ -30,6 +31,7 @@ export * from './schemas/contract';
 export * from './schemas/ecosystem';
 export * from './schemas/failure';
 export * from './schemas/findings';
+export * from './schemas/network';
 export * from './schemas/payment';
 export * from './schemas/plan';
 export * from './schemas/simulate';
@@ -43,6 +45,7 @@ export const TOOL_SCHEMAS = {
   probeAnchor: { input: ProbeAnchorInput, output: ProbeAnchorOutput },
   queryFindings: { input: QueryFindingsInput, output: QueryFindingsOutput },
   getSummary: { input: GetSummaryInput, output: GetSummaryOutput },
+  getNetworkStatus: { input: GetNetworkStatusInput, output: GetNetworkStatusOutput },
   searchEcosystem: { input: SearchEcosystemInput, output: SearchEcosystemOutput },
   simulateExtendTtl: { input: SimulateExtendTtlInput, output: SimulateExtendTtlOutput },
   simulateRestore: { input: SimulateRestoreInput, output: SimulateRestoreOutput },
