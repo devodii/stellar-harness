@@ -9,13 +9,11 @@ Every call made without explicit direction is tagged `@decision` so it can be re
 - `@decision` Next.js 15.5 as the brief asks, even though 16.x is current. It matches the conventions already used in other projects.
 - `@decision` Biome formats with single quotes, trailing commas and a 100 column width to match house style.
 - `@decision` `AI_MODEL` defaults to `claude-sonnet-5`; the brief's `claude-sonnet-4-5` is superseded.
-- `@decision` `POLICY_SPEND_CAP_XLM` is listed in `.env.example` (the brief references it in M5 but omits it from the env list).
 
 ## Schema
 
 - `@decision` `Summary.findingsCount` is a partial record so a run that skipped a census still validates.
 - `@decision` `Summary.contracts.scfFunded.projects[].round` is nullable because not every awarded project row carries a round.
-- `@decision` `PlanState` adds `declined` to the brief's `proposed → awaiting_approval → approved → executed` chain so the Decline button has a terminal state.
 - `@decision` The suggested action table lives in `@harness/schema` (`SUGGESTED_ACTION`, `ACTION_BY_CODE`) so scanner, agent and UI read one source. Anchor and repo finding types had no action in the brief; one line each was written for them.
 - `@decision` `defineEnv(shape)` in `@harness/schema` is the single env loader. It throws on the first import with every missing or invalid variable listed.
 
@@ -39,9 +37,6 @@ Every call made without explicit direction is tagged `@decision` so it can be re
 
 ## Agent logic and plans
 
-- `@decision` Plan steps may name three non-tool actions: `buildTransaction`, `submitTransaction`, `draftNotice`. Read and simulate steps always name real tools; submit has no tool by design.
-- `@decision` Fee, timebound, signature, float and limit clusters plan a policy notice instead of a submit because the failed transactions cannot be retried. Only channel-account and reserve top-up plans submit.
-- `@decision` A plan's estimated cost comes from evidence `xlm12m`, channel count times 1.5 XLM, or a reserve top-up (default 2 XLM). Extend and restore plans without cost evidence carry no estimate; their submit step still forces approval.
 - `@decision` When both apply, the `spend_cap` boundary wins over `submit_requires_approval`. A cost equal to the cap is within policy.
 - `@decision` The plan state machine is strict: `proposed` must pass through `request_approval` before `approve`; `propose` is valid only on a fresh plan.
 - `@decision` AI SDK input validation is a pass-through; `invokeTool` validates so bad input returns an `INVALID_INPUT` envelope the UI can render, instead of an SDK error part.
@@ -124,7 +119,6 @@ Every call made without explicit direction is tagged `@decision` so it can be re
 - `@decision` `/api/live` caches the Horizon ledger for 5 s and the summary for 30 s so the strip moves on every 5 s poll. Its window numbers come from the scan summary (`window: {days, txFailed, preventable, preventableShare}`) because the summary has no separate 24 h breakdown.
 - `@decision` Without a scan, scan-derived numbers render as `n/a`; the chat, suggestions and tools work against live mainnet regardless.
 - `@decision` `apiHandler` shows messages from errors the app raises itself and masks unexpected throws, so a missing `ANTHROPIC_API_KEY` reaches the user verbatim.
-- `@decision` Plan approval travels as a `data-plan-approval` part `{type: 'plan-approval', planId, decision}` on a user message; the chat route converts it to text the agent parses with `parsePlanApproval`.
 - `@decision` Chat URLs are `/?c=<id>`; `/?q=<prompt>` starts a new chat, which is how "Open in chat" on `/findings` works. Conversations are capped at 50 in local storage.
 - `@decision` AI Elements no longer ships `Loader`; `Shimmer` is used instead. The chat route passes `instructions` because `system` is deprecated in AI SDK 7.
 - `@decision` The web app renders tool results against the canonical tool schemas through client-safe entries (`@harness/stellar-tools/schemas`, `@harness/agent/protocol`), so the browser bundle never includes network clients.
@@ -153,7 +147,7 @@ Every call made without explicit direction is tagged `@decision` so it can be re
 
 ## Patch 01: honest demo boundaries
 
-- `@decision` Plans no longer contain `build` or `submit` steps and there is no approve or decline flow: the scanner's subjects belong to other parties, so the demo cannot claim authority over them. A plan is read and simulate steps followed by exactly one `handoff` step, with a `handoff` object naming the required authority (`contract_admin`, `any_payer`, `account_signer`, `anchor_operator`), the simulated cost when known, and the fixed roadmap note. `PolicyBoundary`, the plan state machine, `POLICY_SPEND_CAP_XLM` and policy evaluation are removed.
+- `@decision` Plans no longer contain `build` or `submit` steps and there is no approve or decline flow: the scanner's subjects belong to other parties, so the demo cannot claim authority over them. A plan is read and simulate steps followed by exactly one `handoff` step, with a `handoff` object naming the required authority (`contract_admin`, `any_payer`, `account_signer`, `anchor_operator`), the simulated cost when known, and the fixed roadmap note. The boundary card, the plan state machine, the spend cap and its evaluation are removed.
 - `@decision` Restoring archived state and extending TTL can be paid by any account on Soroban, so those plans hand off to `any_payer`; trustline sponsorship needs the destination's signature, so payment plans hand off to `account_signer`.
 - `@decision` Simulation tools return a plain-language `operation` and the resource fee instead of an unsigned transaction envelope.
 - `@decision` "Meaningful" means an anchor domain, an SCF-funded subject, or a contract with at least 100 invocations. The header shows `ARCHIVED (active)` (240 at the current snapshot, against 65,140 raw), `/findings` defaults to the meaningful filter with a `show all` toggle, and suggestion chips draw subjects only from that set. Failure clusters carry neither tag nor invocation count, so they appear under `show all`.
