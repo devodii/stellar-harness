@@ -11,7 +11,6 @@
     "build": "pnpm -r build",
     "lint": "biome lint .",
     "format": "prettier --write .",
-    "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "scan": "pnpm --filter scan-cli scan",
     "report": "pnpm --filter scan-cli scan report",
