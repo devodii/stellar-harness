@@ -8,6 +8,7 @@ import { EcosystemView } from '@/components/ecosystem-view';
 import { FailureExplanationView } from '@/components/failure-explanation-view';
 import { FindingsTable } from '@/components/findings-table';
 import { JsonView } from '@/components/json-view';
+import { NetworkStatusView } from '@/components/network-status-view';
 import { PaymentPreflightView } from '@/components/payment-preflight-view';
 import { PlanView } from '@/components/plan-view';
 import { SimulationCostView } from '@/components/simulation-cost-view';
@@ -61,6 +62,9 @@ export const TOOL_RENDERERS = {
     </div>
   )),
   getSummary: defineRenderer(S.getSummary, ({ data }) => <SummaryView summary={data} />),
+  getNetworkStatus: defineRenderer(S.getNetworkStatus, ({ data }) => (
+    <NetworkStatusView status={data} />
+  )),
   searchEcosystem: defineRenderer(S.searchEcosystem, ({ data }) => (
     <EcosystemView ecosystem={data} />
   )),
