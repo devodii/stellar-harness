@@ -166,12 +166,22 @@ export const anchorTestsConfig = (domain: string, seps: number[]): LibConfig => 
   },
 });
 
-const emptyResult = (): AnchorSepResult => ({ passed: 0, failed: 0, skipped: 0, names: [] });
+const FAILED_DEPENDENCY = 'failed dependency';
+
+const emptyResult = (): AnchorSepResult => ({
+  passed: 0,
+  failed: 0,
+  skipped: 0,
+  blocked: 0,
+  names: [],
+});
 
 const record = (perSep: Record<string, AnchorSepResult>, run: LibRun) => {
   const sep = String(run.test.sep);
   const result = perSep[sep] ?? emptyResult();
-  if (run.result.failure) {
+  if (run.result.failure?.name === FAILED_DEPENDENCY) {
+    result.blocked += 1;
+  } else if (run.result.failure) {
     result.failed += 1;
     result.names.push(`${run.test.group}: ${run.test.assertion} (${run.result.failure.name})`);
   } else if (run.result.skipped) {

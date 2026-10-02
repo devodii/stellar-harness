@@ -115,6 +115,23 @@ const fakeLib = (
 };
 
 describe('runSafeAnchorTests', () => {
+  it('counts tests blocked by a failed dependency apart from real failures', async () => {
+    const { lib } = fakeLib((tests) =>
+      tests.map((test) => ({
+        test,
+        result:
+          test === jwt
+            ? { failure: { name: 'failed dependency' } }
+            : test === passphrase
+              ? { failure: { name: 'invalid passphrase' } }
+              : {},
+      })),
+    );
+    const report = await runSafeAnchorTests('clpx.finance', [1, 10], { lib });
+    expect(report.perSep['10']).toMatchObject({ failed: 0, blocked: 1, names: [] });
+    expect(report.perSep['1']).toMatchObject({ failed: 1, blocked: 0 });
+  });
+
   it('runs only safe tests and reports per sep results', async () => {
     const { lib, seen } = fakeLib((tests) =>
       tests.map((test) => ({
@@ -130,11 +147,12 @@ describe('runSafeAnchorTests', () => {
       networkPassphrase: 'Public Global Stellar Network ; September 2015',
     });
     expect(report.perSep).toEqual({
-      '1': { passed: 2, failed: 0, skipped: 0, names: [] },
+      '1': { passed: 2, failed: 0, skipped: 0, blocked: 0, names: [] },
       '10': {
         passed: 0,
         failed: 1,
         skipped: 0,
+        blocked: 0,
         names: ['POST /auth: returns a valid JWT (invalid JWT)'],
       },
     });
