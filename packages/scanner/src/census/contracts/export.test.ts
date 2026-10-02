@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   archivedExportRows,
+  archivedMeaningfulExportRows,
   CONTRACT_EXPORT_COLUMNS,
   contractStatus,
   expiring30dExportRows,
@@ -34,6 +35,13 @@ describe('contract exports', () => {
       scf_slug: 'blend',
       scf_round: null,
     });
+  });
+
+  it('lists archived contracts that matter with the same columns', () => {
+    const busy = contractRow(7, { instance: ttl.archived(), invocations: 250 });
+    const exported = archivedMeaningfulExportRows([...rows, busy]);
+    expect(exported.map((row) => row.contract)).toEqual([busy.contract, rows[1]?.contract]);
+    expect(Object.keys(exported[0] ?? {})).toEqual([...CONTRACT_EXPORT_COLUMNS]);
   });
 
   it('lists contracts expiring within 30 days, soonest first', () => {
