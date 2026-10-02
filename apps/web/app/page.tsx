@@ -12,7 +12,7 @@ export default async function Page() {
     <div className="flex h-full flex-col">
       <Header org={DEMO_ORG} />
       <div className="flex min-h-0 flex-1">
-        <WatchPanel watch={watch} anchorDomain={DEMO_ORG.anchorDomain} />
+        <WatchPanel watch={watch} network={DEMO_ORG.network} anchorDomain={DEMO_ORG.anchorDomain} />
         <Chat />
       </div>
     </div>

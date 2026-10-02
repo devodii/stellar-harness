@@ -3,63 +3,46 @@
 import { useChat } from '@ai-sdk/react';
 import type { HarnessMessage } from '@harness/agent';
 import { useRouter } from 'next/navigation';
-import * as React from 'react';
 import {
   Conversation,
   ConversationContent,
   ConversationScrollButton,
 } from '@/components/ai-elements/conversation';
 import { Message, MessageContent, MessageResponse } from '@/components/ai-elements/message';
-import { ToolCall } from '@/components/tool-results';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-
-const SUGGESTIONS = [
-  'Check all our contracts and tell me which need attention',
-  'Can we pay 25 USDC from treasury to distribution right now?',
-  'What would it cost to keep Escrow alive for a year?',
-  'Is our anchor passing conformance?',
-];
+import { Shimmer } from '@/components/ai-elements/shimmer';
+import { ChatComposer } from '@/components/chat-composer';
+import { ChatSuggestions } from '@/components/chat-suggestions';
+import { InlineAlert } from '@/components/inline-alert';
+import { isToolCallPart, ToolCall } from '@/components/tool-call';
 
 type Part = HarnessMessage['parts'][number];
 
 function MessagePart({ part, role }: { part: Part; role: HarnessMessage['role'] }) {
-  if (part.type !== 'text') return <ToolCall part={part} />;
+  if (isToolCallPart(part)) return <ToolCall part={part} />;
+  if (part.type !== 'text') return null;
   return role === 'user' ? <p>{part.text}</p> : <MessageResponse>{part.text}</MessageResponse>;
 }
 
 export function Chat() {
   const router = useRouter();
-  const { messages, sendMessage, status, error } = useChat<HarnessMessage>({
+  const { messages, sendMessage, status, stop, error } = useChat<HarnessMessage>({
     onFinish: () => router.refresh(),
   });
-  const [input, setInput] = React.useState('');
   const busy = status === 'submitted' || status === 'streaming';
-
-  const send = (text: string) => {
-    if (!text.trim() || busy) return;
-    void sendMessage({ text });
-    setInput('');
-  };
+  const send = (text: string) => void sendMessage({ text });
 
   return (
     <main className="flex min-h-0 flex-1 flex-col">
       {messages.length === 0 ? (
-        <div className="flex flex-1 flex-wrap content-center justify-center gap-2 p-6">
-          {SUGGESTIONS.map((suggestion) => (
-            <Button key={suggestion} variant="outline" size="sm" onClick={() => send(suggestion)}>
-              {suggestion}
-            </Button>
-          ))}
+        <div className="flex flex-1 items-center justify-center p-6">
+          <ChatSuggestions onSelect={send} disabled={busy} className="w-full max-w-2xl" />
         </div>
       ) : (
-        <Conversation>
-          <ConversationContent className="mx-auto w-full max-w-3xl">
+        <Conversation className="min-h-0">
+          <ConversationContent className="mx-auto w-full max-w-3xl gap-6 px-4 py-6">
             {messages.map((message) => (
               <Message key={message.id} from={message.role}>
-                <MessageContent
-                  className={message.role === 'user' ? 'w-fit rounded-md border px-3 py-2' : ''}
-                >
+                <MessageContent>
                   {message.parts.map((part, index) => (
                     // biome-ignore lint/suspicious/noArrayIndexKey: message parts are append-only
                     <MessagePart key={index} part={part} role={message.role} />
@@ -68,29 +51,22 @@ export function Chat() {
               </Message>
             ))}
             {status === 'submitted' && (
-              <p className="font-mono text-xs text-muted-foreground">working…</p>
+              <Shimmer as="p" className="font-mono text-xs">
+                working…
+              </Shimmer>
             )}
           </ConversationContent>
           <ConversationScrollButton />
         </Conversation>
       )}
-      <form
-        className="mx-auto flex w-full max-w-3xl gap-2 p-4"
-        onSubmit={(event) => {
-          event.preventDefault();
-          send(input);
-        }}
-      >
-        <Input
-          value={input}
-          onChange={(event) => setInput(event.target.value)}
-          placeholder="Ask about the organisation's accounts, contracts or anchor"
-        />
-        <Button type="submit" disabled={busy || !input.trim()}>
-          Send
-        </Button>
-      </form>
-      {error && <p className="px-4 pb-4 text-center font-mono text-xs">{error.message}</p>}
+      <div className="mx-auto w-full max-w-3xl space-y-2 px-4 pb-4">
+        {error && (
+          <InlineAlert tone="destructive" title="Chat request failed">
+            {error.message}
+          </InlineAlert>
+        )}
+        <ChatComposer onSubmit={send} onStop={() => void stop()} status={status} />
+      </div>
     </main>
   );
 }
