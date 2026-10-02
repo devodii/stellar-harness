@@ -1,4 +1,4 @@
-import { COMMANDS, createScanContext } from '@harness/scanner';
+import { COMMANDS, createScanContext, dataDirFor, reportFileFor } from '@harness/scanner';
 import { commandSteps, parseScanArgs, USAGE } from './args';
 import { findWorkspaceRoot, resolveFrom } from './paths';
 
@@ -12,9 +12,14 @@ const main = async (): Promise<number> => {
   }
 
   const root = findWorkspaceRoot(process.env.INIT_CWD ?? process.cwd());
-  const dataDir = resolveFrom(root, process.env.HARNESS_DATA_DIR ?? './data');
+  const dataDir = dataDirFor(
+    resolveFrom(root, process.env.HARNESS_DATA_DIR ?? './data'),
+    args.network,
+  );
+  const reportPath = resolveFrom(root, reportFileFor(args.network));
   const ctx = await createScanContext({
     dataDir,
+    network: args.network,
     noCache: args.noCache,
     newSnapshot: args.newSnapshot,
     limit: args.limit,
@@ -22,6 +27,7 @@ const main = async (): Promise<number> => {
     concurrency: args.concurrency,
     env: process.env,
   });
+  ctx.log(`[scan] ${args.network} data in ${dataDir}`);
   ctx.log(`[scan] snapshot ledger ${ctx.snapshot.snapshotLedger} at ${ctx.snapshot.snapshotTime}`);
 
   for (const step of commandSteps(args.command)) {
@@ -31,7 +37,7 @@ const main = async (): Promise<number> => {
       continue;
     }
     ctx.log(`[scan] ${step} started`);
-    const outcome = await command(ctx, { reportPath: resolveFrom(root, 'REPORT.md') });
+    const outcome = await command(ctx, { reportPath });
     ctx.log(`[scan] ${step} finished with ${outcome.findings} findings`);
   }
 
