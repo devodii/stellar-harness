@@ -35,8 +35,10 @@ describe('getContractTtl', () => {
     expect(result).toMatchObject({
       ok: true,
       data: {
-        executable: 'wasm',
+        contractId: unverified.contract,
         wasmHash: unverified.wasm,
+        snapshotLedger: router.result.latestLedger,
+        ledgerCloseSeconds: 5,
         instance: {
           present: true,
           archived: false,
@@ -45,10 +47,15 @@ describe('getContractTtl', () => {
         },
         code: { present: true, archived: false, liveUntilLedgerSeq: 67235018 },
         invocations: 235213,
-        subinvocations: 217568,
-        sourceValidation: 'unverified',
       },
     });
+    expect(result.ok && Object.keys(result.data.instance).sort()).toEqual([
+      'archived',
+      'daysLeft',
+      'ledgersLeft',
+      'liveUntilLedgerSeq',
+      'present',
+    ]);
   });
 
   it('reports an archived instance', async () => {

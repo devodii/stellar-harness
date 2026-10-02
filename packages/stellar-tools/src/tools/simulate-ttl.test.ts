@@ -10,6 +10,7 @@ import restore from '../contracts/__fixtures__/rpc-simulate-restore.json';
 import type { ContractToolContext } from '../contracts/context';
 import { DEFAULT_SIMULATION_SOURCE } from '../contracts/defaults';
 import { type FakeRpc, fakeFetcher, fakeHorizon, fakeRpc } from '../contracts/fakes';
+import { codeKeyXdr, instanceKeyXdr } from '../contracts/keys';
 import type { HorizonAccount, LedgerEntryResult } from '../contracts/ports';
 import { invokeTool } from '../tool';
 import { simulateExtendTtl } from './simulate-extend-ttl';
@@ -44,13 +45,20 @@ describe('simulateExtendTtl', () => {
       data: {
         days: 365,
         extendToLedgers: 6_307_200,
-        sourceAccount: DEFAULT_SIMULATION_SOURCE,
+        contractId: ROUTER,
         minResourceFeeStroops: 491_604_076,
         estimatedXlm: 49.1604176,
-        restorePreamble: null,
-        wasmHash: '4c3db3ebd2d6a2ab23de1f622eaabb39501539b4611b68622ec4e47f76c4ba07',
       },
     });
+    expect(result.ok && Object.keys(result.data).sort()).toEqual([
+      'contractId',
+      'days',
+      'estimatedXlm',
+      'extendToLedgers',
+      'footprint',
+      'minResourceFeeStroops',
+      'unsignedXdr',
+    ]);
     const tx = submitted(ctx);
     expect(tx.source).toBe(DEFAULT_SIMULATION_SOURCE);
     expect(tx.operations[0]).toMatchObject({ type: 'extendFootprintTtl', extendTo: 6_307_200 });
@@ -63,10 +71,20 @@ describe('simulateExtendTtl', () => {
     expect(result.ok && result.data.extendToLedgers).toBe(518_400);
   });
 
-  it('reports the restore preamble for an archived instance', async () => {
-    const ctx = context(archived.result.entries, extendArchived);
+  it('rejects more than 730 days', async () => {
+    const ctx = context(router.result.entries, extend365);
+    const result = await invokeTool(simulateExtendTtl, { contractId: ROUTER, days: 731 }, ctx);
+    expect(result).toMatchObject({ ok: false, error: { code: 'INVALID_INPUT' } });
+  });
+
+  it('simulates from the context source account when one is configured', async () => {
+    const ctx = {
+      ...context(archived.result.entries, extendArchived),
+      simulationSource: account.id,
+    };
     const result = await invokeTool(simulateExtendTtl, { contractId: archived.contractId }, ctx);
-    expect(result.ok && result.data.restorePreamble).toEqual({ minResourceFeeStroops: 784_506 });
+    expect(result.ok && result.data.minResourceFeeStroops).toBe(179_194_774);
+    expect(submitted(ctx).source).toBe(account.id);
   });
 
   it('fails when the source account does not exist', async () => {
@@ -85,7 +103,7 @@ describe('simulateRestore', () => {
       data: {
         minResourceFeeStroops: 784_506,
         estimatedXlm: 0.0784606,
-        wasmHash: '07097f83dae3b746db7dba3263d9cc334efb88a9a7d5450fb96ca19f33d284b0',
+        entries: 'both',
         footprint: { readOnly: [] },
       },
     });
@@ -93,13 +111,30 @@ describe('simulateRestore', () => {
     expect(submitted(ctx).operations[0]).toMatchObject({ type: 'restoreFootprint' });
   });
 
-  it('accepts a caller supplied source account', async () => {
+  it('restores only the instance when asked', async () => {
     const ctx = context(archived.result.entries, restore);
     const result = await invokeTool(
       simulateRestore,
-      { contractId: archived.contractId, sourceAccount: account.id },
+      { contractId: archived.contractId, entries: 'instance' },
       ctx,
     );
-    expect(result.ok && result.data.sourceAccount).toBe(account.id);
+    expect(result.ok && result.data.footprint.readWrite).toEqual([
+      instanceKeyXdr(archived.contractId),
+    ]);
+  });
+
+  it('restores only the code when asked', async () => {
+    const ctx = context(archived.result.entries, restore);
+    const result = await invokeTool(
+      simulateRestore,
+      { contractId: archived.contractId, entries: 'code' },
+      ctx,
+    );
+    expect(result.ok && result.data).toMatchObject({
+      entries: 'code',
+      footprint: {
+        readWrite: [codeKeyXdr('07097f83dae3b746db7dba3263d9cc334efb88a9a7d5450fb96ca19f33d284b0')],
+      },
+    });
   });
 });
