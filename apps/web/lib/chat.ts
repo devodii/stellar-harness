@@ -1,4 +1,4 @@
-import type { UIMessage, UITools } from 'ai';
+import type { DataUIPart, TextPart, UIMessage, UITools } from 'ai';
 import {
   type PlanApproval,
   PlanApproval as PlanApprovalSchema,
@@ -23,6 +23,11 @@ export const planDecisions = (messages: HarnessUIMessage[]): Record<string, Plan
   }
   return decisions;
 };
+
+export const dataPartToModelText = (part: DataUIPart<HarnessDataParts>): TextPart | undefined =>
+  part.type === 'data-plan-approval'
+    ? { type: 'text', text: JSON.stringify(part.data) }
+    : undefined;
 
 export const firstUserText = (message: HarnessUIMessage | undefined): string | null => {
   const part = message?.parts.find((candidate) => candidate.type === 'text');
