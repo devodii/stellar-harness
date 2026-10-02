@@ -2,7 +2,6 @@ export * from './accounts';
 export * from './cors';
 export * from './domain';
 export * from './endpoints';
-export * from './finding';
 export * from './findings';
 export * from './info';
 export * from './info-endpoint';
