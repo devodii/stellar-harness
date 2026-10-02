@@ -58,7 +58,7 @@ const testsReport = (domain: string): AnchorTestsReport => ({
   domain,
   requestedSeps: [1],
   ranSeps: [1],
-  perSep: { '1': { passed: 5, failed: 0, skipped: 0, names: [] } },
+  perSep: { '1': { passed: 5, failed: 0, skipped: 0, blocked: 0, names: [] } },
   excludedSeps: [],
   excludedTests: [],
   error: null,
