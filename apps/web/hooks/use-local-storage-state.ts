@@ -20,8 +20,12 @@ export const useLocalStorageState = <T>(
       const changed = state !== newState;
       if (!changed) return;
       setState(newState as T);
-      if (newState === undefined) localStorage.removeItem(key);
-      else localStorage.setItem(key, JSON.stringify(newState));
+      try {
+        if (newState === undefined) localStorage.removeItem(key);
+        else localStorage.setItem(key, JSON.stringify(newState));
+      } catch (e) {
+        console.warn(`Error writing ${key} to localStorage:`, e);
+      }
     },
     [state, key],
   );
