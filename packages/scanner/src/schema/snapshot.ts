@@ -1,5 +1,5 @@
-import { Network } from '@harness/schema';
 import { z } from 'zod';
+import { Network } from './network';
 
 export const Snapshot = z.object({
   snapshotLedger: z.number().int().positive(),
