@@ -1,4 +1,10 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "ignoreWorkspaces": ["packages/scanner", "apps/scan-cli"]
+  "ignoreWorkspaces": ["packages/scanner", "apps/scan-cli"],
+  "workspaces": {
+    "apps/web": {
+      "ignore": ["components/ui/**", "components/ai-elements/**", "lib/api-handler.ts"]
+    }
+  },
+  "ignore": [".git/**"]
 }

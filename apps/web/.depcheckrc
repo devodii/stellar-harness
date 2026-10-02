@@ -1,3 +1,10 @@
 {
-  "ignores": ["tw-animate-css", "tailwindcss", "@tailwindcss/postcss", "typescript"]
+  "ignores": [
+    "tw-animate-css",
+    "tailwindcss",
+    "@tailwindcss/postcss",
+    "typescript",
+    "@storybook/addon-a11y",
+    "@storybook/addon-docs"
+  ]
 }
