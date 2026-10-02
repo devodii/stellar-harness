@@ -21,7 +21,7 @@ export * from './explain/explain';
 export * from './plan/plan-fix';
 export * from './plan/policy';
 export * from './plan/step';
-export * from './ports';
+export type { Fetcher, HorizonPort, RpcPort, SimulateTransactionResult } from './ports';
 export * from './tool';
 export * from './tools/context';
 export * from './tools/define';
