@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { expect, userEvent, within } from 'storybook/test';
 import { liveQueryKey } from '@/hooks/use-live';
 import type { LiveResponse } from '@/lib/api-schemas';
 import { LiveHeaderStrip } from './live-header-strip';
@@ -12,7 +13,8 @@ const SCANNED: LiveResponse = {
   ledgerSource: 'horizon',
   ledgerCloseSeconds: 5.9,
   window: { days: 7, txFailed: 120345, preventable: 49000, preventableShare: 0.41 },
-  archivedContracts: 812,
+  archivedContracts: 65_140,
+  archivedMeaningful: 240,
   anchorsFailing: 17,
   scanned: true,
   horizonOk: true,
@@ -23,6 +25,7 @@ const NO_SCAN: LiveResponse = {
   ledgerCloseSeconds: null,
   window: { days: 0, txFailed: null, preventable: null, preventableShare: null },
   archivedContracts: null,
+  archivedMeaningful: null,
   anchorsFailing: null,
   scanned: false,
 };
@@ -42,7 +45,15 @@ export default meta;
 
 type Story = StoryObj<{ live: LiveResponse }>;
 
-export const Scanned: Story = {};
+export const Scanned: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.hover(await canvas.findByText('240'));
+    await expect(await within(document.body).findByRole('tooltip')).toHaveTextContent(
+      '65,140 archived in total',
+    );
+  },
+};
 
 export const NoScanData: Story = { args: { live: NO_SCAN } };
 
