@@ -1,3 +1,4 @@
+import { formatStroops, reserveShortfallStroops } from '@harness/stellar-tools';
 import type { AccountActivity } from './clusters';
 import type { HorizonAccount, HorizonPort, Runner } from './ports';
 
@@ -21,6 +22,7 @@ export type AccountClassification = {
   firstOperationType?: string;
   funder?: string;
   contractCallerShare?: number;
+  reserveShortfallXlm?: number;
 };
 
 export type ClassificationGap = {
@@ -109,6 +111,8 @@ export const classifyAccounts = async (input: ClassifyInput): Promise<ClassifyOu
       result.medThreshold = horizonAccount.thresholds.med_threshold;
       result.signerCount = activeSignerCount(horizonAccount);
       result.multisig = isMultisig(horizonAccount);
+      const shortfall = reserveShortfallStroops(horizonAccount);
+      if (shortfall > 0n) result.reserveShortfallXlm = Number(formatStroops(shortfall));
       if (result.multisig) tags.push('multisig');
       if (isAnchorDistribution(result.homeDomain, anchorDomains)) tags.push('anchor_distribution');
     }

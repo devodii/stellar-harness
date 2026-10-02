@@ -99,6 +99,8 @@ describe('classifyAccounts', () => {
       funder: 'GC2XJKN5VZEMM35F5LRSUP5CWVDZJVM37YKR7UYYXGN3TGKZXMP5FZIB',
     });
     expect(byAccount.get(holder.id)?.tags).toEqual(['contract_caller']);
+    expect(byAccount.get(holder.id)?.reserveShortfallXlm).toBe(0.0475819);
+    expect(byAccount.get(single.id)?.reserveShortfallXlm).toBeUndefined();
   });
 
   it('tags channel_pattern when at least five clustered accounts share a funder', async () => {
