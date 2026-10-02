@@ -49,7 +49,7 @@ export type ResolveWindowInput = {
   limitLedgers?: number;
 };
 
-const ledgerTime = (snapshot: Snapshot, ledger: number): string => {
+export const ledgerTime = (snapshot: Snapshot, ledger: number): string => {
   const offsetMs = (snapshot.snapshotLedger - ledger) * snapshot.ledgerCloseSeconds * 1000;
   return new Date(Date.parse(snapshot.snapshotTime) - offsetMs).toISOString();
 };
