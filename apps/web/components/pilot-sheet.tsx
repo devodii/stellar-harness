@@ -1,81 +1,68 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
 import * as React from 'react';
-import * as RHF from 'react-hook-form';
-import { z } from 'zod';
+import { Form } from '@/components/forms/form';
+import { TextField } from '@/components/forms/text-field';
+import { ResponsiveSheet } from '@/components/responsive-sheet';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
+import { useZodForm } from '@/hooks/use-zod-form';
+import { PilotBody } from '@/lib/api-schemas';
+import { requestPilot as defaultRequestPilot, type RequestPilot, waitingLabel } from '@/lib/pilot';
 
-const PilotForm = z.object({ email: z.email('Enter a valid email.') });
-type PilotForm = z.infer<typeof PilotForm>;
+const PILOT_BODY =
+  "Connect your organisation's accounts and contracts and the harness will watch them and prepare fixes. Execution under policy is next.";
 
-export function PilotSheet() {
-  const [waiting, setWaiting] = React.useState<number | null>(null);
-  const form = RHF.useForm<PilotForm>({
-    resolver: zodResolver(PilotForm),
-    defaultValues: { email: '' },
-  });
+export function PilotForm({ requestPilot }: { requestPilot: RequestPilot }) {
+  const form = useZodForm(PilotBody, { defaultValues: { email: '' } });
+  const [waiting, setWaiting] = React.useState<number>();
 
-  const submit = form.handleSubmit(async (values) => {
-    const response = await fetch('/api/pilot', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(values),
-    });
-    const body = await response.json();
-    if (!response.ok) return form.setError('email', { message: body.error });
-    setWaiting(body.count);
-  });
+  const submit = async (values: PilotBody) => {
+    const result = await requestPilot({ email: values.email.trim() });
+    if (result.ok) setWaiting(result.value.count);
+    return result;
+  };
 
+  if (waiting !== undefined) {
+    return (
+      <p role="status" className="font-mono text-xs">
+        {waitingLabel(waiting)}
+      </p>
+    );
+  }
   return (
-    <Sheet>
-      <SheetTrigger asChild>
+    <Form form={form} onSubmit={submit}>
+      <TextField
+        control={form.control}
+        name="email"
+        label="email"
+        type="email"
+        autoComplete="email"
+        placeholder="ops@example.org"
+        mono={false}
+      />
+      <Button type="submit" size="sm">
+        request a pilot
+      </Button>
+    </Form>
+  );
+}
+
+export function PilotSheet({
+  requestPilot = defaultRequestPilot,
+}: {
+  requestPilot?: RequestPilot;
+}) {
+  return (
+    <ResponsiveSheet
+      title="request a pilot"
+      trigger={
         <Button variant="link" size="sm" className="px-0">
           request a pilot
         </Button>
-      </SheetTrigger>
-      <SheetContent className="p-6">
-        <SheetTitle>Request a pilot</SheetTitle>
-        <SheetDescription>
-          Connect your organisation&apos;s accounts and contracts and the harness will watch them
-          and prepare fixes. Execution under policy is next.
-        </SheetDescription>
-        {waiting === null ? (
-          <form onSubmit={submit} className="space-y-2">
-            <RHF.Controller
-              control={form.control}
-              name="email"
-              render={({ field, fieldState }) => (
-                <>
-                  <Input
-                    {...field}
-                    type="email"
-                    autoComplete="email"
-                    placeholder="you@company.com"
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.error && (
-                    <p className="text-xs text-destructive">{fieldState.error.message}</p>
-                  )}
-                </>
-              )}
-            />
-            <Button type="submit" disabled={form.formState.isSubmitting}>
-              request a pilot
-            </Button>
-          </form>
-        ) : (
-          <p className="font-mono text-sm">received · {waiting} waiting</p>
-        )}
-      </SheetContent>
-    </Sheet>
+      }
+      description={<p className="text-sm text-muted-foreground">{PILOT_BODY}</p>}
+    >
+      <PilotForm requestPilot={requestPilot} />
+    </ResponsiveSheet>
   );
 }

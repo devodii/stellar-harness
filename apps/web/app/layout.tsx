@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Instrument_Serif, Outfit } from 'next/font/google';
 import type * as React from 'react';
-import { TooltipProvider } from '@/components/ui/tooltip';
+import { Providers } from '@/components/providers';
 import './globals.css';
 
 const outfit = Outfit({ variable: '--font-outfit', subsets: ['latin'] });
@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${outfit.variable} ${instrumentSerif.variable} h-full antialiased`}>
       <body className="h-full font-sans">
-        <TooltipProvider>{children}</TooltipProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
