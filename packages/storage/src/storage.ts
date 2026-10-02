@@ -1,4 +1,4 @@
-import type { Finding, FindingQuery, Snapshot, Summary } from '@harness/schema';
+import type { Finding, FindingQuery, Snapshot, Summary, WaitlistEntry } from '@harness/schema';
 
 export type FindingPage = { rows: Finding[]; total: number };
 
@@ -9,4 +9,6 @@ export interface Storage {
   getSummary(): Promise<Summary | null>;
   putSummary(summary: Summary): Promise<void>;
   getSnapshot(): Promise<Snapshot | null>;
+  putWaitlist(entry: WaitlistEntry): Promise<void>;
+  countWaitlist(): Promise<number>;
 }

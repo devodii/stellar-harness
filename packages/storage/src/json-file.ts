@@ -1,5 +1,11 @@
 import { join } from 'node:path';
-import { Finding, type FindingQuery, type Snapshot, Summary } from '@harness/schema';
+import {
+  Finding,
+  type FindingQuery,
+  type Snapshot,
+  Summary,
+  WaitlistEntry,
+} from '@harness/schema';
 import { appendJsonl, readJson, readJsonl, writeJson } from './jsonl';
 import { queryFindingRows } from './query';
 import type { FindingPage, Storage } from './storage';
@@ -7,11 +13,13 @@ import type { FindingPage, Storage } from './storage';
 export class JsonFileStorage implements Storage {
   readonly findingsPath: string;
   readonly summaryPath: string;
+  readonly waitlistPath: string;
   #findings: Promise<Map<string, Finding>> | null = null;
 
   constructor(dataDir: string) {
     this.findingsPath = join(dataDir, 'findings.jsonl');
     this.summaryPath = join(dataDir, 'summary.json');
+    this.waitlistPath = join(dataDir, 'waitlist.jsonl');
   }
 
   #load(): Promise<Map<string, Finding>> {
@@ -46,5 +54,13 @@ export class JsonFileStorage implements Storage {
 
   async getSnapshot(): Promise<Snapshot | null> {
     return (await this.getSummary())?.snapshot ?? null;
+  }
+
+  async putWaitlist(entry: WaitlistEntry): Promise<void> {
+    await appendJsonl(this.waitlistPath, [WaitlistEntry.parse(entry)]);
+  }
+
+  async countWaitlist(): Promise<number> {
+    return (await readJsonl(this.waitlistPath, WaitlistEntry)).length;
   }
 }

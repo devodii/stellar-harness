@@ -1,10 +1,11 @@
-import type { Finding, FindingQuery, Snapshot, Summary } from '@harness/schema';
+import type { Finding, FindingQuery, Snapshot, Summary, WaitlistEntry } from '@harness/schema';
 import { queryFindingRows } from './query';
 import type { FindingPage, Storage } from './storage';
 
 export class MemoryStorage implements Storage {
   readonly #findings = new Map<string, Finding>();
   #summary: Summary | null;
+  readonly #waitlist: WaitlistEntry[] = [];
 
   constructor(seed: { findings?: Finding[]; summary?: Summary | null } = {}) {
     this.#summary = seed.summary ?? null;
@@ -33,5 +34,13 @@ export class MemoryStorage implements Storage {
 
   async getSnapshot(): Promise<Snapshot | null> {
     return this.#summary?.snapshot ?? null;
+  }
+
+  async putWaitlist(entry: WaitlistEntry): Promise<void> {
+    this.#waitlist.push(entry);
+  }
+
+  async countWaitlist(): Promise<number> {
+    return this.#waitlist.length;
   }
 }
