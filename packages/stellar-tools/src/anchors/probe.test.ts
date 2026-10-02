@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { ToolError } from '../tool';
 import type { HorizonAccount } from './ports';
 import { anchorTestSeps, probeAnchor } from './probe';
-import type { AnchorProbeResult, AnchorTestsSummary } from './schemas';
+import type { AnchorProbeResult, AnchorTestsReport } from './schemas';
 import {
   type FakeRoute,
   fakeFetcher,
@@ -232,7 +232,7 @@ describe('probeAnchor', () => {
   });
 
   describe('anchor tests stage', () => {
-    const summary = (failed: number): AnchorTestsSummary => ({
+    const summary = (failed: number): AnchorTestsReport => ({
       domain: 'clpx.finance',
       requestedSeps: [1, 10],
       ranSeps: [1, 10],

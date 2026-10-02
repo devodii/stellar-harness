@@ -11,7 +11,7 @@ import type { Fetcher, HorizonPort } from './ports';
 import type {
   AnchorProbeResult,
   AnchorTestSep,
-  AnchorTestsSummary,
+  AnchorTestsReport,
   AnchorToml,
   ProbeDetails,
   StageRecord,
@@ -22,7 +22,7 @@ import { probeSep38 } from './sep38';
 import { SKIP_REASONS, type SkipReason, skippedStage, stageRecord, startTimer } from './stage';
 import { fetchToml } from './toml';
 
-export type RunAnchorTests = (domain: string, seps: AnchorTestSep[]) => Promise<AnchorTestsSummary>;
+export type RunAnchorTests = (domain: string, seps: AnchorTestSep[]) => Promise<AnchorTestsReport>;
 
 export type AnchorProbePorts = {
   fetch: Fetcher;
@@ -51,7 +51,7 @@ const emptyDetails = (): ProbeDetails => ({
   cors: [],
 });
 
-const testsFailures = (summary: AnchorTestsSummary): string | null => {
+const testsFailures = (summary: AnchorTestsReport): string | null => {
   if (summary.error) return summary.error;
   const failing = Object.entries(summary.perSep)
     .filter(([, result]) => result.failed > 0)
@@ -64,7 +64,7 @@ const runTestsStage = async (
   toml: AnchorToml,
   ports: AnchorProbePorts,
   requested: boolean,
-): Promise<{ record: StageRecord; summary: AnchorTestsSummary | null }> => {
+): Promise<{ record: StageRecord; summary: AnchorTestsReport | null }> => {
   if (!requested)
     return { record: skippedStage('tests', SKIP_REASONS.notRequested), summary: null };
   if (!ports.runAnchorTests) {
@@ -124,7 +124,7 @@ export const probeAnchor = async (
   const records = new Map<AnchorStage, StageRecord>();
   const details = emptyDetails();
   const tags: string[] = [];
-  let anchorTests: AnchorTestsSummary | null = null;
+  let anchorTests: AnchorTestsReport | null = null;
 
   const tomlOutcome = await fetchToml(domain, ports.fetch);
   records.set('toml', tomlOutcome.record);

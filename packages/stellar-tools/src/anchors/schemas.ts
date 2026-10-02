@@ -45,13 +45,13 @@ export const ANCHOR_TEST_SEPS = [1, 10, 12, 24, 31, 38] as const;
 export const AnchorTestSep = z.literal(ANCHOR_TEST_SEPS);
 export type AnchorTestSep = z.infer<typeof AnchorTestSep>;
 
-export const SepTestResult = z.object({
+export const AnchorSepResult = z.object({
   passed: z.number().int().nonnegative(),
   failed: z.number().int().nonnegative(),
   skipped: z.number().int().nonnegative(),
   names: z.array(z.string()),
 });
-export type SepTestResult = z.infer<typeof SepTestResult>;
+export type AnchorSepResult = z.infer<typeof AnchorSepResult>;
 
 export const ExcludedTest = z.object({
   sep: z.number().int(),
@@ -61,16 +61,16 @@ export const ExcludedTest = z.object({
 });
 export type ExcludedTest = z.infer<typeof ExcludedTest>;
 
-export const AnchorTestsSummary = z.object({
+export const AnchorTestsReport = z.object({
   domain: z.string(),
   requestedSeps: z.array(AnchorTestSep),
   ranSeps: z.array(AnchorTestSep),
-  perSep: z.record(z.string(), SepTestResult),
+  perSep: z.record(z.string(), AnchorSepResult),
   excludedSeps: z.array(z.object({ sep: AnchorTestSep, reason: z.string() })),
   excludedTests: z.array(ExcludedTest),
   error: nullableString,
 });
-export type AnchorTestsSummary = z.infer<typeof AnchorTestsSummary>;
+export type AnchorTestsReport = z.infer<typeof AnchorTestsReport>;
 
 export const AccountCheck = z.object({
   id: z.string(),
@@ -173,6 +173,6 @@ export const AnchorProbeResult = z.object({
   tags: z.array(z.string()),
   findings: z.array(FindingDraft),
   details: ProbeDetails,
-  anchorTests: AnchorTestsSummary.nullable(),
+  anchorTests: AnchorTestsReport.nullable(),
 });
 export type AnchorProbeResult = z.infer<typeof AnchorProbeResult>;
