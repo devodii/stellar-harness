@@ -1,0 +1,56 @@
+import { Finding, FindingType, Severity, Summary } from '@harness/schema';
+import { z } from 'zod';
+
+const listOf = <T extends z.ZodType>(item: T) =>
+  z
+    .union([item, z.array(item)])
+    .optional()
+    .transform((value) =>
+      value === undefined ? undefined : Array.isArray(value) ? value : [value],
+    );
+
+const blankToUndefined = (value: unknown) => (value === '' ? undefined : value);
+
+export const FINDINGS_PAGE_SIZE = 25;
+
+export const FindingsQueryParams = z.object({
+  type: listOf(FindingType),
+  severity: listOf(Severity),
+  tag: listOf(z.string().min(1)),
+  subject: z.preprocess(blankToUndefined, z.string().min(1).optional()),
+  limit: z.coerce.number().int().positive().max(200).default(FINDINGS_PAGE_SIZE),
+  offset: z.coerce.number().int().nonnegative().default(0),
+});
+export type FindingsQueryParams = z.infer<typeof FindingsQueryParams>;
+
+export const FindingsResponse = z.object({
+  rows: z.array(Finding),
+  total: z.number().int().nonnegative(),
+  limit: z.number().int().positive(),
+  offset: z.number().int().nonnegative(),
+});
+export type FindingsResponse = z.infer<typeof FindingsResponse>;
+
+export const SummaryResponse = z.object({ summary: Summary, scanned: z.boolean() });
+export type SummaryResponse = z.infer<typeof SummaryResponse>;
+
+export const LiveResponse = z.object({
+  latestLedger: z.number().int().nullable(),
+  closedAt: z.iso.datetime().nullable(),
+  ledgerCloseSeconds: z.number().positive().nullable(),
+  window: z.object({
+    days: z.number().int().nonnegative(),
+    txFailed: z.number().int().nonnegative().nullable(),
+    preventable: z.number().int().nonnegative().nullable(),
+    preventableShare: z.number().min(0).max(1).nullable(),
+  }),
+  archivedContracts: z.number().int().nonnegative().nullable(),
+  anchorsFailing: z.number().int().nonnegative().nullable(),
+  scanned: z.boolean(),
+  horizonOk: z.boolean(),
+});
+export type LiveResponse = z.infer<typeof LiveResponse>;
+
+export const ApiErrorBody = z.object({
+  error: z.object({ code: z.string(), message: z.string() }),
+});
