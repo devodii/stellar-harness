@@ -2,7 +2,7 @@ import { createAnthropic } from '@ai-sdk/anthropic';
 import { appError } from '@harness/schema';
 import { convertToModelMessages, safeValidateUIMessages, stepCountIs, streamText } from 'ai';
 import { z } from 'zod';
-import { systemPrompt, tools } from '@/lib/agent';
+import { getAgentTools, systemPrompt } from '@/lib/agent';
 import { apiHandler } from '@/lib/api-handler';
 import {
   dataPartSchemas,
@@ -52,6 +52,7 @@ export const POST = apiHandler({
       logger.info({ requestId, decisions }, 'plan approval received');
     }
 
+    const tools = getAgentTools();
     const anthropic = createAnthropic({ apiKey: env.ANTHROPIC_API_KEY });
     const result = streamText({
       model: anthropic(env.AI_MODEL),
