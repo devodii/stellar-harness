@@ -1,5 +1,5 @@
 import type { Result } from '@harness/schema';
-import type { DecodedResultCodes, EnvelopeSummary } from './tools/failures-schemas';
+import type { DecodedResultCodes, EnvelopeSummary } from './tools/decoder-schemas';
 
 export type HttpResponse = {
   url: string;
