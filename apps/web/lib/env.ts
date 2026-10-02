@@ -2,6 +2,7 @@ import 'server-only';
 import { resolve } from 'node:path';
 import { defineEnv, envUrl } from '@harness/schema';
 import { z } from 'zod';
+import { memo } from './memo';
 
 const serverShape = {
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
@@ -12,14 +13,6 @@ const serverShape = {
 
 const chatShape = {
   ANTHROPIC_API_KEY: z.string().min(1, 'ANTHROPIC_API_KEY is required for /api/chat'),
-};
-
-const memo = <T>(load: () => T): (() => T) => {
-  let value: T | undefined;
-  return () => {
-    value ??= load();
-    return value;
-  };
 };
 
 export const getServerEnv = memo(() => {
