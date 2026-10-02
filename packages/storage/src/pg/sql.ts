@@ -26,11 +26,13 @@ export const closeSql = async (databaseUrl: string): Promise<void> => {
   await sql.end();
 };
 
-const ESCAPED_NUL = /(?<!\\)((?:\\\\)*)\\u0000/g;
+const ESCAPED_NUL_SOURCE = String.raw`(?<!\\)((?:\\\\)*)\\u0000`;
+const HAS_ESCAPED_NUL = new RegExp(ESCAPED_NUL_SOURCE);
+const ESCAPED_NUL = new RegExp(ESCAPED_NUL_SOURCE, 'g');
 
 export const withoutNul = (value: unknown): unknown => {
   const text = JSON.stringify(value);
-  return text.includes('\\u0000') ? JSON.parse(text.replace(ESCAPED_NUL, '$1\\ufffd')) : value;
+  return HAS_ESCAPED_NUL.test(text) ? JSON.parse(text.replace(ESCAPED_NUL, '$1\\ufffd')) : value;
 };
 
 export const toJson = (value: unknown): postgres.JSONValue =>
