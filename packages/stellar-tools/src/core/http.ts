@@ -70,6 +70,7 @@ export type HttpOptions = {
   random?: () => number;
   now?: () => number;
   defaultTimeoutMs?: number;
+  reliableHosts?: ReadonlySet<string>;
 };
 
 export type Http = {
@@ -252,7 +253,9 @@ export const createHttp = (options: HttpOptions = {}): Http => {
           error: `${failure.kind}: ${failure.message}`,
         });
         const errorMeta = { ...meta, kind: failure.kind, code: failure.code, attempts: attempt };
-        if (!failure.retryable) {
+        const retryable =
+          failure.retryable || (failure.kind === 'dns' && !!options.reliableHosts?.has(host));
+        if (!retryable) {
           stats.increment(host, 'errors');
           return err(
             httpError(`${failure.kind} failure for ${host}: ${failure.message}`, errorMeta),

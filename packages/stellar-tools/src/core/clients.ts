@@ -1,5 +1,5 @@
 import type { Cache } from './cache';
-import { hostLimitsFromConfig, type NetworkConfig } from './config';
+import { hostLimitsFromConfig, hostOf, type NetworkConfig } from './config';
 import { createExpertClient, type ExpertClient } from './expert';
 import { createHorizonClient, type HorizonClient } from './horizon';
 import { createHttp, type Http, type HttpOptions } from './http';
@@ -35,7 +35,12 @@ export const createClients = (
     defaultLimit: config.CONCURRENCY_ANCHOR,
     globalLimit,
   });
-  const client = createHttp({ ...http, limiter, cache, log });
+  const reliableHosts = new Set(
+    [config.HORIZON_URL, config.RPC_URL, config.STELLAR_EXPERT_URL, config.STELLARLIGHT_URL].map(
+      hostOf,
+    ),
+  );
+  const client = createHttp({ reliableHosts, ...http, limiter, cache, log });
   return {
     config,
     http: client,
