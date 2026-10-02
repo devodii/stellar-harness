@@ -9,6 +9,7 @@ import { ResultCard } from '@/components/result-card';
 import { SeverityTag } from '@/components/severity-tag';
 import { StatLabel } from '@/components/stat';
 import { formatInt } from '@/lib/format';
+import { TONE_TEXT } from '@/lib/tone';
 import type { AnchorProbeView as AnchorProbeData, ProbeStageView } from '@/lib/tool-views';
 
 const stageColumns: ColumnDef<ProbeStageView>[] = [
@@ -121,7 +122,7 @@ export function AnchorProbeView({ probe }: { probe: AnchorProbeData }) {
             {Object.entries(probe.anchorTests.perSep).map(([sep, result]) => (
               <li key={sep}>
                 {sep} <span className="text-success">{result.passed}</span>/
-                <span className={result.failed ? 'text-destructive' : 'text-muted-foreground'}>
+                <span className={result.failed ? TONE_TEXT.destructive : TONE_TEXT.muted}>
                   {result.failed}
                 </span>
               </li>

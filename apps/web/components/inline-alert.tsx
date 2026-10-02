@@ -4,6 +4,7 @@ import { CheckCircleIcon, InfoIcon, WarningIcon, XIcon } from '@phosphor-icons/r
 import { cn } from 'cn';
 import * as React from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { TONE_TEXT } from '@/lib/tone';
 
 export type InlineAlertTone = 'neutral' | 'success' | 'warning' | 'destructive';
 
@@ -18,7 +19,7 @@ const TONE_CLASS: Record<InlineAlertTone, string> = {
   neutral: '',
   success: 'border-success/40 text-success [&>svg]:text-success',
   warning: 'border-warning/40 text-warning [&>svg]:text-warning',
-  destructive: 'border-destructive/40 text-destructive [&>svg]:text-destructive',
+  destructive: `border-destructive/40 ${TONE_TEXT.destructive} [&>svg]:text-current`,
 };
 
 export interface InlineAlertProps {

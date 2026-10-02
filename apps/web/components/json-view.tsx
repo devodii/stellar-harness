@@ -1,6 +1,7 @@
 import { cn } from 'cn';
 import * as React from 'react';
 import { CopyButton } from '@/components/copy-button';
+import { TONE_TEXT } from '@/lib/tone';
 
 const TOKEN =
   /("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(?:\s*:)?|\btrue\b|\bfalse\b|\bnull\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g;
@@ -10,7 +11,7 @@ const tokenClass = (token: string): string => {
     return token.trimEnd().endsWith(':') ? 'text-foreground' : 'text-success';
   if (token === 'null') return 'text-muted-foreground';
   if (token === 'true' || token === 'false') return 'text-warning';
-  return 'text-primary';
+  return TONE_TEXT.primary;
 };
 
 const highlight = (json: string): React.ReactNode[] => {
