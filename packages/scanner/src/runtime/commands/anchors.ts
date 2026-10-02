@@ -115,6 +115,7 @@ export const anchorsCommand = async (ctx: ScanContext) => {
         'domain limit': options.limit ?? 'none',
       },
       notes: [
+        ...ctx.notes,
         ...list.notes,
         'The funnel is cumulative: each step counts domains that passed every earlier step.',
         'anchor-tests that write to anchor servers (customer PUT/DELETE, deposit, withdraw, quote POST) and all of SEP-31 are excluded.',

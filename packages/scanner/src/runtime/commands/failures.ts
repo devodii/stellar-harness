@@ -93,6 +93,7 @@ export const failuresCommand = async (ctx: ScanContext) => {
         `GET ${config.HORIZON_URL}/accounts/{id}/operations?order=asc&limit=1`,
       ],
       parameters: {
+        network: config.NETWORK,
         window: String(window ?? '7d'),
         'start ledger': result.value.window.startLedger,
         'end ledger': result.value.window.endLedger,
@@ -103,6 +104,7 @@ export const failuresCommand = async (ctx: ScanContext) => {
         'cluster threshold other codes': 10,
       },
       notes: [
+        ...ctx.notes,
         'Result codes are decoded from result_xdr and named exactly as Horizon names them.',
         'Transaction-level codes such as tx_bad_seq are rejected at submission and never reach ledger history, so their clusters are expected to be empty.',
         'byCode counts each code once per failed transaction.',

@@ -1,3 +1,4 @@
+import { simulationSourceFor } from '@harness/stellar-tools/contracts';
 import { CONTRACT_ROWS_DERIVED } from '../../census/contracts/index';
 import { ContractRow } from '../../census/contracts/schemas';
 import { RENT_DERIVED, RENT_TOP_COLUMNS, runRentCensus } from '../../census/rent';
@@ -49,10 +50,12 @@ export const rentCommand = async (ctx: ScanContext) => {
       census: 'Census 4: rent',
       endpoints: [
         `POST ${config.RPC_URL} simulateTransaction (extendFootprintTtl, read-only footprint of instance and code)`,
-        `GET ${config.HORIZON_URL}/accounts/{simulation source}`,
+        `GET ${config.HORIZON_URL}/accounts/{simulation source} (RPC getLedgerEntries when Horizon fails)`,
         'GET https://api.coingecko.com/api/v3/simple/price?ids=stellar&vs_currencies=usd',
       ],
       parameters: {
+        network: config.NETWORK,
+        'simulation source': simulationSourceFor(config.NETWORK),
         'extend horizon (days)': 365,
         'full population limit': 5000,
         'sample size above the limit': 2000,
@@ -62,6 +65,7 @@ export const rentCommand = async (ctx: ScanContext) => {
         simulated: result.stats.simulated,
       },
       notes: [
+        ...ctx.notes,
         'Rent is the minimum resource fee returned by simulation; nothing is signed or submitted.',
         'Totals sum simulated contracts only, with no population weighting.',
       ],
