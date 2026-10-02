@@ -6,12 +6,17 @@ describe('@harness/agent', () => {
   it('exports the agent surface', () => {
     expect(typeof systemPrompt).toBe('string');
     expect(APPROVAL_NOTE).toContain('passkey signature');
-    const tools = createAgentTools({ storage: new MemoryStorage(), policy: { spendCapXlm: 5 } });
+    const tools = createAgentTools({
+      storage: new MemoryStorage(),
+      policy: { spendCapXlm: 5 },
+      stellarlight: { get: async () => ({}) },
+    });
     expect(Object.keys(tools).sort()).toEqual([
       'explainFailure',
       'getSummary',
       'planFix',
       'queryFindings',
+      'searchEcosystem',
     ]);
   });
 
