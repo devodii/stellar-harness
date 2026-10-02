@@ -1,7 +1,8 @@
 import { open, rm } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { Snapshot } from '@harness/schema';
+import { DEFAULT_NETWORK, type Network, type Snapshot } from '@harness/schema';
 import {
+  type Cache,
   createClients,
   createPorts,
   DiskCache,
@@ -14,6 +15,7 @@ import {
   type Ports,
   stderrLogger,
   takeSnapshot,
+  withRpcAccountFallback,
 } from '@harness/stellar-tools';
 import { z } from 'zod';
 import { createDerivedWriter, derivedPath } from '../core/derived';
@@ -28,6 +30,8 @@ import { createStateStore, snapshotStore, writeJsonAtomic } from '../core/state'
 
 export type ScanOptions = {
   dataDir: string;
+  network?: Network;
+  cache?: Cache;
   noCache?: boolean;
   newSnapshot?: boolean;
   limit?: number;
@@ -93,11 +97,12 @@ const resolveSnapshot = async (
   dataDir: string,
   fresh: boolean,
 ): Promise<Snapshot> => {
+  const network = clients.config.NETWORK;
   const store = snapshotStore(dataDir);
   const existing = fresh ? null : await store.read();
-  if (existing) return existing;
+  if (existing?.network === network) return existing;
   await resetForSnapshot(dataDir);
-  const taken = await takeSnapshot(clients, { gitSha: process.env.GIT_SHA });
+  const taken = await takeSnapshot(clients, { gitSha: process.env.GIT_SHA, network });
   if (!taken.ok) throw new Error(`Could not take a snapshot: ${taken.error.message}`);
   await store.write(taken.value);
   return taken.value;
@@ -125,12 +130,22 @@ const createRun =
     };
   };
 
+export const selectCache = ({ noCache, cache, dataDir }: ScanOptions): Cache => {
+  if (noCache) return new NoCache();
+  return cache ?? new DiskCache(dataDir);
+};
+
+export const scanPorts = (clients: NetworkClients): Ports => {
+  const ports = createPorts(clients);
+  return { ...ports, horizon: withRpcAccountFallback(ports.horizon, ports.rpc) };
+};
+
 export const createScanContext = async (options: ScanOptions): Promise<ScanContext> => {
   const log = options.log ?? ((line: string) => process.stderr.write(`${line}\n`));
-  const config = loadNetworkConfig(options.env);
+  const config = loadNetworkConfig(options.env, options.network ?? DEFAULT_NETWORK);
   const gaps: HttpGap[] = [];
   const clients = createClients(config, {
-    cache: options.noCache ? new NoCache() : new DiskCache(options.dataDir),
+    cache: selectCache(options),
     log: stderrLogger,
     limits: options.concurrency,
     onGap: (gap) => gaps.push(gap),
@@ -150,7 +165,7 @@ export const createScanContext = async (options: ScanOptions): Promise<ScanConte
     options,
     config,
     clients,
-    ports: createPorts(clients),
+    ports: scanPorts(clients),
     snapshot,
     sink,
     gaps,
