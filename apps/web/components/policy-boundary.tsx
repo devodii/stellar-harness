@@ -8,30 +8,20 @@ export interface PolicyBoundaryProps {
 }
 
 export function PolicyBoundary({ boundary, className }: PolicyBoundaryProps) {
+  const limits = [
+    boundary.requested && `${boundary.requested} requested`,
+    boundary.threshold && `${boundary.threshold} threshold`,
+  ].filter(Boolean);
+
   return (
-    <div
-      className={cn('space-y-2 rounded-md border border-warning/40 bg-warning/5 p-3', className)}
-    >
+    <div className={cn('space-y-1 border-l-2 border-warning pl-3', className)}>
       <div className="flex flex-wrap items-baseline gap-x-2">
-        <StatLabel>policy boundary</StatLabel>
-        <code className="font-mono text-xs text-warning">{boundary.rule}</code>
+        <StatLabel>policy</StatLabel>
+        <code className="font-mono text-xs text-foreground">{boundary.rule}</code>
       </div>
-      <p className="text-xs text-foreground">{boundary.reason}</p>
-      {(boundary.requested || boundary.threshold) && (
-        <dl className="grid grid-cols-2 gap-3 font-mono text-xs">
-          <div>
-            <dt>
-              <StatLabel>requested</StatLabel>
-            </dt>
-            <dd className="text-foreground">{boundary.requested ?? 'n/a'}</dd>
-          </div>
-          <div>
-            <dt>
-              <StatLabel>threshold</StatLabel>
-            </dt>
-            <dd className="text-foreground">{boundary.threshold ?? 'n/a'}</dd>
-          </div>
-        </dl>
+      <p className="text-sm text-foreground">{boundary.reason}</p>
+      {limits.length > 0 && (
+        <p className="font-mono text-xs text-muted-foreground">{limits.join(' · ')}</p>
       )}
     </div>
   );
