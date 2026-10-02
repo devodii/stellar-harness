@@ -6,8 +6,10 @@ import type * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { useCopy } from '@/hooks/use-copy';
 
-export interface CopyButtonProps
-  extends Omit<React.ComponentProps<typeof Button>, 'onClick' | 'children'> {
+export interface CopyButtonProps extends Omit<
+  React.ComponentProps<typeof Button>,
+  'onClick' | 'children'
+> {
   value: string;
   label?: string;
 }
