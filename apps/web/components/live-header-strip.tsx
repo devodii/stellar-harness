@@ -3,13 +3,18 @@
 import { LiveStrip, type LiveStripItem } from '@/components/live-strip';
 import { useLive } from '@/hooks/use-live';
 import type { LiveResponse } from '@/lib/api-schemas';
-import { formatDateTime, formatPercent, formatSeconds } from '@/lib/format';
+import { formatDateTime, formatInt, formatPercent, formatSeconds } from '@/lib/format';
 
 const ledgerTitle = (live: LiveResponse | undefined): string | undefined => {
   if (!live?.ledgerSource) return undefined;
   const closed = live.closedAt ? `closed ${formatDateTime(live.closedAt)} UTC, ` : '';
   return `${closed}via ${live.ledgerSource}`;
 };
+
+const archivedTitle = (live: LiveResponse | undefined): string | undefined =>
+  live?.archivedContracts == null
+    ? undefined
+    : `${formatInt(live.archivedContracts)} archived in total (active: 100+ invocations or SCF-funded)`;
 
 export const liveStripItems = (live: LiveResponse | undefined): LiveStripItem[] => [
   {
@@ -32,7 +37,13 @@ export const liveStripItems = (live: LiveResponse | undefined): LiveStripItem[] 
     format: (share) => formatPercent(share),
     tone: 'warning',
   },
-  { id: 'archived', label: 'archived', value: live?.archivedContracts },
+  {
+    id: 'archived',
+    label: 'archived',
+    qualifier: 'active',
+    value: live?.archivedMeaningful,
+    title: archivedTitle(live),
+  },
   { id: 'anchors', label: 'anchors failing', value: live?.anchorsFailing },
 ];
 
