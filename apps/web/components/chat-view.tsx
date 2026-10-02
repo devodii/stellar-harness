@@ -1,7 +1,7 @@
 'use client';
 
 import { useChat } from '@ai-sdk/react';
-import type { Finding } from '@harness/schema';
+import type { Finding, Network } from '@harness/schema';
 import * as React from 'react';
 import {
   Conversation,
@@ -23,6 +23,7 @@ export interface ChatViewProps {
   conversationId: string;
   initialMessages: HarnessUIMessage[];
   suggestions: ChatSuggestion[];
+  network?: Network;
   scanned?: boolean;
   initialPrompt?: string;
   onMessagesChange?: (messages: HarnessUIMessage[]) => void;
@@ -32,6 +33,7 @@ export function ChatView({
   conversationId,
   initialMessages,
   suggestions,
+  network,
   scanned,
   initialPrompt,
   onMessagesChange,
@@ -96,6 +98,7 @@ export function ChatView({
             <ChatEmpty
               suggestions={suggestions}
               onSelect={sendPrompt}
+              network={network}
               scanned={scanned}
               disabled={busy}
             />
