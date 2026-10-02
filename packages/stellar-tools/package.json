@@ -9,7 +9,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "collect:result-fixtures": "tsx scripts/collect-result-fixtures.ts"
   },
   "dependencies": {
     "@harness/schema": "workspace:*",
