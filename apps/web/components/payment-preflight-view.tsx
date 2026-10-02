@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from 'cn';
+import { AccentBlock } from '@/components/accent-block';
 import { BracketTag } from '@/components/bracket-tag';
 import { PlanView, type PlanViewProps } from '@/components/plan-view';
 import { ResultSection } from '@/components/result-section';
@@ -46,16 +47,15 @@ export function PaymentPreflightView({ preflight, ...planProps }: PaymentPreflig
         {preflight.blockers.length > 0 && (
           <div className="space-y-1.5">
             <StatLabel>blockers</StatLabel>
-            <ul className="space-y-1.5">
+            <ul className="space-y-2">
               {preflight.blockers.map((blocker) => (
-                <li
-                  key={blocker.code}
-                  className="rounded-md border border-destructive/40 bg-destructive/5 p-2"
-                >
-                  <code className={cn('font-mono text-xs', TONE_TEXT.destructive)}>
-                    {blocker.code}
-                  </code>
-                  <p className="text-xs text-foreground">{blocker.fix}</p>
+                <li key={blocker.code}>
+                  <AccentBlock tone="destructive">
+                    <code className={cn('font-mono text-xs', TONE_TEXT.destructive)}>
+                      {blocker.code}
+                    </code>
+                    <p className="text-sm text-foreground">{blocker.fix}</p>
+                  </AccentBlock>
                 </li>
               ))}
             </ul>
