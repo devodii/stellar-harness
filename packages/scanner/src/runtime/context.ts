@@ -1,4 +1,4 @@
-import { rm } from 'node:fs/promises';
+import { open, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { Snapshot } from '@harness/schema';
 import {
@@ -24,7 +24,7 @@ import {
   makeFinding,
 } from '../core/findings';
 import { formatProgress, runTasks } from '../core/runner';
-import { createStateStore, snapshotStore } from '../core/state';
+import { createStateStore, snapshotStore, writeJsonAtomic } from '../core/state';
 
 export type ScanOptions = {
   dataDir: string;
@@ -57,11 +57,28 @@ export type ScanContext = {
   emit: (draft: FindingInput) => Promise<void>;
   writeDerived: (name: string, rows: unknown[]) => Promise<void>;
   resetDerived: (...names: string[]) => Promise<void>;
+  readDerived: (name: string) => AsyncIterable<unknown>;
+  writeDerivedJson: (relativePath: string, data: unknown) => Promise<void>;
   checkpointer: (census: string) => (state: Record<string, unknown>) => Promise<void>;
   readCheckpoint: (census: string) => Promise<Record<string, unknown> | null>;
   stats: () => HostStats;
   log: (line: string) => void;
 };
+
+async function* readJsonlLines(path: string): AsyncIterable<unknown> {
+  let handle: Awaited<ReturnType<typeof open>>;
+  try {
+    handle = await open(path);
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') return;
+    throw error;
+  }
+  try {
+    for await (const line of handle.readLines()) if (line.trim()) yield JSON.parse(line);
+  } finally {
+    await handle.close();
+  }
+}
 
 const CheckpointState = z.record(z.string(), z.unknown());
 
@@ -151,6 +168,9 @@ export const createScanContext = async (options: ScanOptions): Promise<ScanConte
         names.map((name) => rm(derivedPath(options.dataDir, name), { force: true })),
       );
     },
+    readDerived: (name) => readJsonlLines(derivedPath(options.dataDir, name)),
+    writeDerivedJson: (relativePath, data) =>
+      writeJsonAtomic(join(options.dataDir, 'derived', relativePath), data),
     checkpointer: (census) => (state) => store(census).write(state),
     readCheckpoint: (census) => store(census).read(),
     stats: () => clients.http.stats.totals(),
