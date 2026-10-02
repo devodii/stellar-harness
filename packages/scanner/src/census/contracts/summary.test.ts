@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { contractsSummary } from './summary';
+import { contractsSummary, isMeaningfulRow, meaningfulCounts } from './summary';
 import { contractRow, ttl } from './testing';
 
 const scf = { slug: 'soroswap', name: 'Soroswap', round: 21 };
@@ -23,8 +23,10 @@ describe('contractsSummary', () => {
       total: 7,
       families: 2,
       archivedInstances: 4,
+      archivedMeaningful: 1,
       archivedByFamily: { [wasmA]: 2, [wasmB]: 1, stellar_asset: 1 },
       expiring30d: 1,
+      expiring30dMeaningful: 1,
       expiring90d: 1,
       liveIdle: 1,
       scfFunded: { total: 2, archived: 1, expiring30d: 1, projects },
@@ -34,6 +36,24 @@ describe('contractsSummary', () => {
   it('uses previous activity for idleness when given', () => {
     const previous = new Map([[rows[4]?.contract ?? '', 10]]);
     expect(contractsSummary(rows, [], previous).liveIdle).toBe(2);
+  });
+
+  it('counts archived and expiring instances that matter', () => {
+    const busy = [
+      contractRow(8, { instance: ttl.archived(), invocations: 100 }),
+      contractRow(9, { instance: ttl.archived(), invocations: 99 }),
+      contractRow(10, { instance: ttl.live(12), invocations: 5_000 }),
+    ];
+    expect(meaningfulCounts([...rows, ...busy])).toEqual({
+      archivedMeaningful: 2,
+      expiring30dMeaningful: 2,
+    });
+  });
+
+  it('treats scf funded or 100+ invocation contracts as meaningful', () => {
+    expect(isMeaningfulRow({ invocations: 100, scf: null })).toBe(true);
+    expect(isMeaningfulRow({ invocations: 0, scf })).toBe(true);
+    expect(isMeaningfulRow({ invocations: 99, scf: null })).toBe(false);
   });
 
   it('summarises an empty run', () => {
