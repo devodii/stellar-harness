@@ -14,3 +14,4 @@ export * from './tools/names';
 export * from './tools/plan-fix';
 export * from './tools/query-findings';
 export * from './tools/schemas';
+export * from './tools/search-ecosystem';
