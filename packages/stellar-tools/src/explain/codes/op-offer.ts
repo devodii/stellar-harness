@@ -11,12 +11,12 @@ export const OP_OFFER_CODES = {
     'No trustline for buying asset',
     'The account has no trustline for the asset it wants to buy.',
   ),
-  op_sell_not_authorized: entry(
+  sell_not_authorized: entry(
     'trust',
     'Not authorized to sell',
     'The issuer has not authorized the account to hold the asset being sold.',
   ),
-  op_buy_not_authorized: entry(
+  buy_not_authorized: entry(
     'trust',
     'Not authorized to buy',
     'The issuer has not authorized the account to hold the asset being bought.',
@@ -26,7 +26,7 @@ export const OP_OFFER_CODES = {
     'Selling asset issuer missing',
     'The issuer of the asset being sold does not exist.',
   ),
-  op_buy_no_issuer: entry(
+  buy_no_issuer: entry(
     'account',
     'Buying asset issuer missing',
     'The issuer of the asset being bought does not exist.',

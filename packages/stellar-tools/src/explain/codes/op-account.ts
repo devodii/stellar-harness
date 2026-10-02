@@ -66,7 +66,7 @@ export const OP_ACCOUNT_CODES = {
     'Cannot delete trustline',
     'The trustline cannot be removed while it still has a balance, liabilities or is used by a pool share trustline.',
   ),
-  op_not_auth_maintain_liabilities: entry(
+  op_not_aut_maintain_liabilities: entry(
     'trust',
     'Not authorized to maintain liabilities',
     'The trustline is not authorized to keep its existing offers or liabilities.',
