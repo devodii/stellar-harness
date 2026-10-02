@@ -1,4 +1,5 @@
 import { ANCHOR_STAGES, type AnchorStage } from '@harness/schema';
+import { type NetworkSelection, resolveNetwork } from '../core/network';
 import { fail } from '../tool';
 import { probeAccounts } from './accounts';
 import { type CorsInput, checkCors } from './cors';
@@ -24,7 +25,7 @@ import { fetchToml } from './toml';
 
 export type RunAnchorTests = (domain: string, seps: AnchorTestSep[]) => Promise<AnchorTestsReport>;
 
-export type AnchorProbePorts = {
+export type AnchorProbePorts = NetworkSelection & {
   fetch: Fetcher;
   horizon: HorizonPort;
   runAnchorTests?: RunAnchorTests;
@@ -126,7 +127,8 @@ export const probeAnchor = async (
   const tags: string[] = [];
   let anchorTests: AnchorTestsReport | null = null;
 
-  const tomlOutcome = await fetchToml(domain, ports.fetch);
+  const { passphrase } = resolveNetwork(ports);
+  const tomlOutcome = await fetchToml(domain, ports.fetch, passphrase);
   records.set('toml', tomlOutcome.record);
   const toml = tomlOutcome.toml;
 
@@ -149,9 +151,13 @@ export const probeAnchor = async (
   };
 
   if (!toml) return finish(SKIP_REASONS.tomlUnreachable);
-  if (tomlOutcome.passphrase === 'testnet') {
-    tags.push('testnet_toml');
-    return finish(SKIP_REASONS.testnetToml);
+  if (tomlOutcome.passphrase === 'other_network') {
+    const reason =
+      tomlOutcome.passphraseNetwork === 'mainnet'
+        ? SKIP_REASONS.mainnetToml
+        : SKIP_REASONS.testnetToml;
+    tags.push(reason);
+    return finish(reason);
   }
   if (tomlOutcome.passphrase === 'nonstandard') tags.push('nonstandard_passphrase');
 
@@ -166,7 +172,7 @@ export const probeAnchor = async (
 
   const [info, sep10, sep38, sep31] = await Promise.all([
     probeInfo(toml, ports.fetch),
-    probeSep10(domain, toml, ports.fetch),
+    probeSep10(domain, toml, ports.fetch, passphrase),
     probeSep38(toml, ports.fetch),
     probeSep31(toml, ports.fetch),
   ]);

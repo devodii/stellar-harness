@@ -128,7 +128,7 @@ export const InfoServer = EndpointProbe.extend({
 export type InfoServer = z.infer<typeof InfoServer>;
 
 export const ChallengeChecks = z.object({
-  mainnetPassphrase: z.boolean(),
+  expectedPassphrase: z.boolean(),
   sourceIsSigningKey: z.boolean(),
   firstOpManageData: z.boolean(),
   homeDomainMatches: z.boolean(),
