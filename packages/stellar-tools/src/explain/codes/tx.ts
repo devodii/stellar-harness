@@ -19,7 +19,7 @@ export const TX_CODES = {
   tx_too_early: entry(
     'time',
     'Too early',
-    'The ledger closed before the transaction minimum time or minimum ledger bound. Submit again once the lower bound has passed.',
+    'The ledger closed before the transaction minimum time or minimum ledger bound. Send it again once the lower bound has passed.',
   ),
   tx_too_late: entry(
     'time',

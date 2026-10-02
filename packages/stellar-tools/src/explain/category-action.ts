@@ -2,14 +2,15 @@ import type { CodeCategory } from './code-info';
 
 export const CATEGORY_ACTION: Record<CodeCategory, string> = {
   success: 'No action needed.',
-  sequence: 'Reload the source account sequence and rebuild the transaction before resubmitting.',
-  fee: 'Raise the fee bid within the policy fee cap or fee-bump the transaction.',
-  time: 'Rebuild with timebounds that match when the transaction will actually be submitted.',
+  sequence:
+    'Reload the source account sequence and rebuild the transaction before sending it again.',
+  fee: 'Raise the fee bid within your fee cap or fee-bump the transaction.',
+  time: 'Rebuild with timebounds that match when the transaction will actually be sent.',
   auth: 'Check signer weights against the account thresholds and collect the missing signatures.',
   balance: 'Check the source balance net of liabilities and reserve before sending.',
   reserve: 'Top up the XLM reserve before creating new ledger entries.',
   trust: 'Check trustlines and issuer authorization for both accounts before sending.',
-  destination: 'Check that the destination account exists, or create and fund it under policy.',
+  destination: 'Check that the destination account exists, or create and fund it first.',
   limit: 'Check the relevant limit before sending; split the amount or raise the limit.',
   offer: 'Reload open offers for the account and rebuild the offer operation.',
   path: 'Re-quote the path with strict send or strict receive and widen the slippage bound.',
