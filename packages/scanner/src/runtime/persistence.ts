@@ -1,22 +1,15 @@
 import { open, readdir, readFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
-import {
-  type ArtifactKind,
-  createScanStore,
-  createSql,
-  ensureMigrated,
-  JsonFileStorage,
-  PostgresStorage,
-  type Storage,
-} from '@harness/storage';
 import { createDerivedWriter, derivedPath } from '../core/derived';
 import { snapshotStore, writeJsonAtomic } from '../core/state';
-import type { Network, Snapshot } from '../schema';
+import type { Snapshot } from '../schema';
+import { JsonFileStorage } from '../storage/json-file';
+
+export type ArtifactKind = 'previews' | 'runs' | 'derived' | 'state';
 
 export interface ScanPersistence {
-  readonly kind: 'files' | 'postgres';
   readonly dataDir: string;
-  readonly storage: Storage;
+  readonly storage: JsonFileStorage;
   getSnapshot(): Promise<Snapshot | null>;
   putSnapshot(snapshot: Snapshot): Promise<void>;
   resetForSnapshot(): Promise<void>;
@@ -63,7 +56,6 @@ const readJson = async (path: string): Promise<unknown | null> => {
 export const filePersistence = (dataDir: string): ScanPersistence => {
   const snapshots = snapshotStore(dataDir);
   return {
-    kind: 'files',
     dataDir,
     storage: new JsonFileStorage(dataDir),
     getSnapshot: () => snapshots.read(),
@@ -96,39 +88,3 @@ export const filePersistence = (dataDir: string): ScanPersistence => {
     },
   };
 };
-
-export const postgresPersistence = async (
-  dataDir: string,
-  network: Network,
-  databaseUrl: string,
-): Promise<ScanPersistence> => {
-  const sql = createSql(databaseUrl);
-  await ensureMigrated(sql);
-  const store = createScanStore({ network, databaseUrl });
-  if (!store) throw new Error('DATABASE_URL is set but the scan store could not be created');
-  return {
-    kind: 'postgres',
-    dataDir,
-    storage: new PostgresStorage(sql, network),
-    getSnapshot: () => store.getSnapshot(),
-    putSnapshot: (snapshot) => store.putSnapshot(snapshot),
-    resetForSnapshot: () => store.resetForSnapshot(),
-    appendDerived: async (name, rows) => {
-      await store.appendDerived(name, rows);
-    },
-    clearDerived: (...names) => store.clearDerived(...names),
-    readDerived: (name) => store.readDerived(name),
-    putArtifact: (kind, name, body) => store.putArtifact(kind, name, body),
-    getArtifact: (kind, name) => store.getArtifact(kind, name),
-    listArtifacts: (kind) => store.listArtifacts(kind),
-  };
-};
-
-export const createPersistence = (
-  dataDir: string,
-  network: Network,
-  databaseUrl?: string,
-): Promise<ScanPersistence> =>
-  databaseUrl
-    ? postgresPersistence(dataDir, network, databaseUrl)
-    : Promise.resolve(filePersistence(dataDir));

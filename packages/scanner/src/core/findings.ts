@@ -1,6 +1,13 @@
 import { createHash } from 'node:crypto';
-import { JsonFileStorage, type Storage } from '@harness/storage';
-import { Finding, type FindingType, type Severity, type Snapshot, SUGGESTED_ACTION, type SubjectKind } from '../schema';
+import {
+  Finding,
+  type FindingType,
+  type Severity,
+  type Snapshot,
+  SUGGESTED_ACTION,
+  type SubjectKind,
+} from '../schema';
+import { JsonFileStorage } from '../storage/json-file';
 
 export const findingId = (type: FindingType, subject: string, snapshotLedger: number): string =>
   createHash('sha256').update(`${type}:${subject}:${snapshotLedger}`).digest('hex');
@@ -34,14 +41,14 @@ export const makeFinding = (
   });
 
 export type FindingSink = {
-  readonly storage: Storage;
+  readonly storage: JsonFileStorage;
   emit(finding: Finding): Promise<boolean>;
   emitMany(findings: Finding[]): Promise<number>;
   readonly emitted: number;
   readonly duplicates: number;
 };
 
-export const createFindingSink = (target: Storage | string): FindingSink => {
+export const createFindingSink = (target: JsonFileStorage | string): FindingSink => {
   const storage = typeof target === 'string' ? new JsonFileStorage(target) : target;
   const seen = new Set<string>();
   let emitted = 0;

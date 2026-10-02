@@ -1,4 +1,3 @@
-import { createCache } from '@harness/storage';
 import { z } from 'zod';
 import {
   createFindingSink,
@@ -10,16 +9,28 @@ import { formatProgress, runTasks } from '../core/runner';
 import { createStateStore } from '../core/state';
 import type { Snapshot } from '../schema';
 import { DEFAULT_NETWORK, type Network } from '../schema';
-import { type Cache, createClients, DiskCache, type HostStats, type HttpGap, loadNetworkConfig, type NetworkClients, type NetworkConfig, NoCache, stderrLogger, takeSnapshot, withRpcAccountFallback } from '../stellar';
+import {
+  type Cache,
+  createClients,
+  DiskCache,
+  type HostStats,
+  type HttpGap,
+  loadNetworkConfig,
+  type NetworkClients,
+  type NetworkConfig,
+  NoCache,
+  stderrLogger,
+  takeSnapshot,
+  withRpcAccountFallback,
+} from '../stellar';
 import { type HorizonStatus, probeHorizon, unavailableHorizon } from './horizon';
-import { createPersistence, type ScanPersistence } from './persistence';
+import { filePersistence, type ScanPersistence } from './persistence';
 import { createPorts, type Ports } from './ports';
 
 export type ScanOptions = {
   dataDir: string;
   network?: Network;
   cache?: Cache;
-  databaseUrl?: string;
   noCache?: boolean;
   newSnapshot?: boolean;
   limit?: number;
@@ -104,20 +115,8 @@ const createRun =
     };
   };
 
-export const selectCache = ({
-  noCache,
-  cache,
-  dataDir,
-  databaseUrl,
-  network,
-}: ScanOptions): Cache => {
-  if (noCache) return new NoCache();
-  return (
-    cache ??
-    createCache({ dataDir, network: network ?? DEFAULT_NETWORK, databaseUrl }) ??
-    new DiskCache(dataDir)
-  );
-};
+export const selectCache = ({ noCache, cache, dataDir }: ScanOptions): Cache =>
+  noCache ? new NoCache() : (cache ?? new DiskCache(dataDir));
 
 export const scanPorts = (
   clients: NetworkClients,
@@ -132,7 +131,7 @@ export const createScanContext = async (options: ScanOptions): Promise<ScanConte
   const log = options.log ?? ((line: string) => process.stderr.write(`${line}\n`));
   const network = options.network ?? DEFAULT_NETWORK;
   const config = loadNetworkConfig(options.env, network);
-  const persistence = await createPersistence(options.dataDir, network, options.databaseUrl);
+  const persistence = filePersistence(options.dataDir);
   const gaps: HttpGap[] = [];
   const clients = createClients(config, {
     cache: selectCache(options),

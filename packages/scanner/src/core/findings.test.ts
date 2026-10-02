@@ -1,9 +1,9 @@
 import { mkdtemp, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { MemoryStorage } from '@harness/storage';
 import { describe, expect, it } from 'vitest';
 import { type Finding, SUGGESTED_ACTION } from '../schema';
+import { JsonFileStorage } from '../storage/json-file';
 import { createFindingSink, findingId, makeFinding } from './findings';
 
 const snapshot = { snapshotLedger: 64722901 };
@@ -68,15 +68,15 @@ describe('createFindingSink', () => {
   });
 
   it('serialises concurrent emits of the same finding', async () => {
-    const storage = new MemoryStorage();
+    const storage = new JsonFileStorage(await mkdtemp(join(tmpdir(), 'harness-findings-')));
     const sink = createFindingSink(storage);
     const results = await Promise.all([sink.emit(cluster()), sink.emit(cluster())]);
     expect(results.filter(Boolean)).toHaveLength(1);
-    expect((await storage.queryFindings({})).total).toBe(1);
+    expect(await storage.listFindings()).toHaveLength(1);
   });
 
   it('rejects invalid findings', async () => {
-    const sink = createFindingSink(new MemoryStorage());
+    const sink = createFindingSink(await mkdtemp(join(tmpdir(), 'harness-findings-')));
     await expect(sink.emit({ ...cluster(), findingId: 'nope' })).rejects.toThrow();
     expect(await sink.emit(cluster())).toBe(true);
   });
