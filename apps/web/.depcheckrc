@@ -1,0 +1,3 @@
+{
+  "ignores": ["tw-animate-css", "tailwindcss", "@tailwindcss/postcss", "typescript"]
+}
