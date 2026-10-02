@@ -3,11 +3,39 @@ import { batched } from './batch';
 import { type Sql, toJson } from './sql';
 
 const DERIVED_BATCH = 1000;
-const DERIVED_BATCH_BYTES = 8 * 1024 * 1024;
 const READ_BATCH = 500;
 
 export const ARTIFACT_KINDS = ['previews', 'runs', 'derived', 'state'] as const;
 export type ArtifactKind = (typeof ARTIFACT_KINDS)[number];
+
+export type DerivedRow = { seq: number; body: unknown };
+
+export const insertDerivedRows = async (
+  sql: Sql,
+  network: Network,
+  name: string,
+  rows: readonly DerivedRow[],
+): Promise<number> => {
+  if (rows.length === 0) return 0;
+  const values = rows.map((row) => ({
+    network,
+    name,
+    seq: row.seq,
+    body: sql.json(toJson(row.body)),
+  }));
+  const result = await sql`
+    insert into derived_rows ${sql(values, 'network', 'name', 'seq', 'body')}
+    on conflict (network, name, seq) do nothing
+  `;
+  return result.count;
+};
+
+export const maxDerivedSeq = async (sql: Sql, network: Network, name: string) => {
+  const [row] = await sql<{ seq: string | null }[]>`
+    select max(seq)::text as seq from derived_rows where network = ${network} and name = ${name}
+  `;
+  return row?.seq ? Number(row.seq) : 0;
+};
 
 export class PgScanStore {
   readonly #sql: Sql;
@@ -43,28 +71,11 @@ export class PgScanStore {
 
   async appendDerived(name: string, rows: AsyncIterable<unknown> | Iterable<unknown>) {
     const sql = this.#sql;
-    const [last] = await sql<{ seq: string | null }[]>`
-      select max(seq)::text as seq from derived_rows
-      where network = ${this.network} and name = ${name}
-    `;
-    let seq = last?.seq ? Number(last.seq) : 0;
+    let seq = await maxDerivedSeq(sql, this.network, name);
     let written = 0;
-    const encoded = async function* () {
-      for await (const row of rows) yield toJson(row);
-    };
-    for await (const batch of batched(encoded(), {
-      maxRows: DERIVED_BATCH,
-      maxBytes: DERIVED_BATCH_BYTES,
-      sizeOf: (row) => JSON.stringify(row).length,
-    })) {
-      const values = batch.map((body) => ({
-        network: this.network,
-        name,
-        seq: ++seq,
-        body: sql.json(body),
-      }));
-      await sql`insert into derived_rows ${sql(values, 'network', 'name', 'seq', 'body')}`;
-      written += batch.length;
+    for await (const batch of batched(rows, { maxRows: DERIVED_BATCH })) {
+      const numbered = batch.map((body) => ({ seq: ++seq, body }));
+      written += await insertDerivedRows(sql, this.network, name, numbered);
     }
     return written;
   }
