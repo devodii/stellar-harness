@@ -24,6 +24,7 @@ export const planProtocol = {
   schemas: { PlanApproval, PlanDecision, PlanEvent },
 } as const;
 
+export * from './context';
 export * from './protocol';
 export * from './system';
 export * from './tools';
