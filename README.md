@@ -29,7 +29,7 @@ apps/web                Next.js chat demo
 
 ## Requirements
 
-Node 22, pnpm 10. Copy `.env.example` to `.env` at the repository root; both the scanner and the web app read it. `OPENAI_API_KEY` is the only required value (chat); `DATABASE_URL` switches storage from `data/` files to Postgres; `GITHUB_TOKEN` enables Census 5. Endpoint URLs (`HORIZON_URL`, `RPC_URL`, `STELLAR_EXPERT_URL`, `STELLARLIGHT_URL`, plus `TESTNET_` variants), `HARNESS_DATA_DIR`, `POLICY_SPEND_CAP_XLM`, `FAILURE_WINDOW` and `CONCURRENCY_*` have defaults and are optional overrides.
+Node 22, pnpm 10. Copy `.env.example` to `.env` at the repository root; both the scanner and the web app read it. `OPENAI_API_KEY` is the only required value (chat); `DATABASE_URL` switches storage from `data/` files to Postgres; `GITHUB_TOKEN` enables Census 5. Endpoint URLs (`HORIZON_URL`, `RPC_URL`, `STELLAR_EXPERT_URL`, `STELLARLIGHT_URL`, plus `TESTNET_` variants), `HARNESS_DATA_DIR`, `FAILURE_WINDOW` and `CONCURRENCY_*` have defaults and are optional overrides.
 
 ```bash
 pnpm install
