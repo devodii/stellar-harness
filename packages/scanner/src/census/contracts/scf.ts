@@ -1,4 +1,4 @@
-import type { AppError, ScfProject } from '@harness/schema';
+import { type AppError, appError, type ScfProject } from '@harness/schema';
 import { ContractId, getJson } from '@harness/stellar-tools/contracts';
 import { z } from 'zod';
 import type { Fetcher } from './ports';
@@ -39,15 +39,21 @@ export const StellarlightRepo = z.looseObject({
 });
 export type StellarlightRepo = z.infer<typeof StellarlightRepo>;
 
-const ProjectsPage = z.object({ meta: Meta, projects: z.array(z.unknown()) });
-const ReposPage = z.object({ meta: Meta, repos: z.array(z.unknown()) });
+type Page = { meta: z.infer<typeof Meta>; items: unknown[] };
+
+const ProjectsPage = z
+  .object({ meta: Meta, projects: z.array(z.unknown()) })
+  .transform((page): Page => ({ meta: page.meta, items: page.projects }));
+const ReposPage = z
+  .object({ meta: Meta, repos: z.array(z.unknown()) })
+  .transform((page): Page => ({ meta: page.meta, items: page.repos }));
 
 export type Paged<T> = { rows: T[]; pages: number; invalid: number; gap: AppError | null };
 
 const fetchAllPages = async <T>(
   fetch: Fetcher,
   urlFor: (offset: number) => string,
-  read: (body: unknown) => { meta: z.infer<typeof Meta>; items: unknown[] } | null,
+  pageSchema: z.ZodType<Page>,
   rowSchema: z.ZodType<T>,
 ): Promise<Paged<T>> => {
   const rows: T[] = [];
@@ -55,19 +61,21 @@ const fetchAllPages = async <T>(
   let pages = 0;
   let invalid = 0;
   for (;;) {
-    const page = await getJson(fetch, urlFor(offset), z.unknown());
+    const url = urlFor(offset);
+    const page = await getJson(fetch, url, pageSchema);
     if (!page.ok) return { rows, pages, invalid, gap: page.error };
-    const content = read(page.value);
-    if (!content) break;
+    if (!page.value) {
+      return { rows, pages, invalid, gap: appError('NOT_FOUND', `GET ${url} returned 404`) };
+    }
     pages += 1;
-    for (const item of content.items) {
+    for (const item of page.value.items) {
       const parsed = rowSchema.safeParse(item);
       if (parsed.success) rows.push(parsed.data);
       else invalid += 1;
     }
-    offset += content.meta.counts.returned;
-    const total = content.meta.counts.total;
-    if (content.meta.counts.returned === 0 || total === null || offset >= total) break;
+    const { returned, total } = page.value.meta.counts;
+    offset += returned;
+    if (returned === 0 || total === null || offset >= total) break;
   }
   return { rows, pages, invalid, gap: null };
 };
@@ -79,10 +87,7 @@ export const fetchScfProjects = (fetch: Fetcher, stellarlightUrl: string) =>
     fetch,
     (offset) =>
       `${base(stellarlightUrl)}/api/projects/search?scfAwarded=1&limit=${PROJECTS_PAGE_SIZE}&offset=${offset}`,
-    (body) => {
-      const page = ProjectsPage.safeParse(body);
-      return page.success ? { meta: page.data.meta, items: page.data.projects } : null;
-    },
+    ProjectsPage,
     StellarlightProject,
   );
 
@@ -91,10 +96,7 @@ export const fetchStellarlightRepos = (fetch: Fetcher, stellarlightUrl: string) 
     fetch,
     (offset) =>
       `${base(stellarlightUrl)}/api/repos/search?minScore=0&limit=${REPOS_PAGE_SIZE}&offset=${offset}`,
-    (body) => {
-      const page = ReposPage.safeParse(body);
-      return page.success ? { meta: page.data.meta, items: page.data.repos } : null;
-    },
+    ReposPage,
     StellarlightRepo,
   );
 
