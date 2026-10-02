@@ -1,4 +1,6 @@
 import { appError, err, ok } from '@harness/schema';
+import type { DecodedResultCodes, EnvelopeSummary } from '@harness/stellar-tools';
+import type { Decoders } from '../extract';
 import type { RpcPort, RpcTransaction, Runner } from '../ports';
 
 export const sequentialRunner: Runner = async (tasks, worker) => {
@@ -66,6 +68,29 @@ export const syntheticTx = (
   resultXdr: `res-${ledger}-${order}`,
   createdAt: ledger * 5,
 });
+
+export type RecordedSample = {
+  envelopeXdr: string;
+  resultXdr: string;
+  expected: { result: DecodedResultCodes; envelope: EnvelopeSummary };
+};
+
+export const recordedDecoders = (samples: RecordedSample[]): Decoders => {
+  const results = new Map(samples.map((s) => [s.resultXdr, s.expected.result]));
+  const envelopes = new Map(samples.map((s) => [s.envelopeXdr, s.expected.envelope]));
+  const lookup = <T>(map: Map<string, T>, key: string): T => {
+    const value = map.get(key);
+    if (!value) throw new Error(`no recorded decoding for ${key.slice(0, 16)}`);
+    return value;
+  };
+  return {
+    decodeResultCodes: (xdr) => {
+      const { tx, ops, feeBump } = lookup(results, xdr);
+      return { tx, ops, feeBump };
+    },
+    decodeEnvelopeSummary: (xdr) => lookup(envelopes, xdr),
+  };
+};
 
 type FixtureTransaction = Omit<RpcTransaction, 'status'> & { status: string };
 
