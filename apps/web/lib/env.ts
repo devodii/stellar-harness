@@ -9,6 +9,7 @@ const serverShape = {
   HORIZON_URL: envUrl('https://horizon.stellar.org'),
   HARNESS_DATA_DIR: z.string().min(1).default('../../data'),
   AI_MODEL: z.string().min(1).default('claude-sonnet-5'),
+  DATABASE_URL: z.string().min(1).optional(),
 };
 
 const chatShape = {
