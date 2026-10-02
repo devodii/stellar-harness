@@ -10,8 +10,10 @@ import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSkeleton,
 } from '@/components/ui/sidebar';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const SKELETON_WIDTHS = ['72%', '58%', '66%'];
 
 export interface ChatListItem {
   id: string;
@@ -35,7 +37,12 @@ export function ChatList({ items, activeId, hrefFor, onDelete, loading }: ChatLi
       </SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
-          {loading && ['a', 'b', 'c'].map((key) => <SidebarMenuSkeleton key={key} />)}
+          {loading &&
+            SKELETON_WIDTHS.map((width) => (
+              <div key={width} className="flex h-8 items-center px-2" data-sidebar="menu-skeleton">
+                <Skeleton className="h-4" style={{ width }} />
+              </div>
+            ))}
           {!loading && items.length === 0 && (
             <p className="px-2 py-1 text-xs text-muted-foreground">No chats yet.</p>
           )}
