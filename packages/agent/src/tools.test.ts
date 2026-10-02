@@ -1,11 +1,11 @@
 import { createHash } from 'node:crypto';
 import { type Finding, SUGGESTED_ACTION } from '@harness/schema';
-import { TOOL_DESCRIPTIONS, TOOL_NAMES } from '@harness/stellar-tools';
+import { type ProbeAnchorOutput, TOOL_DESCRIPTIONS, TOOL_NAMES } from '@harness/stellar-tools';
 import { MemoryStorage } from '@harness/storage';
 import { generateText, stepCountIs } from 'ai';
 import { MockLanguageModelV4 } from 'ai/test';
 import { describe, expect, it } from 'vitest';
-import { createTestContext } from './testing';
+import { createTestContext, TEST_LEDGER } from './testing';
 import { createAgentTools, type ToolEnvelope } from './tools';
 
 const finding: Finding = {
@@ -41,6 +41,23 @@ describe('createAgentTools', () => {
       data: { planId: `plan_${finding.findingId.slice(0, 12)}`, requiresApproval: true },
       meta: { tool: 'planFix' },
     });
+  });
+
+  it('reads accounts through the horizon port', async () => {
+    const address = 'GASWSYFT5UDG7JTJQI2CGO6HF5KQIQAP5L6JCNM3ETMUFIARTQ73ATMB';
+    const result = await tools.getAccount.execute({ address }, options);
+    expect(result).toMatchObject({ ok: true, data: { address, exists: false } });
+  });
+
+  it('stamps anchor probe findings with the context ledger', async () => {
+    const result = (await tools.probeAnchor.execute(
+      { domain: 'anchor.test' },
+      options,
+    )) as ToolEnvelope<ProbeAnchorOutput>;
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.data.findings.length).toBeGreaterThan(0);
+    for (const item of result.data.findings) expect(item.snapshotLedger).toBe(TEST_LEDGER);
   });
 
   it('returns invalid input as an error envelope instead of throwing', async () => {
