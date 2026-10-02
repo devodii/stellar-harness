@@ -58,13 +58,13 @@ docker compose run --rm scanner pnpm scan anchors --limit 20
 
 ### Censuses
 
-| Census | Source | Output |
-| --- | --- | --- |
-| 1. Contract archival | stellar.expert contract list, RPC `getLedgerEntries` | archived and expiring instances, archived code, idle and unverified contracts, SCF join |
-| 2. Failed transactions | RPC `getTransactions`, `result_xdr` decoded with Horizon's code names | failures by code, preventable share, per-account clusters with classification |
-| 3. Anchor conformance | stellarlight partners, SCF recaps, stellar.expert assets, each domain's `stellar.toml` | nine-stage probe per domain, funnel, read-only anchor tests |
-| 4. Rent | RPC `simulateTransaction` of a 365-day TTL extension | 12-month rent per contract and in total |
-| 5. GitHub | GitHub issue search | TTL, transaction failure and anchor conformance issues from the last 180 days |
+| Census                 | Source                                                                                 | Output                                                                                  |
+| ---------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| 1. Contract archival   | stellar.expert contract list, RPC `getLedgerEntries`                                   | archived and expiring instances, archived code, idle and unverified contracts, SCF join |
+| 2. Failed transactions | RPC `getTransactions`, `result_xdr` decoded with Horizon's code names                  | failures by code, preventable share, per-account clusters with classification           |
+| 3. Anchor conformance  | stellarlight partners, SCF recaps, stellar.expert assets, each domain's `stellar.toml` | nine-stage probe per domain, funnel, read-only anchor tests                             |
+| 4. Rent                | RPC `simulateTransaction` of a 365-day TTL extension                                   | 12-month rent per contract and in total                                                 |
+| 5. GitHub              | GitHub issue search                                                                    | TTL, transaction failure and anchor conformance issues from the last 180 days           |
 
 `REPORT.md` lists every endpoint, parameter, threshold, window and sampling decision, plus measured wall time and request counts per census. Scan output (`data/`, `REPORT.md`) is not committed.
 
