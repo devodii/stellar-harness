@@ -33,7 +33,8 @@ const HISTORY: HarnessUIMessage[] = [
             contractId: CONTRACT,
             minResourceFeeStroops: 18_350_421,
             estimatedXlm: 1.8350421,
-            unsignedXdr: 'AAAAAgAAAABGQUtFWERSRk9SU1RPUllCT09LT05MWQ==',
+            operation:
+              'Extend the TTL of the contract instance and its wasm code to 365 days (ExtendFootprintTTL)',
             footprint: { readOnly: ['instance', 'code'], readWrite: [] },
             days: 365,
             extendToLedgers: 5_256_000,
