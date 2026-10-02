@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { memo, ttlCache } from './memo';
+import { memo, memoBy, ttlCache } from './memo';
 
 describe('memo', () => {
   it('loads once', () => {
@@ -7,6 +7,18 @@ describe('memo', () => {
     const get = memo(load);
     expect(get()).toBe(get());
     expect(load).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('memoBy', () => {
+  it('loads once per key and keeps keys apart', () => {
+    const load = vi.fn((network: 'mainnet' | 'testnet') => ({ network }));
+    const get = memoBy(load);
+    expect(get('mainnet')).toBe(get('mainnet'));
+    expect(get('testnet')).toBe(get('testnet'));
+    expect(get('mainnet')).not.toBe(get('testnet'));
+    expect(get('testnet').network).toBe('testnet');
+    expect(load).toHaveBeenCalledTimes(2);
   });
 });
 

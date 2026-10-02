@@ -10,6 +10,14 @@ export const memo = <T>(load: () => T): (() => T) => {
   };
 };
 
+export const memoBy = <K, T>(load: (key: K) => T): ((key: K) => T) => {
+  const values = new Map<K, T>();
+  return (key) => {
+    if (!values.has(key)) values.set(key, load(key));
+    return values.get(key) as T;
+  };
+};
+
 export interface TtlCache<T> {
   get: (load: () => Promise<T>) => Promise<T>;
   clear: () => void;
