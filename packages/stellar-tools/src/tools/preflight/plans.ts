@@ -1,4 +1,5 @@
 import { Plan, type PlanStep, type PlanStepKind } from '@harness/schema';
+import { DEFAULT_SPEND_CAP_XLM, evaluatePolicy, type Policy } from '../../plan/policy';
 import { formatStroops, toStroops } from '../amount';
 import { assetId, type ParsedAsset } from '../assets';
 import { BASE_RESERVE_STROOPS } from '../reserve';
@@ -12,7 +13,10 @@ export type AlternativeInput = {
   asset: ParsedAsset;
   amount: string;
   blockers: PreflightCode[];
+  policy?: Policy;
 };
+
+const DEFAULT_POLICY: Policy = { spendCapXlm: DEFAULT_SPEND_CAP_XLM };
 
 const SOURCE_SIDE: ReadonlySet<PreflightCode> = new Set([
   'tx_no_source_account',
@@ -59,20 +63,6 @@ const stableId = (parts: string[]): string => {
   return hash.toString(16).padStart(8, '0');
 };
 
-export const submitBoundary = (steps: Pick<PlanStep, 'kind'>[]) => {
-  const submits = steps.filter((s) => s.kind === 'submit').length;
-  if (submits === 0) return { requiresApproval: false };
-  return {
-    requiresApproval: true,
-    boundary: {
-      rule: 'submit_requires_approval',
-      reason: 'The plan submits a transaction; every submission needs explicit approval.',
-      threshold: '0 submissions without approval',
-      requested: `${submits} submission${submits === 1 ? '' : 's'}`,
-    },
-  };
-};
-
 const finalize = (
   input: AlternativeInput,
   kind: AlternativeKind,
@@ -89,13 +79,14 @@ const finalize = (
         : draft.args;
     return { ...draft, id, args, status: draft.status ?? 'pending' };
   });
+  const costed = estimatedCostXlm !== undefined ? { estimatedCostXlm } : {};
   return Plan.parse({
     planId: `preflight-${kind}-${stableId([input.from, input.to, assetId(input.asset), input.amount])}`,
     title,
     subject: input.to,
     steps,
-    ...(estimatedCostXlm !== undefined ? { estimatedCostXlm } : {}),
-    ...submitBoundary(steps),
+    ...costed,
+    ...evaluatePolicy({ steps, ...costed }, input.policy ?? DEFAULT_POLICY),
   });
 };
 
