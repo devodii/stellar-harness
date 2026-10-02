@@ -1,4 +1,5 @@
 import type { Result } from '@harness/schema';
+import type { DecodedResultCodes, EnvelopeSummary } from './tools/failures-schemas';
 
 export type HttpResponse = {
   url: string;
@@ -38,12 +39,11 @@ export type RpcTransaction = {
   createdAt: number;
 };
 
-export type SimulateTransactionResult = {
-  minResourceFee?: string;
-  error?: string;
-  transactionData?: string;
+export type RpcTransactionsPage = {
+  transactions: RpcTransaction[];
+  cursor: string;
   latestLedger: number;
-  restorePreamble?: { minResourceFee: string; transactionData: string };
+  oldestLedger: number;
 };
 
 export type RpcPort = {
@@ -51,15 +51,33 @@ export type RpcPort = {
   getLedgerEntries(
     keys: string[],
   ): Promise<Result<{ entries: LedgerEntryResult[]; latestLedger: number }>>;
-  simulateTransaction(txXdr: string): Promise<Result<SimulateTransactionResult>>;
-  getTransactions(params: { startLedger?: number; cursor?: string; limit?: number }): Promise<
+  simulateTransaction(txXdr: string): Promise<
     Result<{
-      transactions: RpcTransaction[];
-      cursor: string;
+      minResourceFee?: string;
+      error?: string;
+      transactionData?: string;
       latestLedger: number;
-      oldestLedger: number;
     }>
   >;
+  getTransactions(params: {
+    startLedger?: number;
+    cursor?: string;
+    limit?: number;
+  }): Promise<Result<RpcTransactionsPage>>;
+};
+
+export type HorizonBalance = {
+  asset_type: string;
+  asset_code?: string;
+  asset_issuer?: string;
+  liquidity_pool_id?: string;
+  balance: string;
+  limit?: string;
+  buying_liabilities?: string;
+  selling_liabilities?: string;
+  is_authorized?: boolean;
+  is_authorized_to_maintain_liabilities?: boolean;
+  sponsor?: string;
 };
 
 export type HorizonAccount = {
@@ -67,6 +85,8 @@ export type HorizonAccount = {
   sequence: string;
   home_domain?: string;
   subentry_count: number;
+  num_sponsoring?: number;
+  num_sponsored?: number;
   thresholds: { low_threshold: number; med_threshold: number; high_threshold: number };
   flags: {
     auth_required: boolean;
@@ -75,16 +95,15 @@ export type HorizonAccount = {
     auth_clawback_enabled: boolean;
   };
   signers: { key: string; weight: number; type: string }[];
-  balances: {
-    asset_type: string;
-    asset_code?: string;
-    asset_issuer?: string;
-    balance: string;
-    limit?: string;
-  }[];
+  balances: HorizonBalance[];
 };
+
+export type HorizonFirstOperation = { type: string; funder?: string };
 
 export type HorizonPort = {
   account(id: string): Promise<Result<HorizonAccount | null>>;
-  firstOperation(accountId: string): Promise<Result<{ type: string; funder?: string } | null>>;
+  firstOperation(accountId: string): Promise<Result<HorizonFirstOperation | null>>;
 };
+
+export type DecodeResultCodes = (resultXdr: string) => DecodedResultCodes;
+export type DecodeEnvelopeSummary = (envelopeXdr: string) => EnvelopeSummary;
