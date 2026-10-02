@@ -7,16 +7,23 @@ import { describeError, fetchText, isRecord } from './request';
 import type { AnchorCurrency, AnchorToml, StageRecord } from './schemas';
 import { stageRecord, startTimer } from './stage';
 
-export const MAINNET_PASSPHRASE: string = Networks.PUBLIC;
-const TEST_PASSPHRASES: string[] = [Networks.TESTNET, Networks.FUTURENET];
+export type KnownNetwork = 'mainnet' | 'testnet' | 'futurenet';
 
-export type PassphraseKind = 'mainnet' | 'testnet' | 'nonstandard' | 'absent';
+const KNOWN_PASSPHRASES: ReadonlyMap<string, KnownNetwork> = new Map([
+  [Networks.PUBLIC, 'mainnet'],
+  [Networks.TESTNET, 'testnet'],
+  [Networks.FUTURENET, 'futurenet'],
+]);
 
-export const passphraseKind = (passphrase: string | null): PassphraseKind => {
+export type PassphraseKind = 'expected' | 'other_network' | 'nonstandard' | 'absent';
+
+export const passphraseNetwork = (passphrase: string | null): KnownNetwork | null =>
+  passphrase === null ? null : (KNOWN_PASSPHRASES.get(passphrase) ?? null);
+
+export const passphraseKind = (passphrase: string | null, expected: string): PassphraseKind => {
   if (passphrase === null) return 'absent';
-  if (passphrase === MAINNET_PASSPHRASE) return 'mainnet';
-  if (TEST_PASSPHRASES.includes(passphrase)) return 'testnet';
-  return 'nonstandard';
+  if (passphrase === expected) return 'expected';
+  return passphraseNetwork(passphrase) ? 'other_network' : 'nonstandard';
 };
 
 const text = (value: unknown): string | null => {
@@ -69,11 +76,16 @@ export type TomlOutcome = {
   record: StageRecord;
   toml: AnchorToml | null;
   passphrase: PassphraseKind;
+  passphraseNetwork: KnownNetwork | null;
   response: HttpResponse | null;
   fetchError: AppError | null;
 };
 
-export const fetchToml = async (domain: string, fetch: Fetcher): Promise<TomlOutcome> => {
+export const fetchToml = async (
+  domain: string,
+  fetch: Fetcher,
+  expectedPassphrase: string,
+): Promise<TomlOutcome> => {
   const url = tomlUrlFor(domain);
   const elapsed = startTimer();
   const result = await fetchText(fetch, url);
@@ -83,6 +95,7 @@ export const fetchToml = async (domain: string, fetch: Fetcher): Promise<TomlOut
       record: stageRecord('toml', false, null, elapsed(), describeError(result.error)),
       toml: null,
       passphrase: 'absent',
+      passphraseNetwork: null,
       response: null,
       fetchError: result.error,
     };
@@ -93,6 +106,7 @@ export const fetchToml = async (domain: string, fetch: Fetcher): Promise<TomlOut
     record: stageRecord('toml', false, response.status, response.ms, error),
     toml: null,
     passphrase: 'absent',
+    passphraseNetwork: null,
     response,
     fetchError: null,
   });
@@ -103,7 +117,8 @@ export const fetchToml = async (domain: string, fetch: Fetcher): Promise<TomlOut
     url,
     record: stageRecord('toml', true, response.status, response.ms),
     toml: parsed.value,
-    passphrase: passphraseKind(parsed.value.networkPassphrase),
+    passphrase: passphraseKind(parsed.value.networkPassphrase, expectedPassphrase),
+    passphraseNetwork: passphraseNetwork(parsed.value.networkPassphrase),
     response,
     fetchError: null,
   };

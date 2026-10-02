@@ -3,13 +3,16 @@ import type { Fetcher } from './ports';
 import { getJson, isRecord, toEndpointProbe } from './request';
 import type { AnchorToml, ChallengeChecks, Sep10Probe, StageRecord } from './schemas';
 import { SKIP_REASONS, skippedStage, stageRecord } from './stage';
-import { MAINNET_PASSPHRASE } from './toml';
 
 export const randomClientAccount = (): string => Keypair.random().publicKey();
 
-type ChallengeExpectation = { signingKey: string | null; domain: string };
+type ChallengeExpectation = {
+  signingKey: string | null;
+  domain: string;
+  networkPassphrase: string;
+};
 
-const NO_CHECKS: Omit<ChallengeChecks, 'mainnetPassphrase'> = {
+const NO_CHECKS: Omit<ChallengeChecks, 'expectedPassphrase'> = {
   sourceIsSigningKey: false,
   firstOpManageData: false,
   homeDomainMatches: false,
@@ -18,10 +21,10 @@ const NO_CHECKS: Omit<ChallengeChecks, 'mainnetPassphrase'> = {
 
 export const verifyChallenge = (
   transactionXdr: string,
-  { signingKey, domain }: ChallengeExpectation,
-): { checks: Omit<ChallengeChecks, 'mainnetPassphrase'>; error: string | null } => {
+  { signingKey, domain, networkPassphrase }: ChallengeExpectation,
+): { checks: Omit<ChallengeChecks, 'expectedPassphrase'>; error: string | null } => {
   try {
-    const tx = TransactionBuilder.fromXDR(transactionXdr, MAINNET_PASSPHRASE);
+    const tx = TransactionBuilder.fromXDR(transactionXdr, networkPassphrase);
     if (tx instanceof FeeBumpTransaction) return { checks: NO_CHECKS, error: 'fee_bump_challenge' };
     const first = tx.operations[0];
     const isManageData = first?.type === 'manageData';
@@ -63,6 +66,7 @@ export const probeSep10 = async (
   domain: string,
   toml: AnchorToml,
   fetch: Fetcher,
+  expectedPassphrase: string,
 ): Promise<Sep10Outcome> => {
   const endpoint = toml.webAuthEndpoint;
   if (!endpoint) return { record: skippedStage('sep10', SKIP_REASONS.notApplicable), probe: null };
@@ -107,9 +111,13 @@ export const probeSep10 = async (
   });
   if (!response.ok) return fail(response.error ?? 'request_failed');
   if (!transaction) return fail('missing_transaction');
-  const verified = verifyChallenge(transaction, { signingKey: toml.signingKey, domain });
+  const verified = verifyChallenge(transaction, {
+    signingKey: toml.signingKey,
+    domain,
+    networkPassphrase: expectedPassphrase,
+  });
   const checks = {
-    mainnetPassphrase: networkPassphrase === MAINNET_PASSPHRASE,
+    expectedPassphrase: networkPassphrase === expectedPassphrase,
     ...verified.checks,
   };
   if (verified.error) return fail(verified.error, checks);

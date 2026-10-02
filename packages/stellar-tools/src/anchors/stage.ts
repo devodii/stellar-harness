@@ -6,6 +6,7 @@ export const SKIPPED_PREFIX = 'skipped: ';
 export const SKIP_REASONS = {
   tomlUnreachable: 'toml_unreachable',
   testnetToml: 'testnet_toml',
+  mainnetToml: 'mainnet_toml',
   noSepEndpoints: 'no_sep_endpoints',
   noAccounts: 'no_accounts',
   notApplicable: 'not_applicable',
