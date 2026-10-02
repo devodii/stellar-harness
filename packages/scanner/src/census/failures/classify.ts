@@ -41,9 +41,7 @@ export const isAnchorDistribution = (
   homeDomain: string | undefined,
   anchorDomains: ReadonlySet<string> | undefined,
 ): boolean =>
-  homeDomain !== undefined &&
-  anchorDomains !== undefined &&
-  anchorDomains.has(normalizeDomain(homeDomain));
+  homeDomain !== undefined && (anchorDomains?.has(normalizeDomain(homeDomain)) ?? false);
 
 export const contractCallerShare = (activity: AccountActivity | undefined): number =>
   activity && activity.opCount > 0 ? activity.invokeOps / activity.opCount : 0;
