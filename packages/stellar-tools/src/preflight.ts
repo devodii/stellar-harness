@@ -55,6 +55,13 @@ export const spendableXlm = (account: HorizonAccount): number => {
   );
 };
 
+export const resolveAsset = (source: HorizonAccount, asset: string): string => {
+  if (asset.toUpperCase() === 'XLM') return 'XLM';
+  if (asset.includes(':')) return asset;
+  const held = source.balances.find((b) => b.asset_code === asset.toUpperCase());
+  return held ? assetName(held.asset_code, held.asset_issuer) : asset;
+};
+
 export const checkPayment = (
   input: PaymentInput,
   source: HorizonAccount,
@@ -86,5 +93,5 @@ export const buildPaymentPreflight = async (
     clients.loadAccount(input.to),
   ]);
   if (!source) throw new Error(`Source account ${input.from} does not exist`);
-  return checkPayment(input, source, destination);
+  return checkPayment({ ...input, asset: resolveAsset(source, input.asset) }, source, destination);
 };
