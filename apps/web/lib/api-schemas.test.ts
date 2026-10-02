@@ -8,6 +8,7 @@ describe('FindingsQueryParams', () => {
       severity: undefined,
       tag: undefined,
       subject: undefined,
+      meaningful: undefined,
       limit: FINDINGS_PAGE_SIZE,
       offset: 0,
     });
@@ -28,6 +29,12 @@ describe('FindingsQueryParams', () => {
     expect(parsed.subject).toBeUndefined();
     expect(parsed.limit).toBe(10);
     expect(parsed.offset).toBe(20);
+  });
+
+  it('reads the meaningful flag from the query string', () => {
+    expect(FindingsQueryParams.parse({ meaningful: 'true' }).meaningful).toBe(true);
+    expect(FindingsQueryParams.parse({ meaningful: 'false' }).meaningful).toBe(false);
+    expect(FindingsQueryParams.safeParse({ meaningful: 'yes' }).success).toBe(false);
   });
 
   it('rejects unknown finding types', () => {

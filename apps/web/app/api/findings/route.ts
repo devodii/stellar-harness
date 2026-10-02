@@ -8,7 +8,10 @@ export const dynamic = 'force-dynamic';
 
 export const GET = apiHandler({
   name: 'findings.list',
-  mcp: { name: 'query_findings', description: 'Filter scan findings by type, severity and tag.' },
+  mcp: {
+    name: 'query_findings',
+    description: 'Filter scan findings by type, severity, tag and whether they matter.',
+  },
   schema: { query: FindingsQueryParams },
   rateLimit: { limit: 120, windowSeconds: 60 },
   handler: async ({ query }) => {
@@ -17,6 +20,7 @@ export const GET = apiHandler({
       severity: query.severity,
       tags: query.tag,
       subject: query.subject,
+      meaningful: query.meaningful,
       limit: query.limit,
       offset: query.offset,
     });

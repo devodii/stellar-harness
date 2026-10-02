@@ -19,6 +19,10 @@ export const FindingsQueryParams = z.object({
   severity: listOf(Severity),
   tag: listOf(z.string().min(1)),
   subject: z.preprocess(blankToUndefined, z.string().min(1).optional()),
+  meaningful: z
+    .enum(['true', 'false'])
+    .optional()
+    .transform((value) => (value === undefined ? undefined : value === 'true')),
   limit: z.coerce.number().int().positive().max(200).default(FINDINGS_PAGE_SIZE),
   offset: z.coerce.number().int().nonnegative().default(0),
 });
