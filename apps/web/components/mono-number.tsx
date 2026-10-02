@@ -20,8 +20,8 @@ export function MonoNumber({
       translate="no"
       className={cn(
         'notranslate font-mono tabular-nums',
-        missing && 'text-muted-foreground',
         className,
+        missing && 'text-muted-foreground opacity-70',
       )}
     >
       {missing ? fallback : format(value)}
