@@ -9,6 +9,7 @@ export * from './core/expert';
 export * from './core/horizon';
 export * from './core/http';
 export * from './core/log';
+export * from './core/network';
 export * from './core/retry';
 export * from './core/rpc';
 export * from './core/semaphore';
