@@ -7,8 +7,10 @@ import { ChatView } from '@/components/chat-view';
 import { useConversations } from '@/components/conversations-provider';
 import { useNetwork } from '@/components/network-provider';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useFinding } from '@/hooks/use-finding';
 import { useSummary } from '@/hooks/use-summary';
 import type { HarnessUIMessage } from '@/lib/chat';
+import { contextFromFinding } from '@/lib/chat-context';
 import { newConversation, sameMessages, withMessages } from '@/lib/conversations';
 import { chatHref } from '@/lib/routes';
 import { buildSuggestions } from '@/lib/suggestions';
@@ -37,6 +39,8 @@ export function ChatPage() {
 
   const paramId = searchParams.get('c');
   const prompt = searchParams.get('q') ?? undefined;
+  const findingId = paramId ? null : searchParams.get('finding');
+  const attachedFinding = useFinding(findingId);
   const conversationId = paramId ?? freshId;
 
   const suggestions = React.useMemo(
@@ -54,7 +58,7 @@ export function ChatPage() {
     [store, conversationId, paramId, router],
   );
 
-  if (!store.ready) return <ChatSkeleton />;
+  if (!store.ready || attachedFinding.isLoading) return <ChatSkeleton />;
   const stored = store.get(conversationId);
 
   return (
@@ -63,6 +67,9 @@ export function ChatPage() {
       conversationId={conversationId}
       initialMessages={stored?.messages ?? []}
       initialPrompt={stored ? undefined : prompt}
+      initialContexts={
+        !stored && attachedFinding.data ? [contextFromFinding(attachedFinding.data)] : []
+      }
       suggestions={suggestions}
       network={network}
       scanned={summary.data?.scanned}
