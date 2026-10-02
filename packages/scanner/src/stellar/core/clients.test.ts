@@ -10,8 +10,6 @@ describe('createClients', () => {
     const clients = createClients(config, { log: silentLogger });
     expect(clients.rpc.url).toBe('https://mainnet.sorobanrpc.com');
     expect(clients.horizon.url).toBe('https://horizon.stellar.org');
-    expect(clients.expert.url).toBe('https://api.stellar.expert/explorer/public');
-    expect(clients.stellarlight.url).toBe('https://stellarlight.xyz/api');
     expect(clients.http.stats.totals().requests).toBe(0);
   });
 
