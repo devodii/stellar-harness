@@ -1,5 +1,5 @@
-import { fakeFetcher } from '@harness/stellar-tools/contracts/testing';
 import { describe, expect, it } from 'vitest';
+import { fakeFetcher } from '../stellar/contracts/fakes';
 import coingecko from './__fixtures__/coingecko-xlm-usd.json';
 import { COINGECKO_XLM_USD_URL, fetchXlmUsd } from './price';
 

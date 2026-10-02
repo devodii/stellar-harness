@@ -1,6 +1,6 @@
-import type { NetworkClients } from '@harness/stellar-tools';
-import type { Fetcher, HorizonPort, RpcPort } from '@harness/stellar-tools/contracts';
 import { ok, type Result } from '../schema';
+import type { NetworkClients } from '../stellar';
+import type { Fetcher, HorizonPort, RpcPort } from '../stellar/contracts';
 
 export type Ports = { fetch: Fetcher; rpc: RpcPort; horizon: HorizonPort };
 

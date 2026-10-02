@@ -1,5 +1,5 @@
-import { fakeFetcher } from '@harness/stellar-tools/contracts/testing';
 import { describe, expect, it } from 'vitest';
+import { fakeFetcher } from '../../stellar/contracts/fakes';
 import projectsFixture from './__fixtures__/stellarlight-projects-scf.json';
 import reposFixture from './__fixtures__/stellarlight-repos.json';
 import {

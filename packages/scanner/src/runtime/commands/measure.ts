@@ -1,5 +1,5 @@
-import type { HostStats } from '@harness/stellar-tools';
 import type { CensusRun } from '../../report/inputs';
+import type { HostStats } from '../../stellar';
 import type { ScanContext } from '../context';
 
 export type Measured<T> = { value: T; run: CensusRun };

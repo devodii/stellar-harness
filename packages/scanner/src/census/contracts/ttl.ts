@@ -3,7 +3,7 @@ import {
   codeKeyXdr,
   instanceKeyXdr,
   type TtlClock,
-} from '@harness/stellar-tools/contracts';
+} from '../../stellar/contracts';
 import type { LedgerEntryResult, RpcPort, Run } from './ports';
 import type { ContractRow } from './schemas';
 

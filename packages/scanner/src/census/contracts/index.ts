@@ -1,5 +1,5 @@
-import type { ExpertContract } from '@harness/stellar-tools/contracts';
 import type { AppError, ContractsSummary, ScfProject, Snapshot } from '../../schema';
+import type { ExpertContract } from '../../stellar/contracts';
 import { enumerateContracts } from './enumerate';
 import {
   archivedExportRows,

@@ -1,5 +1,5 @@
-import { createClients, loadNetworkConfig, NoCache } from '@harness/stellar-tools';
 import { describe, expect, it } from 'vitest';
+import { createClients, loadNetworkConfig, NoCache } from '../stellar';
 import { scanPorts } from './context';
 import { probeHorizon, unavailableHorizon } from './horizon';
 

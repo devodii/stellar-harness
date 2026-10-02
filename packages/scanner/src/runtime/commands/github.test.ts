@@ -1,8 +1,8 @@
 import { mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { loadNetworkConfig } from '@harness/stellar-tools';
 import { describe, expect, it } from 'vitest';
+import { loadNetworkConfig } from '../../stellar';
 import { readCensusRecords } from '../artifacts';
 import type { ScanContext } from '../context';
 import { filePersistence } from '../persistence';

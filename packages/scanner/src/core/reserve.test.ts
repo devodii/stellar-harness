@@ -1,6 +1,6 @@
-import type { HorizonAccount } from '@harness/stellar-tools/contracts';
 import { describe, expect, it } from 'vitest';
 import holderFixture from '../census/failures/__fixtures__/horizon-account-usdc-holder.json';
+import type { HorizonAccount } from '../stellar/contracts';
 import { minimumBalanceStroops, reserveEntries, reserveShortfallStroops } from './reserve';
 
 const holder: HorizonAccount = holderFixture;

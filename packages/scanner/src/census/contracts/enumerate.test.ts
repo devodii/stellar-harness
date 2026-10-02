@@ -1,6 +1,6 @@
-import { fakeFetcher } from '@harness/stellar-tools/contracts/testing';
 import { describe, expect, it } from 'vitest';
 import { appError, err } from '../../schema';
+import { fakeFetcher } from '../../stellar/contracts/fakes';
 import page1 from './__fixtures__/expert-contracts-page-1.json';
 import page2 from './__fixtures__/expert-contracts-page-2.json';
 import { CONTRACTS_DERIVED, enumerateContracts } from './enumerate';

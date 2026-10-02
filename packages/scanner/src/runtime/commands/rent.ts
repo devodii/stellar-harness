@@ -1,5 +1,5 @@
-import { simulationSourceFor } from '@harness/stellar-tools/contracts';
 import { RENT_DERIVED, RENT_TOP_COLUMNS, runRentCensus } from '../../census/rent';
+import { simulationSourceFor } from '../../stellar/contracts';
 import { writeCensusRecord, writeExport } from '../artifacts';
 import type { ScanContext } from '../context';
 import { readContractRows } from './contract-rows';

@@ -1,6 +1,6 @@
-import { codeKeyXdr } from '@harness/stellar-tools/contracts';
-import { fakeFetcher, fakeRpc } from '@harness/stellar-tools/contracts/testing';
 import { describe, expect, it } from 'vitest';
+import { codeKeyXdr } from '../../stellar/contracts';
+import { fakeFetcher, fakeRpc } from '../../stellar/contracts/fakes';
 import page1 from './__fixtures__/expert-contracts-page-1.json';
 import page2 from './__fixtures__/expert-contracts-page-2.json';
 import batch from './__fixtures__/rpc-instance-entries.json';

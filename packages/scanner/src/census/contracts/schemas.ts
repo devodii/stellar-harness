@@ -1,5 +1,5 @@
-import { ContractId, TtlStatus, WasmHash } from '@harness/stellar-tools/contracts';
 import { z } from 'zod';
+import { ContractId, TtlStatus, WasmHash } from '../../stellar/contracts';
 
 const count = z.number().int().nonnegative();
 

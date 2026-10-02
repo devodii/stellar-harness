@@ -7,7 +7,7 @@ export type {
   HttpResponse,
   LedgerEntryResult,
   RpcPort,
-} from '@harness/stellar-tools/contracts';
+} from '../../stellar/contracts';
 
 export type FindingDraft = {
   type: FindingType;

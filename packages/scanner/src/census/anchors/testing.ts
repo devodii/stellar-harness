@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 
-export { fakeFetcher, fakeHorizon, jsonRoute } from '@harness/stellar-tools/anchors/testing';
+export { fakeFetcher, fakeHorizon, jsonRoute } from '../../stellar/anchors/testing';
 
 export const readFixture = (relative: string): string =>
   readFileSync(new URL(`./__fixtures__/${relative}`, import.meta.url), 'utf8');
