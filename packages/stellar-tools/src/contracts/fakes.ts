@@ -1,4 +1,5 @@
 import { appError, err, ok, type Result } from '@harness/schema';
+import { StrKey } from '@stellar/stellar-sdk';
 import type {
   Fetcher,
   HorizonAccount,
@@ -60,3 +61,9 @@ export const fakeFetcher =
       cached: false,
     });
   };
+
+export const syntheticContractId = (seed: number): string => {
+  const bytes = Buffer.alloc(32);
+  bytes.writeUInt32BE(seed, 28);
+  return StrKey.encodeContract(bytes);
+};
