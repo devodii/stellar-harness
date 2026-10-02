@@ -16,7 +16,7 @@ export const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   getSummary:
     'Read the latest scan summary: contracts, failures, anchors, rent and GitHub numbers with the snapshot they were measured at.',
   searchEcosystem:
-    'Search Stellar ecosystem projects and repositories (stellarlight.xyz). In the product, Raven, SDF MCP server, is the fuller knowledge gateway and would be wired here.',
+    'Search Stellar ecosystem projects and repositories (stellarlight.xyz). In the product, Raven (the SDF MCP server) is the fuller knowledge gateway and would be wired here.',
   simulateExtendTtl:
     'Simulate extending a contract instance and code TTL by N days. Returns the resource fee, estimated XLM and unsigned XDR for display. Nothing is submitted.',
   simulateRestore:
