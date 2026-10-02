@@ -48,6 +48,14 @@ describe('fetchScfProjects', () => {
     );
     expect(result.gap?.code).toBe('UPSTREAM_FAILED');
   });
+
+  it('records a gap when a page has an unexpected shape', async () => {
+    const result = await fetchScfProjects(
+      fakeFetcher({ [projectsUrl(0)]: { body: { results: [] } } }),
+      BASE,
+    );
+    expect(result).toMatchObject({ pages: 0, gap: { code: 'UPSTREAM_FAILED' } });
+  });
 });
 
 describe('fetchStellarlightRepos', () => {
