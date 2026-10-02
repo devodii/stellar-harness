@@ -1,6 +1,5 @@
 import { open, readdir, readFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { Network } from '@harness/schema';
 import {
   type ArtifactKind,
   createScanStore,
@@ -12,7 +11,7 @@ import {
 } from '@harness/storage';
 import { createDerivedWriter, derivedPath } from '../core/derived';
 import { snapshotStore, writeJsonAtomic } from '../core/state';
-import type { Snapshot } from '../schema';
+import type { Network, Snapshot } from '../schema';
 
 export interface ScanPersistence {
   readonly kind: 'files' | 'postgres';

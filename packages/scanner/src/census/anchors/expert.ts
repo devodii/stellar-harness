@@ -1,4 +1,4 @@
-import { ok, type Result } from '@harness/schema';
+import { ok, type Result } from '../../schema';
 import { getJsonAs, parseRows } from './http';
 import type { Fetcher } from './ports';
 import { ExpertAsset, ExpertAssetsResponse } from './schemas';

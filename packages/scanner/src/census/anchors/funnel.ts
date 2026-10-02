@@ -1,6 +1,6 @@
-import { ANCHOR_STAGES, type AnchorStage } from '@harness/schema';
 import { type AnchorTestsReport, isFailed, isSkipped } from '@harness/stellar-tools/anchors';
 import type { AnchorsSummary, FailingAnchor } from '../../schema';
+import { ANCHOR_STAGES, type AnchorStage } from '../../schema';
 import type { AnchorDomain, AnchorProbeRow } from './schemas';
 
 export type FindingRef = { type: string; subject: string };

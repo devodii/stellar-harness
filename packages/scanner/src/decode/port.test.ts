@@ -1,5 +1,5 @@
-import { NETWORK_PROFILES } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
+import { NETWORK_PROFILES } from '../schema';
 import envelopes from './__fixtures__/envelope-xdr.json';
 import { createPortDecoders, decodeEnvelopePort, toEnvelopePort } from './port';
 import { EnvelopeSummary } from './schemas';

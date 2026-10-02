@@ -1,5 +1,5 @@
-import { appError, err, ok, type Result } from '@harness/schema';
 import type { z } from 'zod';
+import { appError, err, ok, type Result } from '../../schema';
 import type { Fetcher } from './ports';
 
 const SOURCE_TIMEOUT_MS = 30_000;

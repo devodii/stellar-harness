@@ -1,4 +1,4 @@
-import type { Network } from '@harness/schema';
+import type { Network } from '../../schema';
 
 export const KNOWN_ANCHORS: Record<Network, readonly string[]> = {
   mainnet: [],

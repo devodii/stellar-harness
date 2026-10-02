@@ -1,6 +1,6 @@
 import { createRequire } from 'node:module';
-import { NETWORK_PROFILES } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
+import { NETWORK_PROFILES } from '../../schema';
 import {
   type AnchorTestsLib,
   anchorTestsConfig,

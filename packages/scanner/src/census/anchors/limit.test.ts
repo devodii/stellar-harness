@@ -1,5 +1,5 @@
-import { ok } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
+import { ok } from '../../schema';
 import { keyedLimiter, limitFetchPerHost, semaphore } from './limit';
 import type { HttpResponse } from './ports';
 

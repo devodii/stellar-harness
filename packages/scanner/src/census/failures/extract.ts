@@ -1,6 +1,6 @@
-import { appError, err, ok, type Result } from '@harness/schema';
 import type { DecodedResultCodes, EnvelopeSummary } from '../../decode';
 import { readFeeCharged } from '../../decode';
+import { appError, err, ok, type Result } from '../../schema';
 import type { DecodeEnvelopeSummary, DecodeResultCodes, RpcTransaction } from './ports';
 import type { FailedPayment, FailedTx } from './rows';
 

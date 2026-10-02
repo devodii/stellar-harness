@@ -1,5 +1,5 @@
-import { AnchorStage } from '@harness/schema';
 import { z } from 'zod';
+import { AnchorStage } from '../../schema';
 
 const optionalText = z.string().nullable().optional();
 

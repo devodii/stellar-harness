@@ -1,4 +1,3 @@
-import { DEFAULT_NETWORK, type Network } from '@harness/schema';
 import { type Cache, createClients, DiskCache, type HostStats, type HttpGap, loadNetworkConfig, type NetworkClients, type NetworkConfig, NoCache, stderrLogger, takeSnapshot, withRpcAccountFallback } from '@harness/stellar-tools';
 import { createCache } from '@harness/storage';
 import { z } from 'zod';
@@ -11,6 +10,7 @@ import {
 import { formatProgress, runTasks } from '../core/runner';
 import { createStateStore } from '../core/state';
 import type { Snapshot } from '../schema';
+import { DEFAULT_NETWORK, type Network } from '../schema';
 import { type HorizonStatus, probeHorizon, unavailableHorizon } from './horizon';
 import { createPersistence, type ScanPersistence } from './persistence';
 import { createPorts, type Ports } from './ports';

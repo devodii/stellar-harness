@@ -1,5 +1,5 @@
-import { appError, err } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
+import { appError, err } from '../../schema';
 import { censusSnapshot, encodedTx, recordingDeps } from './__tests__/census-harness';
 import { fakeHorizon, fakeRpc, pagedRpc } from './__tests__/fakes';
 import { runFailuresCensus } from './census';

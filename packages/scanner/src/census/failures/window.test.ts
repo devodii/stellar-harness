@@ -1,6 +1,6 @@
-import { ok } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
 import type { Snapshot } from '../../schema';
+import { ok } from '../../schema';
 import page from './__fixtures__/rpc-get-transactions-page.json';
 import { asRpcTransaction, fakeRpc } from './__tests__/fakes';
 import { parseWindowSeconds, probeRetention, resolveWindow } from './window';

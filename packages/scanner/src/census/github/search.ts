@@ -1,5 +1,5 @@
-import { appError, err, ok, type Result } from '@harness/schema';
 import { z } from 'zod';
+import { appError, err, ok, type Result } from '../../schema';
 import type { Fetcher, HttpResponse, Sleep } from './ports';
 
 export const GITHUB_API = 'https://api.github.com';
