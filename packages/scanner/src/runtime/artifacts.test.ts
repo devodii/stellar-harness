@@ -29,6 +29,16 @@ describe('writeExport', () => {
   });
 });
 
+describe('export preview paths', () => {
+  it('name the data directory the export was written to', async () => {
+    const base = await tempDir();
+    const mainnet = await writeExport(join(base, 'data'), 'sample', [{ id: 'a' }], ['id']);
+    const testnet = await writeExport(join(base, 'data-testnet'), 'sample', [{ id: 'a' }], ['id']);
+    expect(mainnet.path).toBe('data/exports/sample.csv');
+    expect(testnet.path).toBe('data-testnet/exports/sample.csv');
+  });
+});
+
 describe('census records', () => {
   it('round trips run records and returns nothing for an empty dir', async () => {
     const dataDir = await tempDir();
