@@ -150,3 +150,12 @@ Every call made without explicit direction is tagged `@decision` so it can be re
 - `@decision` The chat model comes from a provider registry (`AI_PROVIDER` = `openai` or `anthropic`, default `openai`; `AI_MODEL` overrides the default `gpt-5.5` or `claude-sonnet-5`). Only the selected provider's key is required.
 
 - `@decision` The chat uses OpenAI only (`gpt-5.5`, `apps/web/lib/model.ts`); the Anthropic provider and the `AI_PROVIDER`/`AI_MODEL` switches were removed to keep configuration minimal. The web app loads the repository root `.env` through `@next/env`, so one env file serves the scanner and the web app.
+
+## Patch 01: honest demo boundaries
+
+- `@decision` Plans no longer contain `build` or `submit` steps and there is no approve or decline flow: the scanner's subjects belong to other parties, so the demo cannot claim authority over them. A plan is read and simulate steps followed by exactly one `handoff` step, with a `handoff` object naming the required authority (`contract_admin`, `any_payer`, `account_signer`, `anchor_operator`), the simulated cost when known, and the fixed roadmap note. `PolicyBoundary`, the plan state machine, `POLICY_SPEND_CAP_XLM` and policy evaluation are removed.
+- `@decision` Restoring archived state and extending TTL can be paid by any account on Soroban, so those plans hand off to `any_payer`; trustline sponsorship needs the destination's signature, so payment plans hand off to `account_signer`.
+- `@decision` Simulation tools return a plain-language `operation` and the resource fee instead of an unsigned transaction envelope.
+- `@decision` "Meaningful" means an anchor domain, an SCF-funded subject, or a contract with at least 100 invocations. The header shows `ARCHIVED (active)` (240 at the current snapshot, against 65,140 raw), `/findings` defaults to the meaningful filter with a `show all` toggle, and suggestion chips draw subjects only from that set. Failure clusters carry neither tag nor invocation count, so they appear under `show all`.
+- `@decision` The only call to action is the `connect organisation` sheet, which stores `{email, createdAt, userAgent}` through `Storage.putWaitlist` (file `data/waitlist.jsonl`, or the `waitlist` table in Postgres) and reports the count. The waitlist is not per network.
+- `@decision` Patch commits use `patch-01` as the conventional-commit scope (for example `refactor(patch-01): …`) so they stay atomic under the commit style instead of a single `patch-01: honest demo boundaries` commit.
