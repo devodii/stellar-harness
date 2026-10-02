@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ChatList, type ChatListItem } from '@/components/chat-list';
 import { useConversations } from '@/components/conversations-provider';
+import { useNetwork } from '@/components/network-provider';
 import { Button } from '@/components/ui/button';
 import {
   Sidebar,
@@ -45,6 +46,7 @@ export function AppSidebarView({
   onNewChat,
   onDelete,
 }: AppSidebarViewProps) {
+  const { network } = useNetwork();
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -92,7 +94,7 @@ export function AppSidebarView({
         />
       </SidebarContent>
       <SidebarFooter className="px-3 pb-3 group-data-[collapsible=icon]:hidden">
-        <p className="font-mono text-[11px] text-muted-foreground">mainnet · read-only</p>
+        <p className="font-mono text-[11px] text-muted-foreground">{network} · read-only</p>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
