@@ -56,6 +56,14 @@ describe('planForFinding', () => {
     expect(plan.boundary?.rule).toBe('submit_requires_approval');
   });
 
+  it('names the selected network on submit steps', () => {
+    const finding = makeFinding('CONTRACT_INSTANCE_EXPIRING_30D');
+    expect(planForFinding(finding, policy).steps[3]?.args).toMatchObject({ network: 'mainnet' });
+    expect(planForFinding(finding, policy, 'testnet').steps[3]?.args).toMatchObject({
+      network: 'testnet',
+    });
+  });
+
   it('plans an archived instance as restore then extend', () => {
     const plan = planForFinding(makeFinding('CONTRACT_INSTANCE_ARCHIVED'), policy);
     expect(toolsOf(plan)).toEqual([
