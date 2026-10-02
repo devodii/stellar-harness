@@ -21,6 +21,8 @@ import {
 } from './schemas/simulate';
 import { GetTransactionInput, GetTransactionOutput } from './schemas/transaction';
 
+export { FailureExplanation, ResultCodes } from '../explain/explain';
+export type { ToolName } from './names';
 export * from './schemas/account';
 export * from './schemas/anchor';
 export * from './schemas/common';
