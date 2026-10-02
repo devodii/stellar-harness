@@ -61,12 +61,12 @@ export function SimulationCostView({ simulation, xlmUsd }: SimulationCostViewPro
           { label: 'read write keys', value: simulation.footprint.readWrite.length },
         ]}
       />
-      <details className="group rounded-md border border-border">
-        <summary className="flex cursor-pointer items-center justify-between px-2 py-1.5">
+      <details className="group">
+        <summary className="flex cursor-pointer items-center justify-between py-1">
           <StatLabel>unsigned xdr (display only, never submitted)</StatLabel>
           <CopyButton value={simulation.unsignedXdr} label="Copy unsigned XDR" />
         </summary>
-        <pre className="max-h-40 overflow-auto border-t border-border p-2 font-mono text-[11px] break-all whitespace-pre-wrap text-muted-foreground">
+        <pre className="mt-1 max-h-40 overflow-auto border-l-2 border-border pl-3 font-mono text-[11px] break-all whitespace-pre-wrap text-muted-foreground">
           {simulation.unsignedXdr}
         </pre>
       </details>
