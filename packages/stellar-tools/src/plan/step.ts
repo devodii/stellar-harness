@@ -48,9 +48,26 @@ export const notice = (description: string, args: Record<string, unknown>): Step
   args,
 });
 
-export const submit = (description: string, fromStep: string): StepDraft => ({
+export const submit = (description: string): StepDraft => ({
   kind: 'submit',
   tool: 'submitTransaction',
   description,
-  args: { fromStep, network: 'mainnet' },
+  args: { network: 'mainnet' },
 });
+
+const linkSource = (step: StepDraft): PlanStepKind | null => {
+  if (step.kind === 'submit') return 'build';
+  if (step.tool === 'buildTransaction') return 'simulate';
+  return null;
+};
+
+export const linkSteps = (steps: StepDraft[]): StepDraft[] =>
+  steps.map((step, index) => {
+    const sourceKind = linkSource(step);
+    if (!sourceKind || 'fromStep' in step.args) return step;
+    const sourceIndex = steps.findLastIndex(
+      (candidate, candidateIndex) => candidateIndex < index && candidate.kind === sourceKind,
+    );
+    if (sourceIndex < 0) return step;
+    return { ...step, args: { fromStep: stepId(sourceIndex), ...step.args } };
+  });
