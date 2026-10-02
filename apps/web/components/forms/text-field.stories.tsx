@@ -40,3 +40,21 @@ export const Sans: Story = {
     </FieldStory>
   ),
 };
+
+export const Email: Story = {
+  render: () => (
+    <FieldStory schema={z.object({ email: z.email() })} defaultValues={{ email: '' }}>
+      {(control) => (
+        <TextField
+          control={control}
+          name="email"
+          label="email"
+          type="email"
+          autoComplete="email"
+          placeholder="ops@example.org"
+          mono={false}
+        />
+      )}
+    </FieldStory>
+  ),
+};
