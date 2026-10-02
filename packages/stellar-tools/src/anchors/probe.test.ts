@@ -237,8 +237,8 @@ describe('probeAnchor', () => {
       requestedSeps: [1, 10],
       ranSeps: [1, 10],
       perSep: {
-        '1': { passed: 5, failed: 0, skipped: 0, names: [] },
-        '10': { passed: 9, failed, skipped: 0, names: failed ? ['GET /auth: x'] : [] },
+        '1': { passed: 5, failed: 0, skipped: 0, blocked: 0, names: [] },
+        '10': { passed: 9, failed, skipped: 0, blocked: 0, names: failed ? ['GET /auth: x'] : [] },
       },
       excludedSeps: [],
       excludedTests: [],
