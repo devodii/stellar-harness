@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Instrument_Serif, Outfit } from 'next/font/google';
 import type * as React from 'react';
+import { ConversationsProvider } from '@/components/conversations-provider';
 import { Providers } from '@/components/providers';
 import './globals.css';
 
@@ -25,7 +26,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
     >
       <body className="h-full font-sans">
-        <Providers>{children}</Providers>
+        <Providers>
+          <ConversationsProvider>{children}</ConversationsProvider>
+        </Providers>
       </body>
     </html>
   );
