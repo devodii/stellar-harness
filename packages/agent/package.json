@@ -13,6 +13,9 @@
   },
   "dependencies": {
     "@harness/schema": "workspace:*",
+    "@harness/stellar-tools": "workspace:*",
+    "@harness/storage": "workspace:*",
+    "ai": "7.0.127",
     "zod": "4.6.5"
   }
 }
