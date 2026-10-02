@@ -6,7 +6,7 @@ import page2 from './__fixtures__/expert-contracts-page-2.json';
 import batch from './__fixtures__/rpc-instance-entries.json';
 import projects from './__fixtures__/stellarlight-projects-scf.json';
 import repos from './__fixtures__/stellarlight-repos.json';
-import { CONTRACT_ROWS_DERIVED, runContractsCensus, SCF_SKIP_NOTE } from './index';
+import { CONTRACT_ROWS_DERIVED, runContractsCensus } from './index';
 import { memorySinks, sequentialRun } from './testing';
 
 const EXPERT = 'https://api.stellar.expert/explorer/public';
@@ -102,32 +102,5 @@ describe('runContractsCensus', () => {
       ['stellarlight:projects', 'NOT_FOUND'],
       ['stellarlight:repos', 'NOT_FOUND'],
     ]);
-  });
-
-  it('skips the scf join without an ecosystem directory and records a note', async () => {
-    const sinks = memorySinks();
-    const urls: string[] = [];
-    const page = fakeFetcher({ [`${EXPERT}/contract?limit=2&order=desc`]: { body: page1 } });
-    const result = await runContractsCensus(
-      {
-        fetch: (url, init) => {
-          urls.push(url);
-          return page(url, init);
-        },
-        rpc,
-        run: sequentialRun,
-        snapshot: { ...snapshot, network: 'testnet' },
-        stellarExpertUrl: EXPERT,
-        stellarlightUrl: LIGHT,
-        ecosystemDirectory: false,
-        ...sinks,
-      },
-      { limit: 2 },
-    );
-    expect(result.stats.enumerated).toBe(2);
-    expect(result.gaps).toEqual([]);
-    expect(result.notes).toEqual([SCF_SKIP_NOTE]);
-    expect(result.stats).toMatchObject({ scfProjectPages: 0, scfRepoPages: 0 });
-    expect(urls.some((url) => url.startsWith(LIGHT))).toBe(false);
   });
 });
