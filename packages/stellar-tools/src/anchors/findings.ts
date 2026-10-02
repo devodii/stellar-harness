@@ -1,4 +1,4 @@
-import type { AnchorStage, FindingType, Severity, SubjectKind } from '@harness/schema';
+import type { AnchorStage, FindingType, Severity } from '@harness/schema';
 import { homeDomainMismatches } from './accounts';
 import { brokenCors } from './cors';
 import type { FindingDraft, ProbeAnchorOutput, StageRecord } from './schemas';
@@ -49,21 +49,31 @@ const failed = (state: ProbeState, stage: AnchorStage): StageRecord | null => {
 
 const unique = (tags: string[]): string[] => [...new Set(tags)];
 
+const FLAG_NAMES = [
+  'auth_required',
+  'auth_revocable',
+  'auth_clawback_enabled',
+  'auth_immutable',
+] as const;
+
+const anyFlags = (
+  issuers: Record<(typeof FLAG_NAMES)[number], boolean>[],
+): Record<(typeof FLAG_NAMES)[number], boolean> =>
+  Object.fromEntries(FLAG_NAMES.map((flag) => [flag, issuers.some((i) => i[flag])])) as Record<
+    (typeof FLAG_NAMES)[number],
+    boolean
+  >;
+
 export const anchorFindings = (state: ProbeState, extraTags: string[] = []): FindingDraft[] => {
   const { domain, tomlUrl, toml, details } = state;
   const tags = unique(['anchor', ...state.tags, ...extraTags]);
-  const draft = (
-    type: AnchorFindingType,
-    evidence: Record<string, unknown>,
-    subject = domain,
-    subjectKind: SubjectKind = 'anchor_domain',
-  ): FindingDraft => ({
+  const draft = (type: AnchorFindingType, evidence: Record<string, unknown>): FindingDraft => ({
     type,
-    subjectKind,
-    subject,
+    subjectKind: 'anchor_domain',
+    subject: domain,
     severity: ANCHOR_FINDING_SEVERITY[type],
     evidence: { domain, ...evidence },
-    tags: subjectKind === 'anchor_domain' ? tags : unique([...tags, `anchor_domain:${domain}`]),
+    tags,
   });
 
   const tomlFailure = failed(state, 'toml');
@@ -85,24 +95,31 @@ export const anchorFindings = (state: ProbeState, extraTags: string[] = []): Fin
     );
   }
 
-  for (const account of homeDomainMismatches(domain, details.accounts)) {
+  const mismatched = homeDomainMismatches(domain, details.accounts);
+  if (mismatched[0]) {
     findings.push(
-      draft(
-        'ANCHOR_HOME_DOMAIN_MISMATCH',
-        { account: account.id, homeDomain: account.homeDomain, roles: account.roles },
-        account.id,
-        'account',
-      ),
+      draft('ANCHOR_HOME_DOMAIN_MISMATCH', {
+        account: mismatched[0].id,
+        homeDomain: mismatched[0].homeDomain,
+        accounts: mismatched.map(({ id, homeDomain, roles, codes }) => ({
+          account: id,
+          homeDomain,
+          roles,
+          codes,
+        })),
+      }),
     );
   }
-  for (const issuer of details.accounts.filter((a) => a.roles.includes('issuer') && a.flags)) {
+  const issuerFlags = details.accounts.flatMap(({ id, roles, codes, flags }) =>
+    roles.includes('issuer') && flags ? [{ account: id, codes, ...flags }] : [],
+  );
+  if (issuerFlags[0]) {
     findings.push(
-      draft(
-        'ANCHOR_ISSUER_FLAGS',
-        { account: issuer.id, codes: issuer.codes, ...issuer.flags },
-        issuer.id,
-        'account',
-      ),
+      draft('ANCHOR_ISSUER_FLAGS', {
+        issuer: issuerFlags[0].account,
+        ...anyFlags(issuerFlags),
+        issuers: issuerFlags,
+      }),
     );
   }
 

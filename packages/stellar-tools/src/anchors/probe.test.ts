@@ -173,14 +173,27 @@ describe('probeAnchor', () => {
       'ANCHOR_SEP10_CHALLENGE_FAILS',
       'ANCHOR_TLS_OR_CORS_BROKEN',
     ]);
-    const mismatch = output.findings[0];
-    expect(mismatch).toMatchObject({
-      subjectKind: 'account',
-      subject: 'GCYE7C77EB5AWAA25R5XMWNI2EDOKTTFTTPZKM2SR5DI4B4WFD52DARS',
+    const ars = 'GCYE7C77EB5AWAA25R5XMWNI2EDOKTTFTTPZKM2SR5DI4B4WFD52DARS';
+    expect(output.findings[0]).toMatchObject({
+      subjectKind: 'anchor_domain',
+      subject: 'anclap.com',
       severity: 'medium',
-      evidence: { homeDomain: 'api.anclap.com' },
+      evidence: {
+        account: ars,
+        homeDomain: 'api.anclap.com',
+        accounts: [{ account: ars, homeDomain: 'api.anclap.com', roles: ['account', 'issuer'] }],
+      },
     });
-    expect(mismatch?.tags).toContain('anchor_domain:anclap.com');
+    expect(output.findings[1]).toMatchObject({
+      subject: 'anclap.com',
+      severity: 'info',
+      evidence: {
+        issuer: ars,
+        auth_required: false,
+        auth_clawback_enabled: false,
+        issuers: [{ account: ars, codes: ['ARS'], auth_revocable: false }],
+      },
+    });
     expect(output.findings.at(-1)?.evidence).toMatchObject({
       checks: [{ target: 'toml', cors: false }],
     });
