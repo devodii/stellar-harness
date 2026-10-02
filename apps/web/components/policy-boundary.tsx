@@ -1,6 +1,5 @@
 import type { PolicyBoundary as PolicyBoundaryShape } from '@harness/schema';
-import { cn } from 'cn';
-import { StatLabel } from '@/components/stat';
+import { AccentBlock } from '@/components/accent-block';
 
 export interface PolicyBoundaryProps {
   boundary: PolicyBoundaryShape;
@@ -14,15 +13,16 @@ export function PolicyBoundary({ boundary, className }: PolicyBoundaryProps) {
   ].filter(Boolean);
 
   return (
-    <div className={cn('space-y-1 border-l-2 border-warning pl-3', className)}>
-      <div className="flex flex-wrap items-baseline gap-x-2">
-        <StatLabel>policy</StatLabel>
-        <code className="font-mono text-xs text-foreground">{boundary.rule}</code>
-      </div>
+    <AccentBlock
+      tone="warning"
+      label="policy"
+      aside={<code className="font-mono text-xs text-foreground">{boundary.rule}</code>}
+      className={className}
+    >
       <p className="text-sm text-foreground">{boundary.reason}</p>
       {limits.length > 0 && (
         <p className="font-mono text-xs text-muted-foreground">{limits.join(' · ')}</p>
       )}
-    </div>
+    </AccentBlock>
   );
 }
