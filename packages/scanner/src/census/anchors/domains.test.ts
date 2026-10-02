@@ -3,12 +3,14 @@ import { describe, expect, it } from 'vitest';
 import {
   buildDomainList,
   type DomainListOptions,
+  ECOSYSTEM_SKIP_NOTE,
   mergeCandidates,
   partnerCandidate,
   transitiveCandidates,
   websiteDomain,
 } from './domains';
 import { topAssetsUrl } from './expert';
+import { KNOWN_ANCHORS } from './known';
 import { MEDIUM_FEED_URL } from './scf-recaps';
 import type { StellarlightPartner } from './schemas';
 import { partnersUrl, projectSearchUrl } from './stellarlight';
@@ -152,5 +154,47 @@ describe('buildDomainList', () => {
     expect(list.domains).toEqual([]);
     expect(list.scfSource).toBe('none');
     expect(list.gaps).toHaveLength(6);
+  });
+
+  it('skips the mainnet-only directory on testnet and seeds known anchors', async () => {
+    const testnetExpert = 'https://api.stellar.expert/explorer/testnet';
+    const fetch = fakeFetcher({
+      [topAssetsUrl(testnetExpert, 200)]: jsonRoute({
+        _embedded: {
+          records: [
+            { asset: `USD-${GTN_ISSUER}-1`, domain: 'testanchor.stellar.org' },
+            { asset: `EUR-${GTN_ISSUER}-1` },
+          ],
+        },
+      }),
+    });
+    const list = await buildDomainList(
+      { fetch, horizon: fakeHorizon({ [GTN_ISSUER]: issuerAccount('issuer.example') }) },
+      {
+        ...opts,
+        expertUrl: testnetExpert,
+        ecosystemDirectory: false,
+        knownDomains: KNOWN_ANCHORS.testnet,
+      },
+    );
+    expect(fetch.calls.map((call) => call.url)).toEqual([topAssetsUrl(testnetExpert, 200)]);
+    expect(list.notes).toEqual([ECOSYSTEM_SKIP_NOTE]);
+    expect(list.scfSource).toBe('none');
+    expect(list.gaps).toEqual([]);
+    expect(list.domains.map((d) => [d.domain, d.sources])).toEqual([
+      ['testanchor.stellar.org', ['known_anchor', 'stellar_expert_asset']],
+      ['anchor-sep-server-dev.stellar.org', ['known_anchor']],
+      ['api-dev.vibrantapp.com', ['known_anchor']],
+      ['issuer.example', ['stellar_expert_asset']],
+    ]);
+    expect(list.counts.known_anchor).toBe(3);
+  });
+
+  it('records no notes on mainnet', async () => {
+    const list = await buildDomainList(
+      { fetch: fakeFetcher({}), horizon: fakeHorizon({}) },
+      { ...opts, limit: 5 },
+    );
+    expect(list.notes).toEqual([]);
   });
 });
