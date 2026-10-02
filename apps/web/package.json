@@ -14,7 +14,6 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^4.0.71",
     "@ai-sdk/openai": "4.0.83",
     "@ai-sdk/react": "^4.0.130",
     "@harness/agent": "workspace:*",
