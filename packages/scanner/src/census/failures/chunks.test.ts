@@ -1,5 +1,5 @@
-import { appError, err } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
+import { appError, err } from '../../schema';
 import page from './__fixtures__/rpc-get-transactions-page.json';
 import { asRpcTransaction, fakeRpc, pagedRpc, syntheticTx } from './__tests__/fakes';
 import { planChunks, scanChunk } from './chunks';

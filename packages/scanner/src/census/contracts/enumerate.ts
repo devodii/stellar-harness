@@ -1,9 +1,9 @@
-import type { AppError } from '@harness/schema';
 import {
   type ExpertContract,
   expertContractsUrl,
   fetchExpertContractPage,
 } from '@harness/stellar-tools/contracts';
+import type { AppError } from '../../schema';
 import type { Checkpoint, Fetcher, WriteDerived } from './ports';
 
 export const CONTRACTS_DERIVED = 'contracts';

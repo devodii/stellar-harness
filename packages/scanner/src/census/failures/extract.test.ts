@@ -1,7 +1,7 @@
-import { NETWORK_PROFILES } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
 import type { EnvelopeOperation } from '../../decode';
 import { createPortDecoders, decodeResultCodes } from '../../decode';
+import { NETWORK_PROFILES } from '../../schema';
 import samples from './__fixtures__/rpc-failed-transactions.json';
 import { asRpcTransaction, recordedDecoders, syntheticTx } from './__tests__/fakes';
 import { extractFailed, extractFailedTx, failingPayment } from './extract';

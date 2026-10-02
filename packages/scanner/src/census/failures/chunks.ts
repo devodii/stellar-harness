@@ -1,4 +1,4 @@
-import { appError, err, ok, type Result } from '@harness/schema';
+import { appError, err, ok, type Result } from '../../schema';
 import type { RpcPort, RpcTransaction } from './ports';
 import type { LedgerTotal } from './rows';
 

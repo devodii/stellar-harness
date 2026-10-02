@@ -1,4 +1,3 @@
-import { type AppError, NETWORK_PROFILES, toAppError } from '@harness/schema';
 import {
   contractCodeKey,
   contractInstanceKey,
@@ -9,7 +8,7 @@ import {
   simulationSourceFor,
   stroopsToXlm,
 } from '@harness/stellar-tools/contracts';
-import { RentSummary, type Snapshot } from '../schema';
+import { type AppError, NETWORK_PROFILES, RentSummary, type Snapshot, toAppError } from '../schema';
 import type {
   Emit,
   Fetcher,

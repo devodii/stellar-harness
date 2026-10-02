@@ -1,5 +1,5 @@
-import { appError, err } from '@harness/schema';
 import type { HorizonPort, NetworkClients } from '@harness/stellar-tools';
+import { appError, err } from '../schema';
 
 export const HORIZON_PROBE_TIMEOUT_MS = 10_000;
 const HORIZON_PROBE_ATTEMPTS = 2;

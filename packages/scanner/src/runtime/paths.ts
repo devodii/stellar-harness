@@ -1,5 +1,5 @@
-import { DEFAULT_NETWORK, type Network } from '@harness/schema';
 import { dataDirFor } from '@harness/storage';
+import { DEFAULT_NETWORK, type Network } from '../schema';
 
 export { dataDirFor };
 

@@ -1,4 +1,4 @@
-import type { Result } from '@harness/schema';
+import type { Result } from '../../schema';
 
 export type HttpResponse = {
   url: string;

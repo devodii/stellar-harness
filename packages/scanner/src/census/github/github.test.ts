@@ -1,5 +1,5 @@
-import { ok } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
+import { ok } from '../../schema';
 import { type FindingDraft, runGithubCensus, sinceDate, toFindingDraft } from './census';
 import type { Fetcher, HttpResponse } from './ports';
 import { MAX_QUERY_LENGTH, packScopes } from './queries';
