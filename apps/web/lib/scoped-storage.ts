@@ -14,5 +14,7 @@ export const scopeStorageToNetwork = (storage: Storage, network: Network): Stora
     getFinding: async (findingId) => ((await belongs()) ? storage.getFinding(findingId) : null),
     getSummary: async () => ((await belongs()) ? storage.getSummary() : null),
     getSnapshot: async () => ((await belongs()) ? storage.getSnapshot() : null),
+    putWaitlist: (entry) => storage.putWaitlist(entry),
+    countWaitlist: () => storage.countWaitlist(),
   };
 };

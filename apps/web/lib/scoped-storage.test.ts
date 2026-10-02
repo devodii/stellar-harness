@@ -34,4 +34,14 @@ describe('scopeStorageToNetwork', () => {
     expect(await scoped.queryFindings({})).toEqual({ rows: [], total: 0 });
     expect(await scoped.getFinding('f1')).toBeNull();
   });
+
+  it('keeps the waitlist shared across networks', async () => {
+    const scoped = scopeStorageToNetwork(await seeded('mainnet'), 'testnet');
+    await scoped.putWaitlist({
+      email: 'ops@example.org',
+      createdAt: '2026-10-02T00:00:00.000Z',
+      userAgent: 'vitest',
+    });
+    expect(await scoped.countWaitlist()).toBe(1);
+  });
 });
