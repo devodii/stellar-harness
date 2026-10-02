@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { DEMO_ORG } from '@/demo-org';
 import type { Watch } from '@/lib/harness';
 import { fakeAccount, fakeContract, fakeHash } from './story-ids';
+import { SidebarProvider } from './ui/sidebar';
 import { WatchPanel } from './watch-panel';
 
 const ttl = (daysLeft: number, archived = false) => ({
@@ -51,12 +53,12 @@ const WATCH: Watch = {
 const meta: Meta<typeof WatchPanel> = {
   component: WatchPanel,
   title: 'components/WatchPanel',
-  args: { watch: WATCH, network: 'testnet', anchorDomain: 'testanchor.stellar.org' },
+  args: { watch: WATCH, org: DEMO_ORG },
   decorators: [
     (Story) => (
-      <div className="flex h-[720px]">
+      <SidebarProvider className="h-[720px] min-h-0">
         <Story />
-      </div>
+      </SidebarProvider>
     ),
   ],
 };

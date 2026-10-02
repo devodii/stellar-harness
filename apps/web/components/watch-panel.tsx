@@ -1,10 +1,11 @@
-import type { Network } from '@harness/schema';
+import type { Org } from '@harness/schema';
 import type { AnchorProbe } from '@harness/stellar-tools';
 import type * as React from 'react';
 import { ActionCard } from '@/components/action-card';
 import { Address } from '@/components/address';
 import { BracketTag } from '@/components/bracket-tag';
 import { StatLabel } from '@/components/stat';
+import { Sidebar, SidebarContent, SidebarHeader } from '@/components/ui/sidebar';
 import { formatDecimal } from '@/lib/format';
 import type { Watch, WatchedContract } from '@/lib/harness';
 import { explorerUrl } from '@/lib/links';
@@ -56,59 +57,70 @@ function Row({
 
 export interface WatchPanelProps {
   watch: Watch;
-  network: Network;
-  anchorDomain?: string;
+  org: Pick<Org, 'name' | 'network' | 'anchorDomain'>;
 }
 
-export function WatchPanel({ watch, network, anchorDomain }: WatchPanelProps) {
+export function WatchPanel({ watch, org }: WatchPanelProps) {
   return (
-    <aside className="flex w-[280px] shrink-0 flex-col gap-6 overflow-y-auto border-r p-4">
-      <h2 className="font-medium">What the harness watches</h2>
-      <Section title="accounts">
-        {watch.accounts.map((account) => (
-          <Row
-            key={account.address}
-            label={account.label}
-            address={
-              <Address
-                value={account.address}
-                href={explorerUrl('account', account.address, network)}
-              />
-            }
-            value={
-              account.xlm === null ? 'unavailable' : `${formatDecimal(Number(account.xlm), 2)} XLM`
-            }
-          />
-        ))}
-      </Section>
-      <Section title="contracts">
-        {watch.contracts.map((contract) => (
-          <Row
-            key={contract.id}
-            label={contract.label}
-            address={
-              <Address value={contract.id} href={explorerUrl('contract', contract.id, network)} />
-            }
-            value={<ContractStatus ttl={contract.ttl} />}
-          />
-        ))}
-      </Section>
-      {anchorDomain && (
-        <Section title="anchor">
-          <li>
-            <p className="text-sm">{anchorDomain}</p>
-            <p className="font-mono text-xs">{anchorStatus(watch.anchor)}</p>
-          </li>
+    <Sidebar>
+      <SidebarHeader className="gap-0.5 border-b px-4 py-3 text-foreground">
+        <h2 className="font-medium">What the harness watches</h2>
+        <p className="text-xs text-muted-foreground md:hidden">
+          {org.name} · {org.network}
+        </p>
+      </SidebarHeader>
+      <SidebarContent className="gap-6 p-4 text-foreground">
+        <Section title="accounts">
+          {watch.accounts.map((account) => (
+            <Row
+              key={account.address}
+              label={account.label}
+              address={
+                <Address
+                  value={account.address}
+                  href={explorerUrl('account', account.address, org.network)}
+                />
+              }
+              value={
+                account.xlm === null
+                  ? 'unavailable'
+                  : `${formatDecimal(Number(account.xlm), 2)} XLM`
+              }
+            />
+          ))}
         </Section>
-      )}
-      <section className="mt-auto">
-        <StatLabel>proposed actions</StatLabel>
-        {watch.actions.length === 0 ? (
-          <p className="pt-1 text-sm text-muted-foreground">None yet.</p>
-        ) : (
-          watch.actions.map((action) => <ActionCard key={action.id} action={action} compact />)
+        <Section title="contracts">
+          {watch.contracts.map((contract) => (
+            <Row
+              key={contract.id}
+              label={contract.label}
+              address={
+                <Address
+                  value={contract.id}
+                  href={explorerUrl('contract', contract.id, org.network)}
+                />
+              }
+              value={<ContractStatus ttl={contract.ttl} />}
+            />
+          ))}
+        </Section>
+        {org.anchorDomain && (
+          <Section title="anchor">
+            <li>
+              <p className="text-sm">{org.anchorDomain}</p>
+              <p className="font-mono text-xs">{anchorStatus(watch.anchor)}</p>
+            </li>
+          </Section>
         )}
-      </section>
-    </aside>
+        <section className="mt-auto">
+          <StatLabel>proposed actions</StatLabel>
+          {watch.actions.length === 0 ? (
+            <p className="pt-1 text-sm text-muted-foreground">None yet.</p>
+          ) : (
+            watch.actions.map((action) => <ActionCard key={action.id} action={action} compact />)
+          )}
+        </section>
+      </SidebarContent>
+    </Sidebar>
   );
 }

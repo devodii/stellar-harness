@@ -1,6 +1,8 @@
+import type * as React from 'react';
 import { Suspense } from 'react';
 import { ChatPage } from '@/components/chat-page';
 import { Header } from '@/components/header';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { WatchPanel } from '@/components/watch-panel';
 import { DEMO_ORG } from '@/demo-org';
 import { readWatch } from '@/lib/harness';
@@ -10,14 +12,17 @@ export const dynamic = 'force-dynamic';
 export default async function Page() {
   const watch = await readWatch();
   return (
-    <div className="flex h-full flex-col">
-      <Header org={DEMO_ORG} />
-      <div className="flex min-h-0 flex-1">
-        <WatchPanel watch={watch} network={DEMO_ORG.network} anchorDomain={DEMO_ORG.anchorDomain} />
+    <SidebarProvider
+      className="h-svh min-h-0"
+      style={{ '--sidebar-width': '280px' } as React.CSSProperties}
+    >
+      <WatchPanel watch={watch} org={DEMO_ORG} />
+      <SidebarInset className="min-h-0 min-w-0">
+        <Header org={DEMO_ORG} />
         <Suspense>
           <ChatPage />
         </Suspense>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
