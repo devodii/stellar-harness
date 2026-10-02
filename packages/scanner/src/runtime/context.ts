@@ -1,5 +1,3 @@
-import { open, rm } from 'node:fs/promises';
-import { join } from 'node:path';
 import { DEFAULT_NETWORK, type Network, type Snapshot } from '@harness/schema';
 import {
   type Cache,
@@ -17,8 +15,8 @@ import {
   takeSnapshot,
   withRpcAccountFallback,
 } from '@harness/stellar-tools';
+import { createCache } from '@harness/storage';
 import { z } from 'zod';
-import { createDerivedWriter, derivedPath } from '../core/derived';
 import {
   createFindingSink,
   type FindingInput,
@@ -26,13 +24,15 @@ import {
   makeFinding,
 } from '../core/findings';
 import { formatProgress, runTasks } from '../core/runner';
-import { createStateStore, snapshotStore, writeJsonAtomic } from '../core/state';
+import { createStateStore } from '../core/state';
 import { type HorizonStatus, probeHorizon, unavailableHorizon } from './horizon';
+import { createPersistence, type ScanPersistence } from './persistence';
 
 export type ScanOptions = {
   dataDir: string;
   network?: Network;
   cache?: Cache;
+  databaseUrl?: string;
   noCache?: boolean;
   newSnapshot?: boolean;
   limit?: number;
@@ -56,6 +56,7 @@ export type ScanContext = {
   clients: NetworkClients;
   ports: Ports;
   snapshot: Snapshot;
+  persistence: ScanPersistence;
   sink: FindingSink;
   gaps: HttpGap[];
   run: Run;
@@ -72,47 +73,25 @@ export type ScanContext = {
   notes: string[];
 };
 
-async function* readJsonlLines(path: string): AsyncIterable<unknown> {
-  let handle: Awaited<ReturnType<typeof open>>;
-  try {
-    handle = await open(path);
-  } catch (error) {
-    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') return;
-    throw error;
-  }
-  try {
-    for await (const line of handle.readLines()) if (line.trim()) yield JSON.parse(line);
-  } finally {
-    await handle.close();
-  }
-}
-
 const CheckpointState = z.record(z.string(), z.unknown());
-
-const resetForSnapshot = async (dataDir: string) => {
-  await rm(join(dataDir, 'findings.jsonl'), { force: true });
-  await rm(join(dataDir, 'derived'), { recursive: true, force: true });
-  await rm(join(dataDir, 'state'), { recursive: true, force: true });
-};
 
 const resolveSnapshot = async (
   clients: NetworkClients,
-  dataDir: string,
+  persistence: ScanPersistence,
   fresh: boolean,
   horizon: HorizonStatus,
 ): Promise<Snapshot> => {
   const network = clients.config.NETWORK;
-  const store = snapshotStore(dataDir);
-  const existing = fresh ? null : await store.read();
+  const existing = fresh ? null : await persistence.getSnapshot();
   if (existing?.network === network) return existing;
-  await resetForSnapshot(dataDir);
+  await persistence.resetForSnapshot();
   const taken = await takeSnapshot(clients, {
     gitSha: process.env.GIT_SHA,
     network,
     skipHorizon: !horizon.available,
   });
   if (!taken.ok) throw new Error(`Could not take a snapshot: ${taken.error.message}`);
-  await store.write(taken.value);
+  await persistence.putSnapshot(taken.value);
   return taken.value;
 };
 
@@ -138,9 +117,19 @@ const createRun =
     };
   };
 
-export const selectCache = ({ noCache, cache, dataDir }: ScanOptions): Cache => {
+export const selectCache = ({
+  noCache,
+  cache,
+  dataDir,
+  databaseUrl,
+  network,
+}: ScanOptions): Cache => {
   if (noCache) return new NoCache();
-  return cache ?? new DiskCache(dataDir);
+  return (
+    cache ??
+    createCache({ dataDir, network: network ?? DEFAULT_NETWORK, databaseUrl }) ??
+    new DiskCache(dataDir)
+  );
 };
 
 export const scanPorts = (
@@ -154,7 +143,9 @@ export const scanPorts = (
 
 export const createScanContext = async (options: ScanOptions): Promise<ScanContext> => {
   const log = options.log ?? ((line: string) => process.stderr.write(`${line}\n`));
-  const config = loadNetworkConfig(options.env, options.network ?? DEFAULT_NETWORK);
+  const network = options.network ?? DEFAULT_NETWORK;
+  const config = loadNetworkConfig(options.env, network);
+  const persistence = await createPersistence(options.dataDir, network, options.databaseUrl);
   const gaps: HttpGap[] = [];
   const clients = createClients(config, {
     cache: selectCache(options),
@@ -166,11 +157,11 @@ export const createScanContext = async (options: ScanOptions): Promise<ScanConte
   if (!horizon.available) log(`[scan] ${horizon.note}`);
   const snapshot = await resolveSnapshot(
     clients,
-    options.dataDir,
+    persistence,
     options.newSnapshot ?? false,
     horizon,
   );
-  const sink = createFindingSink(options.dataDir);
+  const sink = createFindingSink(persistence.storage);
   const stores = new Map<string, ReturnType<typeof createStateStore<typeof CheckpointState>>>();
   const store = (census: string) => {
     const existing = stores.get(census);
@@ -186,25 +177,18 @@ export const createScanContext = async (options: ScanOptions): Promise<ScanConte
     clients,
     ports: scanPorts(clients, horizon),
     snapshot,
+    persistence,
     sink,
     gaps,
     run: createRun(log),
     emit: async (draft) => {
       await sink.emit(makeFinding(draft, snapshot));
     },
-    writeDerived: async (name, rows) => {
-      const writer = createDerivedWriter(options.dataDir, name);
-      await writer.writeMany(rows);
-      await writer.close();
-    },
-    resetDerived: async (...names) => {
-      await Promise.all(
-        names.map((name) => rm(derivedPath(options.dataDir, name), { force: true })),
-      );
-    },
-    readDerived: (name) => readJsonlLines(derivedPath(options.dataDir, name)),
+    writeDerived: (name, rows) => persistence.appendDerived(name, rows),
+    resetDerived: (...names) => persistence.clearDerived(...names),
+    readDerived: (name) => persistence.readDerived(name),
     writeDerivedJson: (relativePath, data) =>
-      writeJsonAtomic(join(options.dataDir, 'derived', relativePath), data),
+      persistence.putArtifact('derived', relativePath.replace(/\.json$/, ''), data),
     checkpointer: (census) => (state) => store(census).write(state),
     readCheckpoint: (census) => store(census).read(),
     stats: () => clients.http.stats.totals(),
