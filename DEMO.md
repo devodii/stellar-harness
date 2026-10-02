@@ -2,13 +2,13 @@
 
 A three-minute screen recording. Run a scan first (`pnpm scan all --window 1d`) so the header and `/findings` have data, then `pnpm dev` with `OPENAI_API_KEY` set in `.env`. Every value below is a real mainnet subject checked with read-only requests; the suggestion chips use the same values when the scan does not supply better ones.
 
-| Subject | Value |
-| --- | --- |
+| Subject                                               | Value                                                              |
+| ----------------------------------------------------- | ------------------------------------------------------------------ |
 | Failed transaction (`op_no_trust`, ledger 64,722,800) | `e2173f4a7f63a3d57bbbf442e72511938aae136e802045d26e564418878c5662` |
-| Anchor with an unreadable `/info` | `mykobo.co` |
-| USDC holder | `GAPV2C4BTHXPL2IVYDXJ5PUU7Q3LAXU7OAQDP7KVYHLCNM2JTAJNOQQI` |
-| Account without a USDC trustline | `GBNPYM6DEBZE5BERKK6EADIHLP2XS3NRX7SKQSJVCAAQ2E52YA5ODU4K` |
-| Contract | `CDZYZVZNURK4DCD3ZJMBKLDYCB7FIYL3FRVSLRLGL2BEOIN53UP4YNQC` |
+| Anchor with an unreadable `/info`                     | `mykobo.co`                                                        |
+| USDC holder                                           | `GAPV2C4BTHXPL2IVYDXJ5PUU7Q3LAXU7OAQDP7KVYHLCNM2JTAJNOQQI`         |
+| Account without a USDC trustline                      | `GBNPYM6DEBZE5BERKK6EADIHLP2XS3NRX7SKQSJVCAAQ2E52YA5ODU4K`         |
+| Contract                                              | `CDZYZVZNURK4DCD3ZJMBKLDYCB7FIYL3FRVSLRLGL2BEOIN53UP4YNQC`         |
 
 ## 0:00 Header (15 s)
 
