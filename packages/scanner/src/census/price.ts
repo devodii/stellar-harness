@@ -1,6 +1,6 @@
-import { getJson } from '@harness/stellar-tools/contracts';
 import { z } from 'zod';
 import { appError, err, ok, type Result } from '../schema';
+import { getJson } from '../stellar/contracts';
 import type { Fetcher } from './contracts/ports';
 
 export const COINGECKO_XLM_USD_URL =

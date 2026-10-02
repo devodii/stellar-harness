@@ -1,7 +1,7 @@
 import type { FindingType, Severity, SubjectKind } from '../../schema';
 
-export type { HorizonAccount, HorizonPort, RpcPort, RpcTransaction } from '@harness/stellar-tools/contracts';
 export type { DecodeEnvelopeSummary, DecodeResultCodes } from '../../decode';
+export type { HorizonAccount, HorizonPort, RpcPort, RpcTransaction } from '../../stellar/contracts';
 
 export type FindingDraft = {
   type: FindingType;

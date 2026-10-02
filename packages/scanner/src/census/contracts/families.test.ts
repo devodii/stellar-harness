@@ -1,5 +1,5 @@
-import { ExpertContract } from '@harness/stellar-tools/contracts';
 import { describe, expect, it } from 'vitest';
+import { ExpertContract } from '../../stellar/contracts';
 import page1 from './__fixtures__/expert-contracts-page-1.json';
 import page2 from './__fixtures__/expert-contracts-page-2.json';
 import { buildFamilies, toContractRows } from './families';

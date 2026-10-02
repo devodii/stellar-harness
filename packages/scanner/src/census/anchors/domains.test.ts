@@ -1,5 +1,5 @@
-import type { AnchorToml, HorizonAccount } from '@harness/stellar-tools/anchors';
 import { describe, expect, it } from 'vitest';
+import type { AnchorToml, HorizonAccount } from '../../stellar/anchors';
 import {
   buildDomainList,
   type DomainListOptions,

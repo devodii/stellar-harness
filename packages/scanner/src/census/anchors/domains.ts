@@ -5,7 +5,7 @@ import {
   normalizeDomain,
   stripWww,
   tomlUrlFor,
-} from '@harness/stellar-tools/anchors';
+} from '../../stellar/anchors';
 import { countryCode } from './country';
 import { fetchTopAssets, type TopAsset } from './expert';
 import { getText } from './http';

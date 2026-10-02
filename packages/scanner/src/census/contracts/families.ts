@@ -1,4 +1,4 @@
-import type { ExpertContract } from '@harness/stellar-tools/contracts';
+import type { ExpertContract } from '../../stellar/contracts';
 import type { ContractRow } from './schemas';
 
 export type Family = { wasm: string; size: number; rank: number };

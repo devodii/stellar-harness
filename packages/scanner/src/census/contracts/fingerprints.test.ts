@@ -1,5 +1,5 @@
-import { fakeFetcher } from '@harness/stellar-tools/contracts/testing';
 import { describe, expect, it } from 'vitest';
+import { fakeFetcher } from '../../stellar/contracts/fakes';
 import unverified from './__fixtures__/expert-contract-detail-unverified.json';
 import verified from './__fixtures__/expert-contract-detail-verified.json';
 import {

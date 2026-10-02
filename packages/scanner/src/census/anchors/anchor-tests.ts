@@ -1,11 +1,11 @@
+import { getTests, runTests } from '@stellar/anchor-tests';
+import { DEFAULT_NETWORK, NETWORK_PROFILES } from '../../schema';
 import type {
   AnchorSepResult,
   AnchorTestSep,
   AnchorTestsReport,
   ExcludedTest,
-} from '@harness/stellar-tools/anchors';
-import { getTests, runTests } from '@stellar/anchor-tests';
-import { DEFAULT_NETWORK, NETWORK_PROFILES } from '../../schema';
+} from '../../stellar/anchors';
 
 export type LibConfig = {
   homeDomain: string;

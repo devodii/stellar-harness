@@ -1,4 +1,3 @@
-import { networkSelection } from '@harness/stellar-tools';
 import { runSafeAnchorTests } from '../../census/anchors/anchor-tests';
 import { makeAnchorProbe, runAnchorCensus } from '../../census/anchors/census';
 import { buildDomainList } from '../../census/anchors/domains';
@@ -11,6 +10,7 @@ import {
 import { computeAnchorsSummary } from '../../census/anchors/funnel';
 import { KNOWN_ANCHORS } from '../../census/anchors/known';
 import { AnchorCensusState } from '../../census/anchors/schemas';
+import { networkSelection } from '../../stellar';
 import { writeCensusRecord, writeExport } from '../artifacts';
 import type { ScanContext } from '../context';
 import { measure } from './measure';

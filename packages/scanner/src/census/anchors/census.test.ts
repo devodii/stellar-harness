@@ -1,13 +1,13 @@
+import { describe, expect, it } from 'vitest';
 import type {
   AnchorTestsReport,
   FindingDraft,
   HorizonAccount,
-} from '@harness/stellar-tools/anchors';
+} from '../../stellar/anchors';
 import {
   readFixture as toolsFixture,
   readJsonFixture as toolsJson,
-} from '@harness/stellar-tools/anchors/testing';
-import { describe, expect, it } from 'vitest';
+} from '../../stellar/anchors/testing';
 import {
   ANCHOR_DOMAINS_FILE,
   type AnchorCensusDeps,

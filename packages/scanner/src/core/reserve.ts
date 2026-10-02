@@ -1,4 +1,4 @@
-import type { HorizonAccount } from '@harness/stellar-tools/contracts';
+import type { HorizonAccount } from '../stellar/contracts';
 import { toStroops } from './amount';
 
 export const BASE_RESERVE_STROOPS = 5_000_000n;

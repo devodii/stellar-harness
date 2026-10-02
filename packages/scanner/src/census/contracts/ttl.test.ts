@@ -1,7 +1,7 @@
-import { codeKeyXdr, ExpertContract } from '@harness/stellar-tools/contracts';
-import { fakeRpc, syntheticContractId } from '@harness/stellar-tools/contracts/testing';
 import { describe, expect, it } from 'vitest';
 import { appError, err } from '../../schema';
+import { codeKeyXdr, ExpertContract } from '../../stellar/contracts';
+import { fakeRpc, syntheticContractId } from '../../stellar/contracts/fakes';
 import page1 from './__fixtures__/expert-contracts-page-1.json';
 import page2 from './__fixtures__/expert-contracts-page-2.json';
 import batch from './__fixtures__/rpc-instance-entries.json';

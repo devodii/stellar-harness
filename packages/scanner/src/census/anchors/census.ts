@@ -1,11 +1,11 @@
-import type { NetworkSelection } from '@harness/stellar-tools';
+import type { NetworkSelection } from '../../stellar';
 import {
   type AnchorProbeResult,
   type AnchorToml,
   type ProbeAnchorOptions,
   probeAnchor,
   type RunAnchorTests,
-} from '@harness/stellar-tools/anchors';
+} from '../../stellar/anchors';
 import { runSafeAnchorTests } from './anchor-tests';
 import { mergeCandidates, transitiveCandidates } from './domains';
 import { keyedLimiter, limitFetchPerHost } from './limit';

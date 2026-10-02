@@ -1,4 +1,4 @@
-import type { FindingDraft } from '@harness/stellar-tools/anchors';
+import type { FindingDraft } from '../../stellar/anchors';
 
 export type {
   Fetcher,
@@ -7,7 +7,7 @@ export type {
   HorizonPort,
   HttpRequest,
   HttpResponse,
-} from '@harness/stellar-tools/anchors';
+} from '../../stellar/anchors';
 
 export type RunTasks = <T, R>(
   tasks: T[],

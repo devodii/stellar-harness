@@ -1,5 +1,5 @@
-import type { TtlStatus } from '@harness/stellar-tools/contracts';
-import { syntheticContractId } from '@harness/stellar-tools/contracts/testing';
+import type { TtlStatus } from '../../stellar/contracts';
+import { syntheticContractId } from '../../stellar/contracts/fakes';
 import type { Checkpoint, Emit, FindingDraft, Run, WriteDerived } from './ports';
 import type { ContractRow } from './schemas';
 
