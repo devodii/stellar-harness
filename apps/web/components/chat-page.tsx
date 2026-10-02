@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import { ChatView } from '@/components/chat-view';
 import { useConversations } from '@/components/conversations-provider';
+import { useNetwork } from '@/components/network-provider';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSummary } from '@/hooks/use-summary';
 import type { HarnessUIMessage } from '@/lib/chat';
@@ -31,6 +32,7 @@ export function ChatPage() {
   const searchParams = useSearchParams();
   const store = useConversations();
   const summary = useSummary();
+  const { network } = useNetwork();
   const [freshId] = React.useState(generateId);
 
   const paramId = searchParams.get('c');
@@ -38,8 +40,8 @@ export function ChatPage() {
   const conversationId = paramId ?? freshId;
 
   const suggestions = React.useMemo(
-    () => buildSuggestions(summary.data?.scanned ? summary.data.summary : null),
-    [summary.data],
+    () => buildSuggestions(summary.data?.scanned ? summary.data.summary : null, network),
+    [summary.data, network],
   );
 
   const persist = React.useCallback(
@@ -62,6 +64,7 @@ export function ChatPage() {
       initialMessages={stored?.messages ?? []}
       initialPrompt={stored ? undefined : prompt}
       suggestions={suggestions}
+      network={network}
       scanned={summary.data?.scanned}
       onMessagesChange={persist}
     />
