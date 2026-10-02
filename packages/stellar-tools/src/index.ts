@@ -44,6 +44,7 @@ export * from './tools/descriptions';
 export * from './tools/explain-failure';
 export { getAccount } from './tools/get-account';
 export * from './tools/get-contract-ttl';
+export * from './tools/get-network-status';
 export * from './tools/get-summary';
 export { getTransaction } from './tools/get-transaction';
 export * from './tools/names';
