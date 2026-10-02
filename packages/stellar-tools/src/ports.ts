@@ -46,19 +46,20 @@ export type RpcTransactionsPage = {
   oldestLedger: number;
 };
 
+export type SimulateTransactionResult = {
+  minResourceFee?: string;
+  error?: string;
+  transactionData?: string;
+  latestLedger: number;
+  restorePreamble?: { minResourceFee: string; transactionData: string };
+};
+
 export type RpcPort = {
   getLatestLedger(): Promise<Result<{ sequence: number; protocolVersion: number }>>;
   getLedgerEntries(
     keys: string[],
   ): Promise<Result<{ entries: LedgerEntryResult[]; latestLedger: number }>>;
-  simulateTransaction(txXdr: string): Promise<
-    Result<{
-      minResourceFee?: string;
-      error?: string;
-      transactionData?: string;
-      latestLedger: number;
-    }>
-  >;
+  simulateTransaction(txXdr: string): Promise<Result<SimulateTransactionResult>>;
   getTransactions(params: {
     startLedger?: number;
     cursor?: string;
@@ -107,3 +108,5 @@ export type HorizonPort = {
 
 export type DecodeResultCodes = (resultXdr: string) => DecodedResultCodes;
 export type DecodeEnvelopeSummary = (envelopeXdr: string) => EnvelopeSummary;
+
+export type * from './tools/decoder-schemas';
