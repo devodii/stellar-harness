@@ -56,14 +56,14 @@ export function ToolCall({ part }: { part: ToolCallPart }) {
         state={part.state}
         toolName={part.toolName}
         title={toolCallTitle(part)}
-        className="gap-2 px-0 py-1 font-mono text-muted-foreground [&_span]:font-mono [&_span]:text-xs"
+        className="gap-2 px-0 py-1 font-mono text-muted-foreground [&_[data-slot=badge]]:bg-transparent [&_[data-slot=badge]]:px-0 [&_span]:font-mono [&_span]:text-xs"
       />
     ) : (
       <ToolHeader
         type={part.type}
         state={part.state}
         title={toolCallTitle(part)}
-        className="gap-2 px-0 py-1 font-mono text-muted-foreground [&_span]:font-mono [&_span]:text-xs"
+        className="gap-2 px-0 py-1 font-mono text-muted-foreground [&_[data-slot=badge]]:bg-transparent [&_[data-slot=badge]]:px-0 [&_span]:font-mono [&_span]:text-xs"
       />
     );
 
