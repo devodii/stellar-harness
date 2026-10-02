@@ -16,7 +16,8 @@
     "scan": "pnpm --filter scan-cli scan",
     "report": "pnpm --filter scan-cli scan report",
     "refresh:public": "tsx scripts/refresh-public-data.ts",
-    "db:migrate": "tsx scripts/db-migrate.ts"
+    "db:migrate": "tsx scripts/db-migrate.ts",
+    "db:import": "tsx scripts/import-to-db.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
