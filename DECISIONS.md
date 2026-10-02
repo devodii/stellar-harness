@@ -36,3 +36,15 @@ Every call made without explicit direction is tagged `@decision` so it can be re
 - `@decision` The report renderer is a pure function of `Summary`, export previews, methodology entries and run stats, so `REPORT.md` is reproducible from `data/` without network access.
 - `@decision` `--window` accepts `s`, `m`, `h` and `d` units; the failures census clamps it to RPC retention.
 - `@decision` The scanner image takes the git SHA as a `GIT_SHA` build arg because `.git` is excluded from the Docker context.
+
+## Agent logic and plans
+
+- `@decision` Plan steps may name three non-tool actions: `buildTransaction`, `submitTransaction`, `draftNotice`. Read and simulate steps always name real tools; submit has no tool by design.
+- `@decision` Fee, timebound, signature, float and limit clusters plan a policy notice instead of a submit because the failed transactions cannot be retried. Only channel-account and reserve top-up plans submit.
+- `@decision` A plan's estimated cost comes from evidence `xlm12m`, channel count times 1.5 XLM, or a reserve top-up (default 2 XLM). Extend and restore plans without cost evidence carry no estimate; their submit step still forces approval.
+- `@decision` When both apply, the `spend_cap` boundary wins over `submit_requires_approval`. A cost equal to the cap is within policy.
+- `@decision` The plan state machine is strict: `proposed` must pass through `request_approval` before `approve`; `propose` is valid only on a fresh plan.
+- `@decision` AI SDK input validation is a pass-through; `invokeTool` validates so bad input returns an `INVALID_INPUT` envelope the UI can render, instead of an SDK error part.
+- `@decision` `getSummary` without stored data returns `emptySummary` with a placeholder snapshot (ledger 1, close time 5 s, git SHA `unknown`).
+- `@decision` `simulateExtendTtl.days` defaults to 365 with a cap of 730; `simulateRestore.entries` is `instance`, `code` or `both` (default `both`).
+- `@decision` Stroop amounts are integers and token amounts are decimal strings across all tool schemas.
