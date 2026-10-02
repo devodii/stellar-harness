@@ -14,5 +14,8 @@
   },
   "dependencies": {
     "@harness/scanner": "workspace:*"
+  },
+  "devDependencies": {
+    "vitest": "5.0.3"
   }
 }
