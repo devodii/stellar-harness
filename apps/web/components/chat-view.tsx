@@ -10,16 +10,17 @@ import {
 } from '@/components/ai-elements/conversation';
 import { Shimmer } from '@/components/ai-elements/shimmer';
 import { type ChatActions, ChatActionsProvider } from '@/components/chat-actions';
-import { ChatComposer } from '@/components/chat-composer';
+import { ChatComposer, focusChatInput } from '@/components/chat-composer';
 import { ChatEmpty } from '@/components/chat-empty';
 import { ChatMessage } from '@/components/chat-message';
 import { InlineAlert } from '@/components/inline-alert';
-import { dataPartSchemas, type HarnessUIMessage, planDecisions } from '@/lib/chat';
+import { dataPartSchemas, type HarnessUIMessage, messageText, planDecisions } from '@/lib/chat';
 import {
   addContext,
   type ChatContext,
   contextFromFinding,
   DEFAULT_CONTEXT_PROMPT,
+  replyContext,
 } from '@/lib/chat-context';
 import { chatErrorMessage } from '@/lib/chat-errors';
 import { approvalText, type PlanDecision, planApproval } from '@/lib/plan-approval';
@@ -112,6 +113,13 @@ export function ChatView({
     [messages, busy, sendPrompt, sendMessage, clearError],
   );
 
+  const reply = React.useCallback((message: HarnessUIMessage) => {
+    const text = messageText(message);
+    if (!text) return;
+    setContexts((current) => addContext(current, replyContext(message.id, text)));
+    focusChatInput();
+  }, []);
+
   const last = messages.at(-1);
 
   return (
@@ -135,6 +143,7 @@ export function ChatView({
                   key={message.id}
                   message={message}
                   streaming={status === 'streaming' && message.id === last?.id}
+                  onReply={message.role === 'assistant' ? () => reply(message) : undefined}
                 />
               ))}
               {status === 'submitted' && (
