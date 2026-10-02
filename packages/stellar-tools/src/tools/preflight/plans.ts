@@ -1,4 +1,10 @@
-import { Plan, type PlanStep, type PlanStepKind } from '@harness/schema';
+import {
+  DEFAULT_NETWORK,
+  type Network,
+  Plan,
+  type PlanStep,
+  type PlanStepKind,
+} from '@harness/schema';
 import { DEFAULT_SPEND_CAP_XLM, evaluatePolicy, type Policy } from '../../plan/policy';
 import { formatStroops, toStroops } from '../amount';
 import { assetId, type ParsedAsset } from '../assets';
@@ -14,6 +20,7 @@ export type AlternativeInput = {
   amount: string;
   blockers: PreflightCode[];
   policy?: Policy;
+  network?: Network;
 };
 
 const DEFAULT_POLICY: Policy = { spendCapXlm: DEFAULT_SPEND_CAP_XLM };
@@ -51,8 +58,11 @@ const step = (
   args: Record<string, unknown>,
 ): StepDraft => ({ kind, tool, description, args });
 
-const submitStep = (description: string, signers: string[]): StepDraft =>
-  step('submit', 'submitTransaction', description, { network: 'mainnet', signers });
+const submitStep = (input: AlternativeInput, description: string, signers: string[]): StepDraft =>
+  step('submit', 'submitTransaction', description, {
+    network: input.network ?? DEFAULT_NETWORK,
+    signers,
+  });
 
 const stableId = (parts: string[]): string => {
   let hash = 0x811c9dc5;
@@ -109,7 +119,7 @@ const paymentSteps = (input: AlternativeInput): StepDraft[] => [
       ],
     },
   ),
-  submitStep('Submit the payment once the policy owner approves and signs.', [input.from]),
+  submitStep(input, 'Submit the payment once the policy owner approves and signs.', [input.from]),
 ];
 
 const sponsoredTrustline = (input: AlternativeInput): Plan => {
@@ -135,7 +145,7 @@ const sponsoredTrustline = (input: AlternativeInput): Plan => {
           ],
         },
       ),
-      submitStep('Submit the sponsorship once approved and signed by both accounts.', [
+      submitStep(input, 'Submit the sponsorship once approved and signed by both accounts.', [
         input.from,
         input.to,
       ]),
@@ -174,7 +184,7 @@ const claimableBalance = (input: AlternativeInput): Plan =>
           ],
         },
       ),
-      submitStep('Submit the claimable balance once the policy owner approves and signs.', [
+      submitStep(input, 'Submit the claimable balance once the policy owner approves and signs.', [
         input.from,
       ]),
     ],
@@ -197,7 +207,7 @@ const createAccount = (input: AlternativeInput): Plan =>
         ],
       },
     ),
-    submitStep('Submit the account creation once the policy owner approves and signs.', [
+    submitStep(input, 'Submit the account creation once the policy owner approves and signs.', [
       input.from,
     ]),
   ]);
