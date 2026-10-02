@@ -1,7 +1,7 @@
-import { type ContractToolContext, orFail } from '../contracts/context';
-import { DEFAULT_LEDGER_CLOSE_SECONDS, DEFAULT_SIMULATION_SOURCE } from '../contracts/defaults';
+import { type ContractToolContext, orFail, resolveSimulationSource } from '../contracts/context';
+import { DEFAULT_LEDGER_CLOSE_SECONDS } from '../contracts/defaults';
 import { footprintKeys, lookupContract } from '../contracts/lookup';
-import { fetchSimulationSource, simulateFootprint } from '../contracts/rent';
+import { simulateFootprint } from '../contracts/rent';
 import { ledgersForDays } from '../contracts/ttl';
 import { defineNamedTool } from './define';
 
@@ -9,9 +9,7 @@ export const simulateExtendTtl = defineNamedTool(
   'simulateExtendTtl',
   async ({ contractId, days }, ctx: ContractToolContext) => {
     const lookup = orFail(await lookupContract(ctx, contractId, { withExpert: false }));
-    const source = orFail(
-      await fetchSimulationSource(ctx.horizon, ctx.simulationSource ?? DEFAULT_SIMULATION_SOURCE),
-    );
+    const source = orFail(await resolveSimulationSource(ctx));
     const extendToLedgers = ledgersForDays(
       days,
       ctx.ledgerCloseSeconds ?? DEFAULT_LEDGER_CLOSE_SECONDS,

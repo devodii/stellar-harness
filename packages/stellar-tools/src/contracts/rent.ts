@@ -1,13 +1,13 @@
 import { appError, err, ok, type Result } from '@harness/schema';
 import {
   Account,
-  Networks,
   Operation,
   SorobanDataBuilder,
   type Transaction,
   TransactionBuilder,
   type xdr,
 } from '@stellar/stellar-sdk';
+import { accountWithRpcFallback } from '../core/account-entry';
 import { encodeLedgerKey } from './keys';
 import type { HorizonPort, RpcPort } from './ports';
 import type { Footprint, RentEstimate } from './schemas';
@@ -15,7 +15,7 @@ import type { Footprint, RentEstimate } from './schemas';
 export const INCLUSION_FEE_STROOPS = 100;
 export const STROOPS_PER_XLM = 10_000_000;
 
-export type SimulationSource = { accountId: string; sequence: string };
+export type SimulationSource = { accountId: string; sequence: string; networkPassphrase: string };
 
 export type FootprintAction = { kind: 'extend'; extendToLedgers: number } | { kind: 'restore' };
 
@@ -45,7 +45,7 @@ export const buildFootprintTransaction = (
       : Operation.restoreFootprint();
   return new TransactionBuilder(new Account(source.accountId, source.sequence), {
     fee: String(INCLUSION_FEE_STROOPS),
-    networkPassphrase: Networks.PUBLIC,
+    networkPassphrase: source.networkPassphrase,
     sorobanData,
   })
     .addOperation(operation)
@@ -88,14 +88,20 @@ export const simulateFootprint = async (
   });
 };
 
+export type SimulationSourcePorts = {
+  horizon: HorizonPort;
+  rpc: Pick<RpcPort, 'getLedgerEntries'>;
+};
+
 export const fetchSimulationSource = async (
-  horizon: HorizonPort,
+  { horizon, rpc }: SimulationSourcePorts,
   accountId: string,
+  networkPassphrase: string,
 ): Promise<Result<SimulationSource>> => {
-  const account = await horizon.account(accountId);
+  const account = await accountWithRpcFallback(horizon, rpc, accountId);
   if (!account.ok) return account;
   if (!account.value) {
     return err(appError('NOT_FOUND', `Simulation source account ${accountId} does not exist`));
   }
-  return ok({ accountId, sequence: account.value.sequence });
+  return ok({ accountId, sequence: account.value.sequence, networkPassphrase });
 };

@@ -1,7 +1,6 @@
-import { type ContractToolContext, orFail } from '../contracts/context';
-import { DEFAULT_SIMULATION_SOURCE } from '../contracts/defaults';
+import { type ContractToolContext, orFail, resolveSimulationSource } from '../contracts/context';
 import { type ContractLookup, footprintKeys, lookupContract } from '../contracts/lookup';
-import { fetchSimulationSource, simulateFootprint } from '../contracts/rent';
+import { simulateFootprint } from '../contracts/rent';
 import type { RestoreEntries } from '../contracts/schemas';
 import { fail } from '../tool';
 import { defineNamedTool } from './define';
@@ -18,9 +17,7 @@ export const simulateRestore = defineNamedTool(
   'simulateRestore',
   async ({ contractId, entries }, ctx: ContractToolContext) => {
     const lookup = orFail(await lookupContract(ctx, contractId, { withExpert: false }));
-    const source = orFail(
-      await fetchSimulationSource(ctx.horizon, ctx.simulationSource ?? DEFAULT_SIMULATION_SOURCE),
-    );
+    const source = orFail(await resolveSimulationSource(ctx));
     const estimate = orFail(
       await simulateFootprint(ctx.rpc, source, restoreKeys(lookup, entries), { kind: 'restore' }),
     );

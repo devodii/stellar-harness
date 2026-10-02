@@ -1,12 +1,18 @@
-import { type AppError, RentSummary, type Snapshot, toAppError } from '@harness/schema';
+import {
+  type AppError,
+  NETWORK_PROFILES,
+  RentSummary,
+  type Snapshot,
+  toAppError,
+} from '@harness/schema';
 import {
   contractCodeKey,
   contractInstanceKey,
-  DEFAULT_SIMULATION_SOURCE,
   fetchSimulationSource,
   ledgersForDays,
   RENT_HORIZON_DAYS,
   simulateFootprint,
+  simulationSourceFor,
   stroopsToXlm,
 } from '@harness/stellar-tools/contracts';
 import type {
@@ -162,9 +168,11 @@ export const runRentCensus = async (
   if (!price.ok) gaps.push({ source: 'price:xlm_usd', error: price.error });
   const xlmUsd = price.ok ? price.value : UNAVAILABLE_PRICE;
 
+  const network = deps.snapshot.network;
   const source = await fetchSimulationSource(
-    deps.horizon,
-    deps.simulationSource ?? DEFAULT_SIMULATION_SOURCE,
+    deps,
+    deps.simulationSource ?? simulationSourceFor(network),
+    NETWORK_PROFILES[network].passphrase,
   );
   let simulated: { row: RentRow; restorePreambleStroops: number | null }[] = [];
   let failed = 0;
