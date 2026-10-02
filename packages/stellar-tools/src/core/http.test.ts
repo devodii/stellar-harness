@@ -142,6 +142,22 @@ describe('createHttp', () => {
     expect(gaps).toHaveLength(1);
   });
 
+  it('fails fast on dns errors for unknown hosts', async () => {
+    const { http, calls } = setup([networkError('ENOTFOUND')]);
+    const result = await http.request({ url: 'https://gone.example/.well-known/stellar.toml' });
+    expect(calls).toHaveLength(1);
+    expect(!result.ok && failureKindOf(result.error)).toBe('dns');
+  });
+
+  it('retries dns errors for reliable hosts', async () => {
+    const { http, calls } = setup([networkError('ENOTFOUND'), json({ ok: true })], {
+      reliableHosts: new Set([new URL(URL_A).host]),
+    });
+    const result = await http.request({ url: URL_A });
+    expect(result.ok).toBe(true);
+    expect(calls).toHaveLength(2);
+  });
+
   it('fails fast and distinguishably on tls errors', async () => {
     const { http, calls, gaps } = setup([networkError('CERT_HAS_EXPIRED')]);
     const result = await http.request({ url: 'https://anchor.example/.well-known/stellar.toml' });
