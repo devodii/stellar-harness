@@ -81,5 +81,10 @@ export const createAgentContext = ({
     ledgerCloseSeconds,
     latestLedger:
       snapshotLedger === undefined ? createLatestLedger(clients) : async () => snapshotLedger,
+    networkStatus: {
+      latestLedger: () => clients.rpc.getLatestLedger(),
+      health: () => clients.rpc.getHealth(),
+      horizonLedger: () => clients.horizon.latestLedger(),
+    },
   };
 };
