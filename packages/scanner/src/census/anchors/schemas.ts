@@ -60,7 +60,6 @@ export const DOMAIN_SOURCES = [
   'stellarlight_project',
   'scf_recap',
   'stellar_expert_asset',
-  'known_anchor',
   'transitive',
 ] as const;
 export const DomainSource = z.enum(DOMAIN_SOURCES);

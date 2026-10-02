@@ -161,14 +161,9 @@ export type DomainListOptions = {
   scfRounds?: readonly number[];
   assetLimit?: number;
   limit?: number;
-  ecosystemDirectory?: boolean;
-  knownDomains?: readonly string[];
 };
 
 export type ScfSource = 'medium' | 'stellarlight' | 'none';
-
-export const ECOSYSTEM_SKIP_NOTE =
-  'Skipped stellarlight partners, stellarlight projects and SCF recaps (Medium): the ecosystem directory is mainnet only.';
 
 export type DomainList = {
   domains: AnchorDomain[];
@@ -176,7 +171,6 @@ export type DomainList = {
   scfSource: ScfSource;
   unresolvedScfProjects: string[];
   counts: Record<DomainSource, number>;
-  notes: string[];
 };
 
 type Collector = { candidates: DomainCandidate[]; gaps: string[] };
@@ -305,7 +299,6 @@ const countSources = (domains: AnchorDomain[]): Record<DomainSource, number> => 
     stellarlight_project: 0,
     scf_recap: 0,
     stellar_expert_asset: 0,
-    known_anchor: 0,
     transitive: 0,
   };
   for (const domain of domains) for (const source of domain.sources) counts[source] += 1;
@@ -317,25 +310,14 @@ export const buildDomainList = async (
   opts: DomainListOptions,
 ): Promise<DomainList> => {
   const out: Collector = { candidates: [], gaps: [] };
-  const notes: string[] = [];
-  let scfSource: ScfSource = 'none';
-  let unresolved: string[] = [];
-  if (opts.ecosystemDirectory === false) {
-    notes.push(ECOSYSTEM_SKIP_NOTE);
-  } else {
-    const partnerDomains = await partnerSource(ports, opts.stellarlightUrl, out);
-    await projectSource(ports, opts.stellarlightUrl, partnerDomains, out);
-    const recap = await recapSource(ports, opts, partnerDomains, out);
-    unresolved = recap.unresolved;
-    scfSource = recap.used
-      ? 'medium'
-      : (await awardedFallback(ports, opts, partnerDomains, out))
-        ? 'stellarlight'
-        : 'none';
-  }
-  for (const domain of opts.knownDomains ?? []) {
-    out.candidates.push({ domain, source: 'known_anchor' });
-  }
+  const partnerDomains = await partnerSource(ports, opts.stellarlightUrl, out);
+  await projectSource(ports, opts.stellarlightUrl, partnerDomains, out);
+  const recap = await recapSource(ports, opts, partnerDomains, out);
+  const scfSource: ScfSource = recap.used
+    ? 'medium'
+    : (await awardedFallback(ports, opts, partnerDomains, out))
+      ? 'stellarlight'
+      : 'none';
   await assetSource(ports, opts, out);
   const merged = mergeCandidates(out.candidates);
   const domains = opts.limit ? merged.slice(0, opts.limit) : merged;
@@ -343,8 +325,7 @@ export const buildDomainList = async (
     domains,
     gaps: out.gaps,
     scfSource,
-    unresolvedScfProjects: unresolved,
+    unresolvedScfProjects: recap.unresolved,
     counts: countSources(domains),
-    notes,
   };
 };
