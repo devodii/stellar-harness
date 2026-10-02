@@ -165,13 +165,7 @@ export const ProbeDetails = z.object({
 });
 export type ProbeDetails = z.infer<typeof ProbeDetails>;
 
-export const ProbeAnchorInput = z.object({
-  domain: z.string().trim().min(3).max(253),
-  runAnchorTests: z.boolean().default(false),
-});
-export type ProbeAnchorInput = z.infer<typeof ProbeAnchorInput>;
-
-export const ProbeAnchorOutput = z.object({
+export const AnchorProbeResult = z.object({
   domain: z.string(),
   tomlUrl: z.string(),
   stages: z.array(StageRecord),
@@ -181,4 +175,4 @@ export const ProbeAnchorOutput = z.object({
   details: ProbeDetails,
   anchorTests: AnchorTestsSummary.nullable(),
 });
-export type ProbeAnchorOutput = z.infer<typeof ProbeAnchorOutput>;
+export type AnchorProbeResult = z.infer<typeof AnchorProbeResult>;

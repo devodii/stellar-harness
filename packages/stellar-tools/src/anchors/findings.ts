@@ -1,7 +1,7 @@
 import type { AnchorStage, FindingType, Severity } from '@harness/schema';
 import { homeDomainMismatches } from './accounts';
 import { brokenCors } from './cors';
-import type { FindingDraft, ProbeAnchorOutput, StageRecord } from './schemas';
+import type { AnchorProbeResult, FindingDraft, StageRecord } from './schemas';
 import { isFailed } from './stage';
 import { issuers } from './toml';
 
@@ -37,7 +37,7 @@ export const ANCHOR_FINDING_STAGE: Record<AnchorFindingType, AnchorStage> = {
   ANCHOR_TESTS_FAILED: 'tests',
 };
 
-export type ProbeState = Omit<ProbeAnchorOutput, 'findings'>;
+export type ProbeState = Omit<AnchorProbeResult, 'findings'>;
 
 const stageOf = (state: ProbeState, stage: AnchorStage): StageRecord | undefined =>
   state.stages.find((r) => r.stage === stage);

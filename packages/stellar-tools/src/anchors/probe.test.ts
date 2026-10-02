@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { ToolError } from '../tool';
 import type { HorizonAccount } from './ports';
 import { anchorTestSeps, probeAnchor } from './probe';
-import type { AnchorTestsSummary, ProbeAnchorOutput } from './schemas';
+import type { AnchorProbeResult, AnchorTestsSummary } from './schemas';
 import {
   type FakeRoute,
   fakeFetcher,
@@ -42,8 +42,8 @@ const clpxRoutes = (toml = readFixture('toml/clpx.finance.toml')): Record<string
 const clpxHorizon = () =>
   fakeHorizon({ [CLPX_ISSUER]: { ...account, id: CLPX_ISSUER, home_domain: 'clpx.finance' } });
 
-const types = (output: ProbeAnchorOutput) => output.findings.map((f) => f.type);
-const stage = (output: ProbeAnchorOutput, name: string) =>
+const types = (output: AnchorProbeResult) => output.findings.map((f) => f.type);
+const stage = (output: AnchorProbeResult, name: string) =>
   output.stages.find((s) => s.stage === name);
 
 describe('probeAnchor', () => {
