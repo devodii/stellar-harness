@@ -6,9 +6,8 @@ import {
 import { runContractsCensus } from '../../census/contracts/index';
 import { writeCensusRecord, writeExport } from '../artifacts';
 import type { ScanContext } from '../context';
+import { exportName, writeArchivedMeaningfulExport } from './contract-rows';
 import { measure } from './measure';
-
-const exportName = (file: string) => file.replace(/\.csv$/, '');
 
 export const contractsCommand = async (ctx: ScanContext) => {
   const { config, ports, snapshot, options } = ctx;
@@ -39,6 +38,7 @@ export const contractsCommand = async (ctx: ScanContext) => {
     result.exports.archived,
     CONTRACT_EXPORT_COLUMNS,
   );
+  await writeArchivedMeaningfulExport(ctx.persistence, result.exports.archivedMeaningful);
   await writeExport(
     ctx.persistence,
     exportName(CONTRACT_EXPORT_FILES.expiring30d),
