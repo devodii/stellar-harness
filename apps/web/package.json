@@ -17,6 +17,7 @@
     "@harness/agent": "workspace:*",
     "@harness/schema": "workspace:*",
     "@harness/storage": "workspace:*",
+    "@phosphor-icons/react": "^2.1.10",
     "@radix-ui/react-use-controllable-state": "^1.2.6",
     "@streamdown/cjk": "^1.0.4",
     "@streamdown/code": "^2.0.0",
