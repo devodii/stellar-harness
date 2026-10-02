@@ -1,7 +1,8 @@
+import type { EnvelopeOperation } from '@harness/stellar-tools';
 import { describe, expect, it } from 'vitest';
 import samples from './__fixtures__/rpc-failed-transactions.json';
 import { asRpcTransaction, recordedDecoders, syntheticTx } from './__tests__/fakes';
-import { extractFailed, extractFailedTx } from './extract';
+import { extractFailed, extractFailedTx, failingPayment } from './extract';
 import { FailedTx } from './rows';
 
 const decoders = recordedDecoders(samples);
@@ -38,6 +39,49 @@ describe('extractFailedTx', () => {
     if (!sample) throw new Error('fixture is empty');
     const row = extractFailedTx(asRpcTransaction(sample), decoders);
     expect(JSON.stringify(row)).not.toContain(sample.envelopeXdr);
+  });
+});
+
+describe('failingPayment', () => {
+  const payment = { type: 'payment', destination: 'GDEST', asset: 'XLM', amount: '5.0000000' };
+  const envelope = {
+    sourceAccount: 'GSRC',
+    maxFee: '200',
+    operationCount: 2,
+    memoType: 'none',
+    opTypes: ['manage_sell_offer', 'payment'],
+    feeBump: false,
+  };
+
+  it('takes destination, asset and amount from the failing operation', () => {
+    const live = samples.find((s) => s.expected.envelope.opTypes[0] === 'payment');
+    if (!live) throw new Error('fixture has no payment sample');
+    const row = extractFailedTx(asRpcTransaction(live), decoders);
+    const op: EnvelopeOperation | undefined = live.expected.envelope.operations[0];
+    expect(row.ok && row.value.payment).toEqual({
+      destination: op?.destination,
+      asset: op?.asset,
+      amount: op?.amount,
+    });
+  });
+
+  it('ignores payments that are not the failing operation', () => {
+    const codes = { tx: 'tx_failed', ops: ['op_underfunded', 'op_success'], feeBump: false };
+    const operations = [{ type: 'manage_sell_offer' }, payment];
+    expect(failingPayment(codes, { ...envelope, operations })).toBeUndefined();
+    expect(
+      failingPayment({ ...codes, ops: ['op_success', 'op_no_trust'] }, { ...envelope, operations }),
+    ).toEqual({ destination: 'GDEST', asset: 'XLM', amount: '5.0000000' });
+  });
+
+  it('falls back to the first payment for tx level failures', () => {
+    const codes = { tx: 'tx_bad_seq', ops: [], feeBump: false };
+    const operations = [{ type: 'manage_sell_offer' }, payment];
+    expect(failingPayment(codes, { ...envelope, operations })?.destination).toBe('GDEST');
+  });
+
+  it('returns nothing when the decoder gives no operation details', () => {
+    expect(failingPayment({ tx: 'tx_bad_seq', ops: [], feeBump: false }, envelope)).toBeUndefined();
   });
 });
 
