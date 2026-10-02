@@ -30,4 +30,28 @@ describe('searchEcosystem', () => {
     );
     expect(result).toMatchObject({ ok: false, error: { code: 'UPSTREAM_FAILED' } });
   });
+
+  it('returns a clear error on networks without an ecosystem directory', async () => {
+    let calls = 0;
+    const result = await invokeTool(
+      searchEcosystem,
+      { query: 'soroswap' },
+      {
+        network: 'testnet' as const,
+        ecosystemDirectory: false,
+        stellarlight: {
+          get: async () => {
+            calls += 1;
+            return projects;
+          },
+        },
+      },
+    );
+    expect(result).toMatchObject({
+      ok: false,
+      error: { code: 'NOT_FOUND', meta: { network: 'testnet' } },
+    });
+    expect(result.ok ? '' : result.error.message).toMatch(/mainnet projects only/);
+    expect(calls).toBe(0);
+  });
 });
