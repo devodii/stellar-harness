@@ -15,9 +15,15 @@ import { ChatEmpty } from '@/components/chat-empty';
 import { ChatMessage } from '@/components/chat-message';
 import { InlineAlert } from '@/components/inline-alert';
 import { dataPartSchemas, type HarnessUIMessage, planDecisions } from '@/lib/chat';
+import {
+  addContext,
+  type ChatContext,
+  contextFromFinding,
+  DEFAULT_CONTEXT_PROMPT,
+} from '@/lib/chat-context';
 import { chatErrorMessage } from '@/lib/chat-errors';
 import { approvalText, type PlanDecision, planApproval } from '@/lib/plan-approval';
-import { type ChatSuggestion, planFixPrompt } from '@/lib/suggestions';
+import type { ChatSuggestion } from '@/lib/suggestions';
 
 export interface ChatViewProps {
   conversationId: string;
@@ -26,6 +32,7 @@ export interface ChatViewProps {
   network?: Network;
   scanned?: boolean;
   initialPrompt?: string;
+  initialContexts?: ChatContext[];
   onMessagesChange?: (messages: HarnessUIMessage[]) => void;
 }
 
@@ -36,6 +43,7 @@ export function ChatView({
   network,
   scanned,
   initialPrompt,
+  initialContexts = [],
   onMessagesChange,
 }: ChatViewProps) {
   const { messages, sendMessage, status, stop, error, clearError } = useChat<HarnessUIMessage>({
@@ -51,10 +59,26 @@ export function ChatView({
     if (messages.length > 0 && status !== 'streaming') onChangeRef.current?.(messages);
   }, [messages, status]);
 
+  const [contexts, setContexts] = React.useState<ChatContext[]>(initialContexts);
+  const contextsRef = React.useRef(contexts);
+  contextsRef.current = contexts;
+
   const sendPrompt = React.useCallback(
     (text: string) => {
       clearError();
-      void sendMessage({ text });
+      const attached = contextsRef.current;
+      if (attached.length === 0) {
+        void sendMessage({ text });
+        return;
+      }
+      setContexts([]);
+      void sendMessage({
+        role: 'user',
+        parts: [
+          ...attached.map((data) => ({ type: 'data-context' as const, data })),
+          { type: 'text', text: text || DEFAULT_CONTEXT_PROMPT[attached[0]?.kind ?? 'finding'] },
+        ],
+      });
     },
     [sendMessage, clearError],
   );
@@ -83,7 +107,7 @@ export function ChatView({
         });
       },
       onFinding: (finding: Finding) =>
-        sendPrompt(planFixPrompt(finding.findingId, finding.type, finding.subject)),
+        setContexts((current) => addContext(current, contextFromFinding(finding))),
     }),
     [messages, busy, sendPrompt, sendMessage, clearError],
   );
@@ -128,7 +152,15 @@ export function ChatView({
               {chatErrorMessage(error)}
             </InlineAlert>
           )}
-          <ChatComposer onSubmit={sendPrompt} onStop={() => void stop()} status={status} />
+          <ChatComposer
+            onSubmit={sendPrompt}
+            onStop={() => void stop()}
+            status={status}
+            contexts={contexts}
+            onRemoveContext={(index) =>
+              setContexts((current) => current.filter((_, position) => position !== index))
+            }
+          />
         </div>
       </div>
     </ChatActionsProvider>
