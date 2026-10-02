@@ -11,15 +11,11 @@
     "build": "pnpm -r build",
     "lint": "biome lint .",
     "format": "prettier --write .",
-    "typecheck": "pnpm -r typecheck && tsc -p tsconfig.json",
+    "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "scan": "pnpm --filter scan-cli scan",
     "report": "pnpm --filter scan-cli scan report",
-    "refresh:public": "tsx scripts/refresh-public-data.ts",
-    "db:migrate": "tsx scripts/db-migrate.ts",
-    "db:import": "tsx scripts/import-to-db.ts",
-    "format:check": "prettier --check .",
-    "db:refresh-actions": "tsx scripts/refresh-actions.ts"
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
@@ -28,9 +24,5 @@
     "tsx": "4.23.15",
     "typescript": "5.9.3",
     "vitest": "5.0.3"
-  },
-  "dependencies": {
-    "@harness/schema": "workspace:*",
-    "@harness/storage": "workspace:*"
   }
 }
