@@ -2,23 +2,12 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
 
-const { createChatModel, DEFAULT_MODELS } = await import('./model');
-
-const env = (overrides: Record<string, unknown>) =>
-  ({ apiKey: 'key', AI_PROVIDER: 'openai', AI_MODEL: undefined, ...overrides }) as Parameters<
-    typeof createChatModel
-  >[0];
+const { CHAT_MODEL, createChatModel } = await import('./model');
 
 describe('createChatModel', () => {
-  it('defaults to the provider default model', () => {
-    const model = createChatModel(env({}));
-    expect(typeof model === 'object' && model.modelId).toBe(DEFAULT_MODELS.openai);
+  it('uses the openai chat model', () => {
+    const model = createChatModel({ OPENAI_API_KEY: 'key' });
+    expect(typeof model === 'object' && model.modelId).toBe(CHAT_MODEL);
     expect(typeof model === 'object' && model.provider).toMatch(/^openai/);
-  });
-
-  it('switches provider and honours an explicit model', () => {
-    const model = createChatModel(env({ AI_PROVIDER: 'anthropic', AI_MODEL: 'claude-opus-5-5' }));
-    expect(typeof model === 'object' && model.modelId).toBe('claude-opus-5-5');
-    expect(typeof model === 'object' && model.provider).toMatch(/^anthropic/);
   });
 });
