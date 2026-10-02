@@ -28,7 +28,7 @@ const SimulationResult = z.object({
   contractId: ContractAddress,
   minResourceFeeStroops: Stroops,
   estimatedXlm: z.number().nonnegative(),
-  unsignedXdr: z.string().min(1),
+  operation: z.string().min(1),
   footprint: Footprint,
 });
 
