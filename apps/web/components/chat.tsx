@@ -21,6 +21,13 @@ const SUGGESTIONS = [
   'Is our anchor passing conformance?',
 ];
 
+type Part = HarnessMessage['parts'][number];
+
+function MessagePart({ part, role }: { part: Part; role: HarnessMessage['role'] }) {
+  if (part.type !== 'text') return <ToolCall part={part} />;
+  return role === 'user' ? <p>{part.text}</p> : <MessageResponse>{part.text}</MessageResponse>;
+}
+
 export function Chat() {
   const router = useRouter();
   const { messages, sendMessage, status, error } = useChat<HarnessMessage>({
@@ -53,19 +60,10 @@ export function Chat() {
                 <MessageContent
                   className={message.role === 'user' ? 'w-fit rounded-md border px-3 py-2' : ''}
                 >
-                  {message.parts.map((part, index) =>
-                    part.type === 'text' ? (
-                      message.role === 'user' ? (
-                        <p key={`${message.id}-${index}`}>{part.text}</p>
-                      ) : (
-                        <MessageResponse key={`${message.id}-${index}`}>
-                          {part.text}
-                        </MessageResponse>
-                      )
-                    ) : (
-                      <ToolCall key={`${message.id}-${index}`} part={part} />
-                    ),
-                  )}
+                  {message.parts.map((part, index) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: message parts are append-only
+                    <MessagePart key={index} part={part} role={message.role} />
+                  ))}
                 </MessageContent>
               </Message>
             ))}
