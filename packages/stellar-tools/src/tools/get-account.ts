@@ -1,4 +1,5 @@
-import type { HorizonAccount } from '../ports';
+import { accountWithRpcFallback } from '../core/account-entry';
+import type { HorizonAccount, RpcPort } from '../ports';
 import { fail } from '../tool';
 import { balanceAsset } from './assets';
 import { defineNamedTool } from './define';
@@ -51,10 +52,16 @@ export const toAccountOutput = (address: string, account: HorizonAccount): GetAc
   numSponsored: account.num_sponsored ?? 0,
 });
 
+export type GetAccountContext = HorizonToolContext & {
+  rpc?: Pick<RpcPort, 'getLedgerEntries'>;
+};
+
 export const getAccount = defineNamedTool(
   'getAccount',
-  async ({ address }, ctx: HorizonToolContext) => {
-    const result = await ctx.horizon.account(address);
+  async ({ address }, ctx: GetAccountContext) => {
+    const result = ctx.rpc
+      ? await accountWithRpcFallback(ctx.horizon, ctx.rpc, address)
+      : await ctx.horizon.account(address);
     if (!result.ok) return fail(result.error.code, result.error.message, result.error.meta);
     return result.value ? toAccountOutput(address, result.value) : missingAccount(address);
   },
