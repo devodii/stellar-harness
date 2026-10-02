@@ -1,11 +1,12 @@
 import { Address } from '@/components/address';
 import { BracketTag } from '@/components/bracket-tag';
-import { CopyButton } from '@/components/copy-button';
+import { Hint } from '@/components/hint';
 import { KeyValueList } from '@/components/key-value-list';
 import { ResultSection } from '@/components/result-section';
-import { Stat, StatLabel } from '@/components/stat';
+import { Stat } from '@/components/stat';
 import { useExplorer } from '@/hooks/use-explorer';
 import { formatInt, formatXlm } from '@/lib/format';
+import { SIMULATE_HINT } from '@/lib/plan-copy';
 import type { ExtendTtlView, RestoreView } from '@/lib/tool-views';
 
 export type SimulationCostData = ExtendTtlView | RestoreView;
@@ -32,8 +33,18 @@ export function SimulationCostView({ simulation, xlmUsd }: SimulationCostViewPro
           />
         </span>
       }
-      aside={<BracketTag label="simulated" tone="primary" />}
+      aside={
+        <Hint hint={SIMULATE_HINT}>
+          <BracketTag
+            label="simulated"
+            tone="primary"
+            tabIndex={0}
+            className="cursor-help underline decoration-dotted underline-offset-4"
+          />
+        </Hint>
+      }
     >
+      <p className="text-sm text-foreground">{simulation.operation}</p>
       <div className="flex flex-wrap items-end gap-6">
         <Stat label="estimated cost" value={simulation.estimatedXlm} format={formatXlm} />
         {xlmUsd !== undefined && xlmUsd > 0 && (
@@ -61,15 +72,6 @@ export function SimulationCostView({ simulation, xlmUsd }: SimulationCostViewPro
           { label: 'read write keys', value: simulation.footprint.readWrite.length },
         ]}
       />
-      <details className="group">
-        <summary className="flex cursor-pointer items-center justify-between py-1">
-          <StatLabel>unsigned xdr (display only, never submitted)</StatLabel>
-          <CopyButton value={simulation.unsignedXdr} label="Copy unsigned XDR" />
-        </summary>
-        <pre className="mt-1 max-h-40 overflow-auto border-l-2 border-border pl-3 font-mono text-[11px] break-all whitespace-pre-wrap text-muted-foreground">
-          {simulation.unsignedXdr}
-        </pre>
-      </details>
     </ResultSection>
   );
 }
