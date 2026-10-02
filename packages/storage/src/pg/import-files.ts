@@ -113,7 +113,8 @@ export const importSummary = async (
   counts.scanned = 1;
   const summary = Summary.safeParse(raw);
   if (!summary.success) return { ...counts, invalid: 1 };
-  if (sql && !dryRun) await new PostgresStorage(sql, network).putSummary(summary.data);
+  if (!sql || dryRun) return counts;
+  await new PostgresStorage(sql, network).putSummary(summary.data);
   return { ...counts, inserted: 1 };
 };
 
@@ -145,7 +146,7 @@ export const importState = async (
     } else {
       await store?.putArtifact('state', envelope.data.name, envelope.data);
     }
-    counts.inserted += 1;
+    if (store) counts.inserted += 1;
   }
   return counts;
 };
@@ -221,7 +222,7 @@ export const importDerived = async (
         continue;
       }
       await store?.putArtifact(kind, name, body);
-      artifacts.inserted += 1;
+      if (store) artifacts.inserted += 1;
     }
   }
   return { rows, artifacts };
