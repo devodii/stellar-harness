@@ -8,6 +8,7 @@ import {
   type NetworkClients,
   type NetworkConfig,
   NoCache,
+  networkSelection,
   type Policy,
   type TransactionToolContext,
 } from '@harness/stellar-tools';
@@ -67,6 +68,8 @@ export const createAgentContext = ({
   return {
     ...ports,
     ...transactions,
+    ...networkSelection(clients.config),
+    ecosystemDirectory: clients.config.ECOSYSTEM_DIRECTORY,
     storage,
     policy,
     getTransaction: async (hash) => {
