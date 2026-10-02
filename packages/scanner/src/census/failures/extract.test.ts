@@ -1,4 +1,4 @@
-import type { EnvelopeOperation } from '@harness/stellar-tools';
+import type { EnvelopeOperation } from '@harness/stellar-tools/ports';
 import { describe, expect, it } from 'vitest';
 import samples from './__fixtures__/rpc-failed-transactions.json';
 import { asRpcTransaction, recordedDecoders, syntheticTx } from './__tests__/fakes';

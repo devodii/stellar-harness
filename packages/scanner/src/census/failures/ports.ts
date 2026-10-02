@@ -7,7 +7,7 @@ export type {
   HorizonPort,
   RpcPort,
   RpcTransaction,
-} from '@harness/stellar-tools';
+} from '@harness/stellar-tools/ports';
 
 export type FindingDraft = {
   type: FindingType;
