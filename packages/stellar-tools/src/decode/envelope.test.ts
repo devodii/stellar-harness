@@ -16,8 +16,16 @@ describe('decodeEnvelopeSummary with real mainnet envelopes', () => {
       feeSource: 'GCSSUJ5YNMFTTREJO3MIFSKZP5QP7CHCRT2HSV77O5EQZFQ2OABU6K3O',
       fee: '400',
       innerFee: null,
+      innerHash: null,
       seq: '276645320346064187',
       opTypes: ['manage_sell_offer', 'manage_buy_offer'],
+      operations: [
+        { type: 'manage_sell_offer' },
+        {
+          type: 'manage_buy_offer',
+          source: 'GCWYMKQZN2XGCXOQD4TY6X5HQZ2EYLZCGV7U2UNHPSLPPXRYETTQVTM4',
+        },
+      ],
       memoType: 'none',
       memo: null,
       timeBounds: { minTime: 0, maxTime: 1790900900 },
@@ -31,6 +39,7 @@ describe('decodeEnvelopeSummary with real mainnet envelopes', () => {
       feeSource: 'GBEJMHIMASJBIGGV5UKACNIZTQN3ZCILKZBH6W5PFI5TPCFPT5ASN4CW',
       fee: '4500006',
       innerFee: '102',
+      innerHash: '4041d7cc52bf4bc20a159662b02b7c6ad7383ec73f88db36700963abf935a61d',
       opTypes: ['path_payment_strict_receive'],
       timeBounds: { minTime: 1790546345, maxTime: 1791146345 },
     });
@@ -49,6 +58,58 @@ describe('decodeEnvelopeSummary with real mainnet envelopes', () => {
       memoType: 'hash',
       memo: '/jmToFUqyg0T8xlUQh3bFO78eRDhOQweg1VEKZcABqQ=',
     });
+  });
+
+  it('reads destination, asset and amount from payment operations', () => {
+    expect(decodeEnvelopeSummary(envelope('single_payment')).operations).toEqual([
+      {
+        type: 'payment',
+        source: 'GBAWLHZCKAQDG6GFR22FFIE6DIJECY5HU3E4IREVZ7G4TRAUDCVN6VXR',
+        destination: 'GAHL2AK6UMA3M6YWKB56Y7APO5VINXW3R6MAXJQ6CWGB4J3XT7TJAQRY',
+        asset: 'KTOKEN:GAFK7QYUEOGDVM4CTI7ELVQIMNPVYUH4D5XERZMYLK45DLHOC5CLQGIH',
+        amount: '100.0000000',
+      },
+    ]);
+  });
+
+  it('reads create_account as an XLM payment of the starting balance', () => {
+    expect(decodeEnvelopeSummary(envelope('single_create_account')).operations).toEqual([
+      {
+        type: 'create_account',
+        destination: 'GAAMIHE3H6VRC7OMIOFTD4QMBPDWOBVYE7OUUW4OSSHMT4FDFE3A5KT2',
+        asset: 'XLM',
+        amount: '2.0000000',
+      },
+    ]);
+  });
+
+  it('reads path payments from the destination side', () => {
+    expect(
+      decodeEnvelopeSummary(envelope('single_path_payment_strict_receive')).operations,
+    ).toEqual([
+      {
+        type: 'path_payment_strict_receive',
+        source: 'GDP4BEOE7ET5SD7TM34PGOMUKYP46IEREFTGWXZWSVHSU4I4ZDYTTBXW',
+        destination: 'GDP4BEOE7ET5SD7TM34PGOMUKYP46IEREFTGWXZWSVHSU4I4ZDYTTBXW',
+        asset: 'AQUA:GBNZILSTVQZ4R7IKQDGHYGY2QXL5QOFJYQMXPKWRRM5PAV7Y4M67AQUA',
+        amount: '0.7336456',
+      },
+    ]);
+    expect(decodeEnvelopeSummary(envelope('single_path_payment_strict_send')).operations).toEqual([
+      {
+        type: 'path_payment_strict_send',
+        source: 'GD6LGTOHDGJSFNQTAQSU3V4FJKEF52FQGXEYUQCRKG2IJPGDRAKGTCIL',
+        destination: 'GD6LGTOHDGJSFNQTAQSU3V4FJKEF52FQGXEYUQCRKG2IJPGDRAKGTCIL',
+        asset: 'XLM',
+        amount: '0.2600000',
+      },
+    ]);
+  });
+
+  it('keeps only type and source for non payment operations', () => {
+    expect(decodeEnvelopeSummary(envelope('single_change_trust')).operations).toEqual([
+      { type: 'change_trust', source: 'GDMGW242MLMPOG5VURILEDUDAXILD2DA5T4QSUNGYFKTX5BN2K6UN4Z6' },
+    ]);
   });
 
   it('reports missing timebounds as null', () => {
