@@ -1,4 +1,3 @@
-import { createAnthropic } from '@ai-sdk/anthropic';
 import { appError } from '@harness/schema';
 import { convertToModelMessages, safeValidateUIMessages, stepCountIs, streamText } from 'ai';
 import { z } from 'zod';
@@ -12,6 +11,7 @@ import {
 } from '@/lib/chat';
 import { getChatEnv } from '@/lib/env';
 import { logger } from '@/lib/log';
+import { createChatModel } from '@/lib/model';
 import { getRequestNetwork } from '@/lib/network';
 
 export const dynamic = 'force-dynamic';
@@ -56,9 +56,8 @@ export const POST = apiHandler({
     }
 
     const tools = getAgentTools(network);
-    const anthropic = createAnthropic({ apiKey: env.ANTHROPIC_API_KEY });
     const result = streamText({
-      model: anthropic(env.AI_MODEL),
+      model: createChatModel(env),
       instructions: systemPromptFor(network),
       messages: await convertToModelMessages<HarnessUIMessage>(messages, {
         tools,
