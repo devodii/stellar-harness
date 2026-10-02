@@ -13,6 +13,8 @@ export interface TextFieldProps<
   disabled?: boolean;
   autoFocus?: boolean;
   mono?: boolean;
+  type?: 'text' | 'email' | 'search';
+  autoComplete?: string;
 }
 
 export function TextField<TValues extends RHF.FieldValues, TName extends RHF.Path<TValues>>({
@@ -25,6 +27,8 @@ export function TextField<TValues extends RHF.FieldValues, TName extends RHF.Pat
   disabled,
   autoFocus,
   mono = true,
+  type = 'text',
+  autoComplete,
 }: TextFieldProps<TValues, TName>) {
   return (
     <RHF.Controller
@@ -40,6 +44,8 @@ export function TextField<TValues extends RHF.FieldValues, TName extends RHF.Pat
         >
           <Input
             id={name}
+            type={type}
+            autoComplete={autoComplete}
             placeholder={placeholder}
             disabled={disabled}
             autoFocus={autoFocus}
