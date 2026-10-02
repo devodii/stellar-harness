@@ -19,10 +19,11 @@ export type ScanArgs = {
   limit?: number;
   windowSeconds?: number;
   noCache: boolean;
+  newSnapshot: boolean;
   concurrency: Record<string, number>;
 };
 
-export const USAGE = `usage: harness-scan <${[...CENSUSES, 'all'].join('|')}> [--limit N] [--window 7d] [--no-cache] [--concurrency host=N]`;
+export const USAGE = `usage: harness-scan <${[...CENSUSES, 'all'].join('|')}> [--limit N] [--window 7d] [--no-cache] [--new-snapshot] [--concurrency host=N]`;
 
 const isCommand = (value: string): value is Command =>
   value === 'all' || (CENSUSES as readonly string[]).includes(value);
@@ -47,6 +48,7 @@ export const parseScanArgs = (argv: string[]): ScanArgs => {
       limit: { type: 'string' },
       window: { type: 'string' },
       'no-cache': { type: 'boolean', default: false },
+      'new-snapshot': { type: 'boolean', default: false },
       concurrency: { type: 'string', multiple: true, default: [] },
     },
   });
@@ -64,6 +66,7 @@ export const parseScanArgs = (argv: string[]): ScanArgs => {
     limit,
     windowSeconds: values.window === undefined ? undefined : parseDuration(values.window),
     noCache: values['no-cache'],
+    newSnapshot: values['new-snapshot'],
     concurrency: parseConcurrency(values.concurrency),
   };
 };

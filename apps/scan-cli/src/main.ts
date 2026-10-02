@@ -16,6 +16,7 @@ const main = async (): Promise<number> => {
   const ctx = await createScanContext({
     dataDir,
     noCache: args.noCache,
+    newSnapshot: args.newSnapshot,
     limit: args.limit,
     windowSeconds: args.windowSeconds,
     concurrency: args.concurrency,
