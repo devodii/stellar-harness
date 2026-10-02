@@ -1,4 +1,5 @@
-import { Chat } from '@/components/chat';
+import { Suspense } from 'react';
+import { ChatPage } from '@/components/chat-page';
 import { Header } from '@/components/header';
 import { WatchPanel } from '@/components/watch-panel';
 import { DEMO_ORG } from '@/demo-org';
@@ -13,7 +14,9 @@ export default async function Page() {
       <Header org={DEMO_ORG} />
       <div className="flex min-h-0 flex-1">
         <WatchPanel watch={watch} network={DEMO_ORG.network} anchorDomain={DEMO_ORG.anchorDomain} />
-        <Chat />
+        <Suspense>
+          <ChatPage />
+        </Suspense>
       </div>
     </div>
   );

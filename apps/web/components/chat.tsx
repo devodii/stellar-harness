@@ -3,6 +3,7 @@
 import { useChat } from '@ai-sdk/react';
 import type { HarnessMessage } from '@harness/agent';
 import { useRouter } from 'next/navigation';
+import * as React from 'react';
 import {
   Conversation,
   ConversationContent,
@@ -23,11 +24,26 @@ function MessagePart({ part, role }: { part: Part; role: HarnessMessage['role'] 
   return role === 'user' ? <p>{part.text}</p> : <MessageResponse>{part.text}</MessageResponse>;
 }
 
-export function Chat() {
+export interface ChatProps {
+  id: string;
+  initialMessages?: HarnessMessage[];
+  onMessagesChange?: (messages: HarnessMessage[]) => void;
+}
+
+export function Chat({ id, initialMessages = [], onMessagesChange }: ChatProps) {
   const router = useRouter();
   const { messages, sendMessage, status, stop, error } = useChat<HarnessMessage>({
+    id,
+    messages: initialMessages,
     onFinish: () => router.refresh(),
   });
+
+  const onChangeRef = React.useRef(onMessagesChange);
+  onChangeRef.current = onMessagesChange;
+  React.useEffect(() => {
+    if (messages.length > 0 && status !== 'streaming') onChangeRef.current?.(messages);
+  }, [messages, status]);
+
   const busy = status === 'submitted' || status === 'streaming';
   const send = (text: string) => void sendMessage({ text });
 
