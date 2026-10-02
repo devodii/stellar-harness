@@ -24,6 +24,15 @@ export const summarizeArgs = (args: unknown, maxLength = 80): string => {
   return text.length > maxLength ? `${text.slice(0, maxLength - 1)}${ELLIPSIS}` : text;
 };
 
+export const argsData = (args: unknown): Record<string, string> =>
+  !args || typeof args !== 'object' || Array.isArray(args)
+    ? {}
+    : Object.fromEntries(
+        Object.entries(args)
+          .filter(([, value]) => value !== undefined)
+          .map(([key, value]) => [key, summarizeValue(value)]),
+      );
+
 const integer = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 const compact = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 });
 
