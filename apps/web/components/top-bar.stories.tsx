@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { formatPercent, formatSeconds } from '@/lib/format';
+import { BracketTag } from './bracket-tag';
 import { LiveStrip } from './live-strip';
 import { ThemeProvider } from './theme-provider';
 import { TopBar } from './top-bar';
@@ -40,3 +41,7 @@ type Story = StoryObj<typeof TopBar>;
 export const WithLiveStrip: Story = {};
 
 export const Empty: Story = { args: { strip: undefined } };
+
+export const OnTestnet: Story = {
+  args: { badge: <BracketTag label="testnet" tone="warning" /> },
+};

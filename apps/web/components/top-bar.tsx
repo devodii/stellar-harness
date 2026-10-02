@@ -6,10 +6,11 @@ import { Wordmark } from '@/components/wordmark';
 
 export interface TopBarProps {
   strip?: React.ReactNode;
+  badge?: React.ReactNode;
   className?: string;
 }
 
-export function TopBar({ strip, className }: TopBarProps) {
+export function TopBar({ strip, badge, className }: TopBarProps) {
   return (
     <header
       className={cn(
@@ -19,6 +20,7 @@ export function TopBar({ strip, className }: TopBarProps) {
     >
       <SidebarTrigger className="-ml-1" />
       <Wordmark />
+      {badge}
       <div className="mx-1 hidden h-4 w-px bg-border sm:block" aria-hidden />
       <div className="min-w-0 flex-1">{strip}</div>
       <ThemeToggle className="size-8" />
