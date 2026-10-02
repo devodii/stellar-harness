@@ -355,7 +355,7 @@
     "expected": {
       "result": {
         "tx": "tx_failed",
-        "ops": ["function_trapped"],
+        "ops": ["op_trapped"],
         "feeBump": true,
         "feeCharged": "13856"
       },
