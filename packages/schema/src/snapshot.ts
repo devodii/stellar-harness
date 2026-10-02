@@ -1,7 +1,5 @@
 import { z } from 'zod';
-
-export const Network = z.enum(['mainnet']);
-export type Network = z.infer<typeof Network>;
+import { Network } from './network';
 
 export const Snapshot = z.object({
   snapshotLedger: z.number().int().positive(),
