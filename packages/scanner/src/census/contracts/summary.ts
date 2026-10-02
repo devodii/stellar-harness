@@ -1,4 +1,4 @@
-import { ContractsSummary, type ScfProject } from '@harness/schema';
+import { ContractsSummary, MEANINGFUL_INVOCATIONS, type ScfProject } from '@harness/schema';
 import { isLiveIdle } from './fingerprints';
 import type { ContractRow } from './schemas';
 
@@ -9,6 +9,19 @@ const countWhere = <T>(items: T[], predicate: (item: T) => boolean): number =>
 
 const isArchived = (row: ContractRow) => row.instance?.archived === true;
 const isExpiring30d = (row: ContractRow) => row.instance?.expiring30d === true;
+
+export const isMeaningfulRow = (row: Pick<ContractRow, 'invocations' | 'scf'>): boolean =>
+  row.invocations >= MEANINGFUL_INVOCATIONS || row.scf !== null;
+
+export const isArchivedMeaningful = (row: ContractRow): boolean =>
+  isArchived(row) && isMeaningfulRow(row);
+
+export const meaningfulCounts = (
+  rows: ContractRow[],
+): Pick<ContractsSummary, 'archivedMeaningful' | 'expiring30dMeaningful'> => ({
+  archivedMeaningful: countWhere(rows, isArchivedMeaningful),
+  expiring30dMeaningful: countWhere(rows, (row) => isExpiring30d(row) && isMeaningfulRow(row)),
+});
 
 export const contractsSummary = (
   rows: ContractRow[],
@@ -27,6 +40,7 @@ export const contractsSummary = (
     archivedInstances: countWhere(rows, isArchived),
     archivedByFamily,
     expiring30d: countWhere(rows, isExpiring30d),
+    ...meaningfulCounts(rows),
     expiring90d: countWhere(rows, (row) => row.instance?.expiring90d === true),
     liveIdle: countWhere(rows, (row) => isLiveIdle(row, previousActivity)),
     scfFunded: {
