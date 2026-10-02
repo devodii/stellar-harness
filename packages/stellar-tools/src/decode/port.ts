@@ -1,4 +1,3 @@
-import { Networks } from '@stellar/stellar-sdk';
 import type { DecodeEnvelopeSummary, DecodeResultCodes } from '../ports';
 import type { EnvelopeSummary as EnvelopePort } from '../tools/decoder-schemas';
 import { decodeEnvelopeSummary, type EnvelopeSummary } from './envelope';
@@ -25,15 +24,17 @@ export const toEnvelopePort = (summary: EnvelopeSummary): EnvelopePort => ({
     : {}),
 });
 
-export const decodeEnvelopePort: DecodeEnvelopeSummary = (envelopeXdr) =>
-  toEnvelopePort(decodeEnvelopeSummary(envelopeXdr, Networks.PUBLIC));
+export const decodeEnvelopePort =
+  (networkPassphrase: string): DecodeEnvelopeSummary =>
+  (envelopeXdr) =>
+    toEnvelopePort(decodeEnvelopeSummary(envelopeXdr, networkPassphrase));
 
 export type PortDecoders = {
   decodeResultCodes: DecodeResultCodes;
   decodeEnvelopeSummary: DecodeEnvelopeSummary;
 };
 
-export const portDecoders: PortDecoders = {
+export const createPortDecoders = (networkPassphrase: string): PortDecoders => ({
   decodeResultCodes,
-  decodeEnvelopeSummary: decodeEnvelopePort,
-};
+  decodeEnvelopeSummary: decodeEnvelopePort(networkPassphrase),
+});

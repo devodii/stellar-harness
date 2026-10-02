@@ -1,6 +1,7 @@
 import {
   type ClientOptions,
   createClients,
+  createPortDecoders,
   createPorts,
   fail,
   getTransaction,
@@ -8,7 +9,6 @@ import {
   type NetworkConfig,
   NoCache,
   type Policy,
-  portDecoders,
   type TransactionToolContext,
 } from '@harness/stellar-tools';
 import { DEFAULT_LEDGER_CLOSE_SECONDS } from '@harness/stellar-tools/contracts';
@@ -62,7 +62,7 @@ export const createAgentContext = ({
     fetch: ports.fetch,
     rpcUrl: clients.config.RPC_URL,
     horizonUrl: clients.config.HORIZON_URL,
-    ...portDecoders,
+    ...createPortDecoders(clients.config.NETWORK_PASSPHRASE),
   };
   return {
     ...ports,

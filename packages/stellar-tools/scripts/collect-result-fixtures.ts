@@ -1,5 +1,6 @@
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { NETWORK_PROFILES } from '@harness/schema';
 import { createClients } from '../src/core/clients';
 import { loadNetworkConfig } from '../src/core/config';
 import type { HttpLogLine } from '../src/core/log';
@@ -76,7 +77,7 @@ const main = async () => {
     if (tx.status !== 'FAILED') return;
     failedTx += 1;
     const decoded = decodeResultCodes(tx.resultXdr);
-    const summary = decodeEnvelopeSummary(tx.envelopeXdr);
+    const summary = decodeEnvelopeSummary(tx.envelopeXdr, NETWORK_PROFILES.mainnet.passphrase);
     const failing = decoded.ops
       .map((code, index) => ({ code, opType: summary.opTypes[index] ?? 'unknown' }))
       .filter((op) => op.code !== 'op_success');
