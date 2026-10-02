@@ -1,10 +1,17 @@
 import type { Org } from '@harness/schema';
 import type { AnchorProbe } from '@harness/stellar-tools';
-import type * as React from 'react';
+import * as React from 'react';
 import { ActionCard } from '@/components/action-card';
 import { Address } from '@/components/address';
+import { NewChatButton, SidebarChats } from '@/components/chat-list';
 import { BracketTag } from '@/components/bracket-tag';
 import { StatLabel } from '@/components/stat';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { Sidebar, SidebarContent, SidebarHeader } from '@/components/ui/sidebar';
 import { formatDecimal } from '@/lib/format';
 import type { Watch, WatchedContract } from '@/lib/harness';
@@ -60,66 +67,85 @@ export interface WatchPanelProps {
   org: Pick<Org, 'name' | 'network' | 'anchorDomain'>;
 }
 
+const TRIGGER_CLASS =
+  'py-2 text-xs font-normal tracking-wide text-muted-foreground [font-variant-caps:all-small-caps] hover:no-underline';
+
 export function WatchPanel({ watch, org }: WatchPanelProps) {
   return (
     <Sidebar>
-      <SidebarHeader className="gap-0.5 border-b px-4 py-3 text-foreground">
-        <h2 className="font-medium">What the harness watches</h2>
+      <SidebarHeader className="gap-2 border-b px-4 py-3 text-foreground">
         <p className="text-xs text-muted-foreground md:hidden">
           {org.name} · {org.network}
         </p>
+        <NewChatButton />
       </SidebarHeader>
-      <SidebarContent className="gap-6 p-4 text-foreground">
-        <Section title="accounts">
-          {watch.accounts.map((account) => (
-            <Row
-              key={account.address}
-              label={account.label}
-              address={
-                <Address
-                  value={account.address}
-                  href={explorerUrl('account', account.address, org.network)}
-                />
-              }
-              value={
-                account.xlm === null
-                  ? 'unavailable'
-                  : `${formatDecimal(Number(account.xlm), 2)} XLM`
-              }
-            />
-          ))}
-        </Section>
-        <Section title="contracts">
-          {watch.contracts.map((contract) => (
-            <Row
-              key={contract.id}
-              label={contract.label}
-              address={
-                <Address
-                  value={contract.id}
-                  href={explorerUrl('contract', contract.id, org.network)}
-                />
-              }
-              value={<ContractStatus ttl={contract.ttl} />}
-            />
-          ))}
-        </Section>
-        {org.anchorDomain && (
-          <Section title="anchor">
-            <li>
-              <p className="text-sm">{org.anchorDomain}</p>
-              <p className="font-mono text-xs">{anchorStatus(watch.anchor)}</p>
-            </li>
-          </Section>
-        )}
-        <section className="mt-auto">
-          <StatLabel>proposed actions</StatLabel>
-          {watch.actions.length === 0 ? (
-            <p className="pt-1 text-sm text-muted-foreground">None yet.</p>
-          ) : (
-            watch.actions.map((action) => <ActionCard key={action.id} action={action} compact />)
-          )}
-        </section>
+      <SidebarContent className="gap-4 p-4 text-foreground">
+        <React.Suspense>
+          <SidebarChats />
+        </React.Suspense>
+        <Accordion type="multiple" defaultValue={['watching']}>
+          <AccordionItem value="watching">
+            <AccordionTrigger className={TRIGGER_CLASS}>what the harness watches</AccordionTrigger>
+            <AccordionContent className="space-y-5">
+              <Section title="accounts">
+                {watch.accounts.map((account) => (
+                  <Row
+                    key={account.address}
+                    label={account.label}
+                    address={
+                      <Address
+                        value={account.address}
+                        href={explorerUrl('account', account.address, org.network)}
+                      />
+                    }
+                    value={
+                      account.xlm === null
+                        ? 'unavailable'
+                        : `${formatDecimal(Number(account.xlm), 2)} XLM`
+                    }
+                  />
+                ))}
+              </Section>
+              <Section title="contracts">
+                {watch.contracts.map((contract) => (
+                  <Row
+                    key={contract.id}
+                    label={contract.label}
+                    address={
+                      <Address
+                        value={contract.id}
+                        href={explorerUrl('contract', contract.id, org.network)}
+                      />
+                    }
+                    value={<ContractStatus ttl={contract.ttl} />}
+                  />
+                ))}
+              </Section>
+              {org.anchorDomain && (
+                <Section title="anchor">
+                  <li>
+                    <p className="text-sm">{org.anchorDomain}</p>
+                    <p className="font-mono text-xs">{anchorStatus(watch.anchor)}</p>
+                  </li>
+                </Section>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="actions">
+            <AccordionTrigger className={TRIGGER_CLASS}>
+              {`proposed actions · ${watch.actions.length}`}
+            </AccordionTrigger>
+            <AccordionContent>
+              {watch.actions.length === 0 ? (
+                <p className="text-sm text-muted-foreground">None yet.</p>
+              ) : (
+                watch.actions.map((action) => (
+                  <ActionCard key={action.id} action={action} compact />
+                ))
+              )}
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </SidebarContent>
     </Sidebar>
   );

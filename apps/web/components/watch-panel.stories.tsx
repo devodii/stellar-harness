@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { DEMO_ORG } from '@/demo-org';
 import type { Watch } from '@/lib/harness';
 import { fakeAccount, fakeContract, fakeHash } from './story-ids';
+import { ConversationsProvider } from './conversations-provider';
 import { SidebarProvider } from './ui/sidebar';
 import { WatchPanel } from './watch-panel';
 
@@ -56,9 +57,11 @@ const meta: Meta<typeof WatchPanel> = {
   args: { watch: WATCH, org: DEMO_ORG },
   decorators: [
     (Story) => (
-      <SidebarProvider className="h-[720px] min-h-0">
-        <Story />
-      </SidebarProvider>
+      <ConversationsProvider>
+        <SidebarProvider className="h-[720px] min-h-0">
+          <Story />
+        </SidebarProvider>
+      </ConversationsProvider>
     ),
   ],
 };
