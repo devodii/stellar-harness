@@ -73,3 +73,17 @@ Every call made without explicit direction is tagged `@decision` so it can be re
 - `@decision` Rent simulations use Circle's USDC issuer (`GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN`) as the source account: a long-lived public account nobody here controls; simulation submits nothing.
 - `@decision` `xlm12m` is the simulated resource fee alone; `estimatedXlm` adds the 100 stroop base fee. Rent totals sum simulated contracts with no population weighting. XLM/USD comes from CoinGecko once per run.
 - `@decision` The rent sample seed is `20261002`; stratification is by invocation decile rank.
+
+## Census 2: failed transactions
+
+- `@decision` RPC `getTransactions` is the only source. The range is split into 100-ledger chunks, each paged with its own cursor until a transaction passes the chunk end. The window stays 720 ledgers inside RPC retention because the oldest ledgers age out during a long scan.
+- `@decision` `--limit N` limits the failures census to the newest N ledgers.
+- `@decision` The checkpoint is the highest ledger completed with no gap before it; chunks finished after a gap are recorded by id so a resume never duplicates rows.
+- `@decision` `byCode` and cluster counts count each code once per transaction. A fee bump counts against the inner transaction's source and inner codes.
+- `@decision` `sameLedgerCollisions` counts matching failures in ledgers where the account had two or more failures of any code.
+- `@decision` `multisig` means med_threshold above 1 or more than one signer with weight above 0. `channel_pattern` uses only first operations of type `create_account` that carry a funder; Horizon's oldest retained operation is not always account creation, so this tag under-counts.
+- `@decision` Transactions that fail to decode are skipped, still counted in `ledger_totals`, and listed as decode gaps.
+- `@decision` `failed_tx` rows carry an optional `payment {destination, asset, amount}` so plans can name the destination and asset. `reserveShortfallXlm` is the XLM needed for one more subentry and is attached to `OP_LOW_RESERVE_CLUSTER` only when above zero.
+- `@decision` Payment preflight blocks an XLM payment that would drop the source below its minimum balance plus fee as `op_low_reserve`. The reserve locked by a sponsored trustline or claimable balance is the plan's `estimatedCostXlm`. When the sender must act first, no alternative plan is offered.
+- `@decision` `getTransaction` reads RPC first and falls back to Horizon `/transactions/{hash}`.
+- `@decision` Measured: one `getTransactions` call (limit 200) covers about 1.08 ledgers. A 1-day window is about 17,000 calls (about 45 to 50 minutes at the ~6 calls/s public RPC sustains at concurrency 8); the brief's 10 minute target for 1 day is not reachable on the public endpoint without a dedicated RPC.
