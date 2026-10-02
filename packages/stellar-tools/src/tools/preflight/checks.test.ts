@@ -2,7 +2,7 @@ import { ACTION_BY_CODE } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
 import type { HorizonAccount } from '../../ports';
 import { parseAsset } from '../assets';
-import { PREFLIGHT_CHECKS } from '../failures-schemas';
+import { PREFLIGHT_CHECKS } from '../schemas';
 import {
   fundedHolder,
   holder,

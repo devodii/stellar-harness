@@ -2,8 +2,8 @@ import { ACTION_BY_CODE } from '@harness/schema';
 import type { HorizonAccount } from '../../ports';
 import { formatStroops, toStroops } from '../amount';
 import { assetId, findBalance, type ParsedAsset } from '../assets';
-import type { PreflightBlocker, PreflightCheck, PreflightCheckName } from '../failures-schemas';
 import { BASE_RESERVE_STROOPS, minimumBalanceStroops, nativeBalance } from '../reserve';
+import type { PreflightBlocker, PreflightCheck, PreflightCheckName } from '../schemas';
 
 export const BASE_FEE_STROOPS = 100n;
 export const MIN_CREATE_ACCOUNT_STROOPS = 2n * BASE_RESERVE_STROOPS;
