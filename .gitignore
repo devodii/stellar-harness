@@ -4,17 +4,13 @@ dist
 .next
 out
 coverage
-storybook-static
 *.tsbuildinfo
 .env
 .env.*
 !.env.example
 .DS_Store
-.vercel
 
 data/*
 REPORT.md
 data-*/
 REPORT.*.md
-data-testnet/
-REPORT.testnet.md
