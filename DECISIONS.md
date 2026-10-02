@@ -117,3 +117,15 @@ Every call made without explicit direction is tagged `@decision` so it can be re
 
 - `@decision` Scan output stays out of git, including `data/public/`. A Vercel deploy is made with the Vercel CLI from a checkout where `pnpm refresh:public` has run: `.vercelignore` keeps raw scan output out of the upload while `data/public/` (summary plus findings trimmed under 5 MB, most severe first) is uploaded and traced into the functions. Set `HARNESS_DATA_DIR=../../data/public` on the Vercel project, whose root directory is `apps/web`.
 - `@decision` The web app resolves `HARNESS_DATA_DIR` from its own working directory and defaults to `../../data` (the repository's `data/`); Docker sets `/app/data`.
+
+## Web app
+
+- `@decision` The design follows the user's design system exactly (Outfit, Instrument Serif, the provided tokens) instead of the brief's black and white. Severity and status use only semantic tokens; primary and destructive text tones are derived from the same tokens with relative color syntax because the dark `--destructive` and light `--primary` are not readable as text.
+- `@decision` `/api/live` caches the Horizon ledger for 5 s and the summary for 30 s so the strip moves on every 5 s poll. Its window numbers come from the scan summary (`window: {days, txFailed, preventable, preventableShare}`) because the summary has no separate 24 h breakdown.
+- `@decision` Without a scan, scan-derived numbers render as `n/a`; the chat, suggestions and tools work against live mainnet regardless.
+- `@decision` `apiHandler` shows messages from errors the app raises itself and masks unexpected throws, so a missing `ANTHROPIC_API_KEY` reaches the user verbatim.
+- `@decision` Plan approval travels as a `data-plan-approval` part `{type: 'plan-approval', planId, decision}` on a user message; the chat route converts it to text the agent parses with `parsePlanApproval`.
+- `@decision` Chat URLs are `/?c=<id>`; `/?q=<prompt>` starts a new chat, which is how "Open in chat" on `/findings` works. Conversations are capped at 50 in local storage.
+- `@decision` AI Elements no longer ships `Loader`; `Shimmer` is used instead. The chat route passes `instructions` because `system` is deprecated in AI SDK 7.
+- `@decision` The web app renders tool results against the canonical tool schemas through client-safe entries (`@harness/stellar-tools/schemas`, `@harness/agent/protocol`), so the browser bundle never includes network clients.
+- `@decision` Suggestion fallbacks are real mainnet values checked live (a failed `op_no_trust` transaction, an anchor with a broken SEP-24 host, a USDC holder, an account without a USDC trustline, a live contract).
