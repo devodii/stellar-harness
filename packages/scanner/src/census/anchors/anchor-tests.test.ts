@@ -1,4 +1,5 @@
 import { createRequire } from 'node:module';
+import { NETWORK_PROFILES } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
 import {
   type AnchorTestsLib,
@@ -113,6 +114,17 @@ const fakeLib = (
   };
   return { lib, seen };
 };
+
+describe('anchorTestsConfig', () => {
+  it('defaults to the mainnet passphrase and takes the selected one', () => {
+    expect(anchorTestsConfig('a.example', [1]).networkPassphrase).toBe(
+      NETWORK_PROFILES.mainnet.passphrase,
+    );
+    expect(
+      anchorTestsConfig('a.example', [1], NETWORK_PROFILES.testnet.passphrase).networkPassphrase,
+    ).toBe(NETWORK_PROFILES.testnet.passphrase);
+  });
+});
 
 describe('runSafeAnchorTests', () => {
   it('counts tests blocked by a failed dependency apart from real failures', async () => {
