@@ -1,6 +1,6 @@
 # Demo script
 
-A three-minute screen recording. Run a scan first (`pnpm scan all --window 1d`) so the header and `/findings` have data, then `pnpm dev` with `ANTHROPIC_API_KEY` set. Every value below is a real mainnet subject checked with read-only requests; the suggestion chips use the same values when the scan does not supply better ones.
+A three-minute screen recording. Run a scan first (`pnpm scan all --window 1d`) so the header and `/findings` have data, then `pnpm dev` with `OPENAI_API_KEY` set in `.env`. Every value below is a real mainnet subject checked with read-only requests; the suggestion chips use the same values when the scan does not supply better ones.
 
 | Subject | Value |
 | --- | --- |
