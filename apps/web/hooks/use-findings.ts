@@ -12,22 +12,31 @@ export interface FindingsFilter {
   tag: string;
 }
 
+export type FindingsScope = 'meaningful' | 'all';
+
 export const findingsQueryKey = (
   network: Network,
   filter: FindingsFilter,
   pageIndex: number,
   pageSize: number,
-) => ['findings', network, filter, pageIndex, pageSize] as const;
+  scope: FindingsScope = 'meaningful',
+) => ['findings', network, scope, filter, pageIndex, pageSize] as const;
 
-export const useFindings = (filter: FindingsFilter, pageIndex: number, pageSize: number) => {
+export const useFindings = (
+  filter: FindingsFilter,
+  pageIndex: number,
+  pageSize: number,
+  scope: FindingsScope = 'meaningful',
+) => {
   const { network } = useNetwork();
   return useQuery({
-    queryKey: findingsQueryKey(network, filter, pageIndex, pageSize),
+    queryKey: findingsQueryKey(network, filter, pageIndex, pageSize, scope),
     queryFn: () => {
       const params = toSearchParams({
         type: filter.type,
         severity: filter.severity,
         tag: filter.tag.trim() || undefined,
+        meaningful: scope === 'meaningful' ? 'true' : undefined,
         limit: pageSize,
         offset: pageIndex * pageSize,
       });
