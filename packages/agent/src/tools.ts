@@ -1,13 +1,18 @@
 import type { AppError, ToolMeta } from '@harness/schema';
 import {
+  buildPaymentPreflight,
   type ContractToolContext,
   type DecodeContext,
   explainFailure,
+  getAccount,
   getContractTtl,
   getSummary,
+  getTransaction,
   invokeTool,
   type PolicyContext,
+  type ProbeAnchorContext,
   planFix,
+  probeAnchorTool,
   queryFindings,
   type StellarlightContext,
   type StorageContext,
@@ -15,6 +20,7 @@ import {
   simulateExtendTtl,
   simulateRestore,
   type ToolDefinition,
+  type TransactionToolContext,
 } from '@harness/stellar-tools';
 import {
   type InferUITools,
@@ -55,9 +61,15 @@ export type AgentToolContext = StorageContext &
   PolicyContext &
   DecodeContext &
   StellarlightContext &
-  ContractToolContext;
+  ContractToolContext &
+  TransactionToolContext &
+  ProbeAnchorContext;
 
 export const createAgentTools = <TContext extends AgentToolContext>(ctx: TContext) => ({
+  getAccount: toAiTool(getAccount, ctx),
+  getTransaction: toAiTool(getTransaction, ctx),
+  probeAnchor: toAiTool(probeAnchorTool, ctx),
+  buildPaymentPreflight: toAiTool(buildPaymentPreflight, ctx),
   planFix: toAiTool(planFix, ctx),
   queryFindings: toAiTool(queryFindings, ctx),
   getSummary: toAiTool(getSummary, ctx),
