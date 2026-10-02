@@ -105,3 +105,10 @@ Every call made without explicit direction is tagged `@decision` so it can be re
 ## Result code names
 
 - `@decision` Horizon's own mapping (`internal/codes/main.go` in stellar/stellar-horizon, pinned commit recorded in `packages/stellar-tools/src/decode/horizon-codes.json`) is vendored and is the decoder's primary table; name derivation from XDR is only a fallback. A test checks all 208 mappings, and another requires an explanation for every code Horizon can emit. This fixed 17 divergences, including Soroban codes Horizon emits without the `op_` prefix (`function_trapped`, `resource_limit_exceeded`, `entry_archived`, `insufficient_refundable_fee`), `buy_not_authorized`, `sell_not_authorized`, `buy_no_issuer`, and `op_no_trust` for allow-trust and set-trustline-flags without a trustline.
+
+## Scan runtime
+
+- `@decision` A snapshot is taken once and reused by every later command until `--new-snapshot` is passed. A new snapshot clears `findings.jsonl`, `data/derived` and `data/state` so findings never mix snapshots; the disk cache is kept.
+- `@decision` Each census command writes its CSV exports, a 20-row preview and a run record (wall time, requests, network calls, cache hits, gaps, methodology) under `data/derived`; `harness-scan report` builds `summary.json` and `REPORT.md` from those files alone.
+- `@decision` DNS failures are retried for the configured infrastructure hosts (Horizon, RPC, stellar.expert, stellarlight) and fail fast for anchor domains. A local network outage during the first full run turned every request into `ENOTFOUND`; without this, a transient outage reads as hundreds of unreachable anchors.
+- `@decision` The rent census reads contract rows from the contracts census output, so `rent` requires `contracts` to have run on the same snapshot; `all` orders them that way.
