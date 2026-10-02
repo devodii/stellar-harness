@@ -6,7 +6,7 @@ import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export type TimelineTone = 'done' | 'pending' | 'blocked' | 'muted';
+export type TimelineTone = 'done' | 'pending' | 'blocked' | 'failed' | 'muted';
 
 export type TimelineValue = string | number | boolean;
 
@@ -35,6 +35,7 @@ const DOT_CLASS: Record<TimelineTone, string> = {
   done: 'bg-primary',
   pending: 'border border-muted-foreground/50 bg-background',
   blocked: 'bg-warning',
+  failed: 'bg-destructive',
   muted: 'bg-muted-foreground/40',
 };
 
