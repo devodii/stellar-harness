@@ -1,5 +1,6 @@
 import { xdr } from '@stellar/stellar-sdk';
 import { camelToSnake } from './case';
+import horizon from './horizon-codes.json';
 
 export type DecodedResultCodes = {
   tx: string;
@@ -44,8 +45,8 @@ export const OUTER_OP_CODES: Record<OuterOpCodeName, string> = {
   opTooManySponsoring: 'op_too_many_sponsoring',
 };
 
-// Horizon (services/horizon/internal/codes) renames these result suffixes; everything else is
-// the XDR member name with its operation prefix stripped and snake_cased.
+// Fallback for members missing from Horizon's table: Horizon renames these suffixes, and
+// everything else is the XDR member name with its operation prefix stripped and snake_cased.
 export const HORIZON_OP_SUFFIX_OVERRIDES: Record<string, string> = {
   AlreadyExist: 'already_exists',
   OfferCrossSelf: 'cross_self',
@@ -64,8 +65,16 @@ const RESULT_PREFIX_ALIASES: Record<string, string[]> = {
   createPassiveSellOffer: ['manageSellOffer'],
 };
 
+const HORIZON_OP_CODES: Record<string, Record<string, string> | undefined> = horizon.codes;
+
+const upperFirst = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
+
 export const innerOpCode = (operation: string, resultName: string): string => {
   const prefixes = [operation, ...(RESULT_PREFIX_ALIASES[operation] ?? [])];
+  for (const candidate of prefixes) {
+    const known = HORIZON_OP_CODES[upperFirst(candidate)]?.[resultName];
+    if (known) return known;
+  }
   const prefix = prefixes.find((candidate) => resultName.startsWith(candidate));
   if (!prefix) return `op_${camelToSnake(resultName)}`;
   const suffix = resultName.slice(prefix.length);
