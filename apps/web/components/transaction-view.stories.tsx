@@ -3,7 +3,7 @@ import type { TransactionView as TransactionViewData } from '@/lib/tool-views';
 import { TransactionView } from './transaction-view';
 
 const TX: TransactionViewData = {
-  hash: 'f'.repeat(56) + '0000fake',
+  hash: `${'f'.repeat(60)}0001`,
   ledger: 1000001,
   createdAt: '2026-01-01T00:00:00Z',
   successful: false,
