@@ -29,8 +29,17 @@ export function SummaryView({ summary }: { summary: Summary }) {
           hint={`${formatInt(metrics.preventable)} tx`}
         />
         <Stat label="clusters" value={metrics.clusters} />
-        <Stat label="archived" value={metrics.archivedContracts} tone="warning" />
-        <Stat label="expiring 30d" value={metrics.expiring30d} />
+        <Stat
+          label="archived (active)"
+          value={metrics.archivedMeaningful}
+          tone="warning"
+          hint={`${formatInt(metrics.archivedContracts)} in total`}
+        />
+        <Stat
+          label="expiring 30d (active)"
+          value={metrics.expiring30dMeaningful}
+          hint={`${formatInt(metrics.expiring30d)} in total`}
+        />
         <Stat
           label="anchors failing"
           value={metrics.anchorsFailing}
