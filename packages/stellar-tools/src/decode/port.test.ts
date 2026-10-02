@@ -1,7 +1,10 @@
+import { NETWORK_PROFILES } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
 import { EnvelopeSummary } from '../tools/decoder-schemas';
 import envelopes from './__fixtures__/envelope-xdr.json';
-import { decodeEnvelopePort, portDecoders, toEnvelopePort } from './port';
+import { createPortDecoders, decodeEnvelopePort, toEnvelopePort } from './port';
+
+const decode = decodeEnvelopePort(NETWORK_PROFILES.mainnet.passphrase);
 
 const envelope = (label: string) => {
   const found = envelopes.find((entry) => entry.label === label);
@@ -13,7 +16,7 @@ describe('decodeEnvelopePort', () => {
   it.each(envelopes.map((entry) => [entry.label, entry.envelopeXdr] as const))(
     'maps the %s envelope to a valid port summary',
     (_label, xdr) => {
-      const port = decodeEnvelopePort(xdr);
+      const port = decode(xdr);
       expect(EnvelopeSummary.parse(port)).toEqual(port);
       expect(port.operationCount).toBe(port.opTypes.length);
       expect(port.operations).toHaveLength(port.opTypes.length);
@@ -21,7 +24,7 @@ describe('decodeEnvelopePort', () => {
   );
 
   it('maps a fee bump to its inner source, outer fee and inner hash', () => {
-    expect(decodeEnvelopePort(envelope('fee_bump'))).toMatchObject({
+    expect(decode(envelope('fee_bump'))).toMatchObject({
       sourceAccount: 'GAZNZKNQC7G2DIKUBQP6LFC4RV4D3K6QU44I7RATHP22OIBPVQRHXQXK',
       feeSource: 'GBEJMHIMASJBIGGV5UKACNIZTQN3ZCILKZBH6W5PFI5TPCFPT5ASN4CW',
       innerHash: '4041d7cc52bf4bc20a159662b02b7c6ad7383ec73f88db36700963abf935a61d',
@@ -32,7 +35,7 @@ describe('decodeEnvelopePort', () => {
   });
 
   it('omits timebounds and inner hash when the envelope has none', () => {
-    const port = decodeEnvelopePort(envelope('single_payment'));
+    const port = decode(envelope('single_payment'));
     expect(port).not.toHaveProperty('timeBounds');
     expect(port).not.toHaveProperty('innerHash');
   });
@@ -59,8 +62,17 @@ describe('toEnvelopePort', () => {
   });
 });
 
-describe('portDecoders', () => {
-  it('pairs the real result decoder with the envelope port', () => {
-    expect(portDecoders.decodeEnvelopeSummary).toBe(decodeEnvelopePort);
+describe('createPortDecoders', () => {
+  it('hashes fee bump inner transactions with the given network passphrase', () => {
+    const xdr = envelope('fee_bump');
+    const mainnet = createPortDecoders(NETWORK_PROFILES.mainnet.passphrase);
+    const testnet = createPortDecoders(NETWORK_PROFILES.testnet.passphrase);
+    expect(mainnet.decodeEnvelopeSummary(xdr)).toEqual(decode(xdr));
+    expect(testnet.decodeEnvelopeSummary(xdr).innerHash).not.toBe(
+      mainnet.decodeEnvelopeSummary(xdr).innerHash,
+    );
+    expect(testnet.decodeEnvelopeSummary(xdr).sourceAccount).toBe(
+      mainnet.decodeEnvelopeSummary(xdr).sourceAccount,
+    );
   });
 });
