@@ -1,7 +1,7 @@
+import { AccentBlock } from '@/components/accent-block';
 import { BracketTag } from '@/components/bracket-tag';
 import { ResultCodes } from '@/components/result-codes';
 import { ResultSection } from '@/components/result-section';
-import { StatLabel } from '@/components/stat';
 import type { FailureExplanationView as FailureExplanationData } from '@/lib/tool-views';
 
 export function FailureExplanationView({ explanation }: { explanation: FailureExplanationData }) {
@@ -30,10 +30,9 @@ export function FailureExplanationView({ explanation }: { explanation: FailureEx
           ))}
         </dl>
       )}
-      <div className="space-y-1 rounded-md border border-primary/40 bg-primary/5 p-2.5">
-        <StatLabel>suggested action</StatLabel>
+      <AccentBlock label="suggested action">
         <p className="text-sm text-foreground">{explanation.suggestedAction}</p>
-      </div>
+      </AccentBlock>
     </ResultSection>
   );
 }

@@ -1,4 +1,5 @@
 import type { Finding } from '@harness/schema';
+import { AccentBlock } from '@/components/accent-block';
 import { FindingSubject, FindingTags } from '@/components/findings-table';
 import { JsonView } from '@/components/json-view';
 import { KeyValueList } from '@/components/key-value-list';
@@ -23,10 +24,9 @@ export function FindingDetail({ finding }: { finding: Finding }) {
         ]}
       />
       {finding.tags.length > 0 && <FindingTags tags={finding.tags} />}
-      <div className="space-y-1 rounded-md border border-primary/40 bg-primary/5 p-2.5">
-        <StatLabel>suggested action</StatLabel>
+      <AccentBlock label="suggested action">
         <p className="text-sm text-foreground">{finding.suggestedAction}</p>
-      </div>
+      </AccentBlock>
       <div className="space-y-1">
         <StatLabel>evidence</StatLabel>
         <JsonView value={finding.evidence} maxHeight={420} />
