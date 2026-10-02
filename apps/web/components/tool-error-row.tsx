@@ -13,7 +13,7 @@ export function ToolErrorRow({ message, code, className }: ToolErrorRowProps) {
     <div
       role="alert"
       className={cn(
-        'flex min-w-0 items-baseline gap-2 rounded-md border border-destructive/40 bg-destructive/5 px-2.5 py-1.5 font-mono text-xs',
+        'flex min-w-0 items-baseline gap-2 border-l-2 border-destructive py-0.5 pl-3 font-mono text-xs',
         className,
       )}
     >
