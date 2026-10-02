@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { portDecoders } from '@harness/stellar-tools';
+import { createPortDecoders } from '@harness/stellar-tools';
 import { ANCHOR_DOMAINS_FILE } from '../../census/anchors/census';
 import { runFailuresCensus } from '../../census/failures/census';
 import {
@@ -36,7 +36,7 @@ export const failuresCommand = async (ctx: ScanContext) => {
   const { value: result, run } = await measure(ctx, CENSUS, () =>
     runFailuresCensus(
       {
-        ...portDecoders,
+        ...createPortDecoders(config.NETWORK_PASSPHRASE),
         rpc: ports.rpc,
         horizon: ports.horizon,
         run: ctx.run,

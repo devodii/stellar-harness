@@ -1,4 +1,5 @@
-import { portDecoders } from '@harness/stellar-tools';
+import { NETWORK_PROFILES } from '@harness/schema';
+import { createPortDecoders } from '@harness/stellar-tools';
 import { fakeFetcher, fakeHorizon, fakeRpc } from '@harness/stellar-tools/contracts/testing';
 import { MemoryStorage } from '@harness/storage';
 import type { AgentToolContext } from './tools';
@@ -15,7 +16,7 @@ export const createTestContext = (overrides: Partial<AgentToolContext> = {}): Ag
   stellarExpertUrl: 'https://expert.test',
   rpcUrl: 'https://rpc.test',
   horizonUrl: 'https://horizon.test',
-  ...portDecoders,
+  ...createPortDecoders(NETWORK_PROFILES.mainnet.passphrase),
   latestLedger: async () => TEST_LEDGER,
   ...overrides,
 });

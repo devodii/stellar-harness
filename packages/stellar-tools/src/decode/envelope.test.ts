@@ -1,3 +1,4 @@
+import { Networks } from '@stellar/stellar-sdk';
 import { describe, expect, it } from 'vitest';
 import envelopes from './__fixtures__/envelope-xdr.json';
 import { decodeEnvelopeSummary } from './envelope';
@@ -10,7 +11,7 @@ const envelope = (label: string) => {
 
 describe('decodeEnvelopeSummary with real mainnet envelopes', () => {
   it('summarises a multi operation transaction with timebounds', () => {
-    expect(decodeEnvelopeSummary(envelope('multi_op'))).toEqual({
+    expect(decodeEnvelopeSummary(envelope('multi_op'), Networks.PUBLIC)).toEqual({
       feeBump: false,
       source: 'GCSSUJ5YNMFTTREJO3MIFSKZP5QP7CHCRT2HSV77O5EQZFQ2OABU6K3O',
       feeSource: 'GCSSUJ5YNMFTTREJO3MIFSKZP5QP7CHCRT2HSV77O5EQZFQ2OABU6K3O',
@@ -33,7 +34,7 @@ describe('decodeEnvelopeSummary with real mainnet envelopes', () => {
   });
 
   it('unwraps a fee bump to the inner transaction', () => {
-    expect(decodeEnvelopeSummary(envelope('fee_bump'))).toMatchObject({
+    expect(decodeEnvelopeSummary(envelope('fee_bump'), Networks.PUBLIC)).toMatchObject({
       feeBump: true,
       source: 'GAZNZKNQC7G2DIKUBQP6LFC4RV4D3K6QU44I7RATHP22OIBPVQRHXQXK',
       feeSource: 'GBEJMHIMASJBIGGV5UKACNIZTQN3ZCILKZBH6W5PFI5TPCFPT5ASN4CW',
@@ -46,22 +47,22 @@ describe('decodeEnvelopeSummary with real mainnet envelopes', () => {
   });
 
   it('reads text, id and hash memos the way horizon shows them', () => {
-    expect(decodeEnvelopeSummary(envelope('memo_text'))).toMatchObject({
+    expect(decodeEnvelopeSummary(envelope('memo_text'), Networks.PUBLIC)).toMatchObject({
       memoType: 'text',
       memo: 'QTC rewards!',
     });
-    expect(decodeEnvelopeSummary(envelope('memo_id'))).toMatchObject({
+    expect(decodeEnvelopeSummary(envelope('memo_id'), Networks.PUBLIC)).toMatchObject({
       memoType: 'id',
       memo: '3245667357452752649',
     });
-    expect(decodeEnvelopeSummary(envelope('memo_hash'))).toMatchObject({
+    expect(decodeEnvelopeSummary(envelope('memo_hash'), Networks.PUBLIC)).toMatchObject({
       memoType: 'hash',
       memo: '/jmToFUqyg0T8xlUQh3bFO78eRDhOQweg1VEKZcABqQ=',
     });
   });
 
   it('reads destination, asset and amount from payment operations', () => {
-    expect(decodeEnvelopeSummary(envelope('single_payment')).operations).toEqual([
+    expect(decodeEnvelopeSummary(envelope('single_payment'), Networks.PUBLIC).operations).toEqual([
       {
         type: 'payment',
         source: 'GBAWLHZCKAQDG6GFR22FFIE6DIJECY5HU3E4IREVZ7G4TRAUDCVN6VXR',
@@ -73,7 +74,9 @@ describe('decodeEnvelopeSummary with real mainnet envelopes', () => {
   });
 
   it('reads create_account as an XLM payment of the starting balance', () => {
-    expect(decodeEnvelopeSummary(envelope('single_create_account')).operations).toEqual([
+    expect(
+      decodeEnvelopeSummary(envelope('single_create_account'), Networks.PUBLIC).operations,
+    ).toEqual([
       {
         type: 'create_account',
         destination: 'GAAMIHE3H6VRC7OMIOFTD4QMBPDWOBVYE7OUUW4OSSHMT4FDFE3A5KT2',
@@ -85,7 +88,8 @@ describe('decodeEnvelopeSummary with real mainnet envelopes', () => {
 
   it('reads path payments from the destination side', () => {
     expect(
-      decodeEnvelopeSummary(envelope('single_path_payment_strict_receive')).operations,
+      decodeEnvelopeSummary(envelope('single_path_payment_strict_receive'), Networks.PUBLIC)
+        .operations,
     ).toEqual([
       {
         type: 'path_payment_strict_receive',
@@ -95,7 +99,10 @@ describe('decodeEnvelopeSummary with real mainnet envelopes', () => {
         amount: '0.7336456',
       },
     ]);
-    expect(decodeEnvelopeSummary(envelope('single_path_payment_strict_send')).operations).toEqual([
+    expect(
+      decodeEnvelopeSummary(envelope('single_path_payment_strict_send'), Networks.PUBLIC)
+        .operations,
+    ).toEqual([
       {
         type: 'path_payment_strict_send',
         source: 'GD6LGTOHDGJSFNQTAQSU3V4FJKEF52FQGXEYUQCRKG2IJPGDRAKGTCIL',
@@ -107,13 +114,17 @@ describe('decodeEnvelopeSummary with real mainnet envelopes', () => {
   });
 
   it('keeps only type and source for non payment operations', () => {
-    expect(decodeEnvelopeSummary(envelope('single_change_trust')).operations).toEqual([
+    expect(
+      decodeEnvelopeSummary(envelope('single_change_trust'), Networks.PUBLIC).operations,
+    ).toEqual([
       { type: 'change_trust', source: 'GDMGW242MLMPOG5VURILEDUDAXILD2DA5T4QSUNGYFKTX5BN2K6UN4Z6' },
     ]);
   });
 
   it('reports missing timebounds as null', () => {
-    expect(decodeEnvelopeSummary(envelope('single_payment')).timeBounds).toBeNull();
+    expect(
+      decodeEnvelopeSummary(envelope('single_payment'), Networks.PUBLIC).timeBounds,
+    ).toBeNull();
   });
 
   it.each(
@@ -121,6 +132,6 @@ describe('decodeEnvelopeSummary with real mainnet envelopes', () => {
       .filter((entry) => entry.label.startsWith('single_'))
       .map((entry) => [entry.label.replace('single_', ''), entry.envelopeXdr] as const),
   )('names the %s operation in horizon snake case', (opType, xdr) => {
-    expect(decodeEnvelopeSummary(xdr).opTypes).toEqual([opType]);
+    expect(decodeEnvelopeSummary(xdr, Networks.PUBLIC).opTypes).toEqual([opType]);
   });
 });

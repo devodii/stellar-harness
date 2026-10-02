@@ -1,7 +1,6 @@
 import {
   type Asset,
   FeeBumpTransaction,
-  Networks,
   type OperationRecord,
   type Transaction,
   TransactionBuilder,
@@ -87,7 +86,7 @@ export const summarizeOperation = (
 
 export const decodeEnvelopeSummary = (
   envelopeXdr: string,
-  networkPassphrase: string = Networks.PUBLIC,
+  networkPassphrase: string,
 ): EnvelopeSummary => {
   const parsed = TransactionBuilder.fromXdr(envelopeXdr, networkPassphrase);
   const feeBump = parsed instanceof FeeBumpTransaction;
