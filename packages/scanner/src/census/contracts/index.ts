@@ -35,7 +35,6 @@ export type ContractsCensusDeps = {
   snapshot: Snapshot;
   stellarExpertUrl: string;
   stellarlightUrl: string;
-  ecosystemDirectory?: boolean;
   rpcConcurrency?: number;
   expertConcurrency?: number;
 };
@@ -70,13 +69,7 @@ export type ContractsCensusResult = {
     findings: number;
   };
   gaps: { source: string; error: AppError }[];
-  notes: string[];
 };
-
-export const SCF_SKIP_NOTE =
-  'Skipped the SCF join (stellarlight projects and repos): the ecosystem directory is mainnet only.';
-
-const NO_SCF_SOURCE = { rows: [], pages: 0, gap: null };
 
 export const runContractsCensus = async (
   deps: ContractsCensusDeps,
@@ -98,14 +91,8 @@ export const runContractsCensus = async (
     { snapshotLedger, ledgerCloseSeconds },
   );
 
-  const withScf = deps.ecosystemDirectory !== false;
-  const notes = withScf ? [] : [SCF_SKIP_NOTE];
-  const projects = withScf
-    ? await fetchScfProjects(deps.fetch, deps.stellarlightUrl)
-    : NO_SCF_SOURCE;
-  const repos = withScf
-    ? await fetchStellarlightRepos(deps.fetch, deps.stellarlightUrl)
-    : NO_SCF_SOURCE;
+  const projects = await fetchScfProjects(deps.fetch, deps.stellarlightUrl);
+  const repos = await fetchStellarlightRepos(deps.fetch, deps.stellarlightUrl);
   if (projects.gap) gaps.push({ source: 'stellarlight:projects', error: projects.gap });
   if (repos.gap) gaps.push({ source: 'stellarlight:repos', error: repos.gap });
   const scf = buildScfIndex(projects.rows, repos.rows);
@@ -153,6 +140,5 @@ export const runContractsCensus = async (
       findings: findings.length,
     },
     gaps,
-    notes,
   };
 };
