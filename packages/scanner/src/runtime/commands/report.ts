@@ -1,16 +1,7 @@
 import { writeFile } from 'node:fs/promises';
-import {
-  AnchorsSummary,
-  ContractsSummary,
-  emptySummary,
-  FailuresSummary,
-  FINDING_TYPES,
-  GithubSummary,
-  RentSummary,
-  Summary,
-} from '@harness/schema';
 import type { z } from 'zod';
 import { renderReport } from '../../report/render';
+import { AnchorsSummary, ContractsSummary, emptySummary, FailuresSummary, FINDING_TYPES, GithubSummary, RentSummary, Summary } from '../../schema';
 import { type CensusRecord, readCensusRecords, readPreviews } from '../artifacts';
 import type { ScanContext } from '../context';
 import { backfillMeaningfulCounts } from './meaningful-backfill';

@@ -1,4 +1,4 @@
-import { DEFAULT_NETWORK, type Network, type Snapshot } from '@harness/schema';
+import { DEFAULT_NETWORK, type Network } from '@harness/schema';
 import {
   type Cache,
   createClients,
@@ -25,6 +25,7 @@ import {
 } from '../core/findings';
 import { formatProgress, runTasks } from '../core/runner';
 import { createStateStore } from '../core/state';
+import type { Snapshot } from '../schema';
 import { type HorizonStatus, probeHorizon, unavailableHorizon } from './horizon';
 import { createPersistence, type ScanPersistence } from './persistence';
 

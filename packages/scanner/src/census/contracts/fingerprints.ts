@@ -1,5 +1,5 @@
-import type { FindingType, Severity } from '@harness/schema';
 import { fetchExpertContract } from '@harness/stellar-tools/contracts';
+import type { FindingType, Severity } from '../../schema';
 import type { Fetcher, FindingDraft, Run } from './ports';
 import { scfTags } from './scf';
 import type { ContractRow } from './schemas';

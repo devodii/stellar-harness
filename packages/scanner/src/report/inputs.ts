@@ -1,4 +1,4 @@
-import type { Summary } from '@harness/schema';
+import type { Summary } from '../schema';
 
 export type ExportPreview = {
   name: string;

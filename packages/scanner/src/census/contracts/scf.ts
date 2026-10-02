@@ -1,6 +1,7 @@
-import { type AppError, appError, type ScfProject } from '@harness/schema';
+import { type AppError, appError } from '@harness/schema';
 import { ContractId, getJson } from '@harness/stellar-tools/contracts';
 import { z } from 'zod';
+import type { ScfProject } from '../../schema';
 import type { Fetcher } from './ports';
 import type { ContractRow, ScfTag } from './schemas';
 

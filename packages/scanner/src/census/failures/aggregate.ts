@@ -1,4 +1,4 @@
-import { isPreventableCode } from '@harness/schema';
+import { isPreventableCode } from '../../schema';
 import type { FailedTx, FailedTxCodes, LedgerTotal } from './rows';
 
 const SUCCESS_CODES = new Set(['op_success', 'tx_success']);

@@ -1,4 +1,4 @@
-import { isPreventableCode } from '@harness/schema';
+import { isPreventableCode } from '../../schema';
 import type { FindingDraft } from './ports';
 
 export const FAILED_TX_BY_CODE_CSV = 'failed_tx_by_code.csv';

@@ -1,4 +1,4 @@
-import type { GithubSummary } from '@harness/schema';
+import type { GithubSummary } from '../../schema';
 import type { GithubIssueRow } from './census';
 
 export const RECENT_LIMIT = 20;

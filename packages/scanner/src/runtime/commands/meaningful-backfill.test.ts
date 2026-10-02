@@ -1,10 +1,10 @@
 import { mkdtemp, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { emptySummary } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
 import { CONTRACT_ROWS_DERIVED } from '../../census/contracts/index';
 import { contractRow, ttl } from '../../census/contracts/testing';
+import { emptySummary } from '../../schema';
 import { readPreviews } from '../artifacts';
 import { filePersistence } from '../persistence';
 import { backfillMeaningfulCounts, lacksMeaningfulCounts } from './meaningful-backfill';

@@ -1,5 +1,5 @@
-import type { AnchorsSummary } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
+import type { AnchorsSummary } from '../../schema';
 import { mergeCandidates } from './domains';
 import {
   ANCHORS_FAILING_COLUMNS,

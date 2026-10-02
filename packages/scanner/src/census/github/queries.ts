@@ -1,4 +1,4 @@
-import type { FindingType } from '@harness/schema';
+import type { FindingType } from '../../schema';
 
 export type IssueCategory = Extract<
   FindingType,
