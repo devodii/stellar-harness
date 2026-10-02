@@ -1,5 +1,10 @@
 import { appError, err, ok } from '@harness/schema';
-import { Networks, type Transaction, TransactionBuilder } from '@stellar/stellar-sdk';
+import {
+  Networks,
+  SorobanDataBuilder,
+  type Transaction,
+  TransactionBuilder,
+} from '@stellar/stellar-sdk';
 import { describe, expect, it } from 'vitest';
 import circle from '../core/__fixtures__/rpc-account-circle-testnet.json';
 import account from './__fixtures__/horizon-account-circle.json';
@@ -80,6 +85,29 @@ describe('simulateFootprint', () => {
     expect(unsigned.fee).toBe(String(491_604_076 + 100));
     expect(unsigned.signatures).toHaveLength(0);
     expect(rpc.calls.simulate).toHaveLength(1);
+  });
+
+  it('keeps the estimate when the resource fee overflows the transaction fee field', async () => {
+    const overflow = 9_690_000_000;
+    const rpc = fakeRpc({
+      simulate: () =>
+        ok({
+          ...extend365.result,
+          minResourceFee: String(overflow),
+          transactionData: new SorobanDataBuilder(extend365.result.transactionData)
+            .setResourceFee(overflow)
+            .build()
+            .toXDR('base64'),
+        }),
+    });
+    const result = await simulateFootprint(
+      rpc,
+      source,
+      [contractInstanceKey(ROUTER), contractCodeKey(ROUTER_WASM)],
+      { kind: 'extend', extendToLedgers: RECORDED_EXTEND_TO },
+    );
+    expect(result.ok && result.value.minResourceFeeStroops).toBe(overflow);
+    expect(result.ok && decode(result.value.unsignedXdr).fee).toBe('100');
   });
 
   it('builds a read write footprint for a restore', async () => {
