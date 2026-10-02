@@ -59,6 +59,10 @@ export type ClusterEvidence = {
   codes: Record<string, number>;
   sampleHashes: string[];
   accountFailures: number;
+  topDestination?: string;
+  asset?: string;
+  sampleAmount?: string;
+  topDestinationCount?: number;
 };
 
 export type ClusterCandidate = {
@@ -77,7 +81,10 @@ type RuleMatch = {
   ledgers: Map<number, number>;
   codes: Record<string, number>;
   sampleHashes: string[];
+  targets: Map<string, PaymentTarget>;
 };
+
+type PaymentTarget = { destination: string; asset?: string; amount?: string; count: number };
 
 type AccountState = AccountActivity & {
   failuresByLedger: Map<number, number>;
@@ -85,9 +92,30 @@ type AccountState = AccountActivity & {
 };
 
 const SAMPLE_HASHES = 3;
+const MAX_TRACKED_TARGETS = 1000;
 const INVOKE_HOST_FUNCTION = 'invoke_host_function';
 
 const bump = <K>(map: Map<K, number>, key: K) => map.set(key, (map.get(key) ?? 0) + 1);
+
+const trackTarget = (targets: Map<string, PaymentTarget>, row: FailedTx) => {
+  if (!row.payment) return;
+  const key = `${row.payment.destination}|${row.payment.asset ?? ''}`;
+  const existing = targets.get(key);
+  if (existing) existing.count += 1;
+  else if (targets.size < MAX_TRACKED_TARGETS) targets.set(key, { ...row.payment, count: 1 });
+};
+
+const topTarget = (targets: Map<string, PaymentTarget>) => {
+  let top: PaymentTarget | undefined;
+  for (const target of targets.values()) if (!top || target.count > top.count) top = target;
+  if (!top) return {};
+  return {
+    topDestination: top.destination,
+    topDestinationCount: top.count,
+    ...(top.asset ? { asset: top.asset } : {}),
+    ...(top.amount ? { sampleAmount: top.amount } : {}),
+  };
+};
 
 export class ClusterAccumulator {
   private readonly accounts = new Map<string, AccountState>();
@@ -127,6 +155,7 @@ export class ClusterAccumulator {
           ledgers: new Map<number, number>(),
           codes: {},
           sampleHashes: [],
+          targets: new Map<string, PaymentTarget>(),
         };
         match.count += 1;
         match.firstLedger = Math.min(match.firstLedger, row.ledger);
@@ -134,6 +163,7 @@ export class ClusterAccumulator {
         bump(match.ledgers, row.ledger);
         for (const code of matched) match.codes[code] = (match.codes[code] ?? 0) + 1;
         if (match.sampleHashes.length < SAMPLE_HASHES) match.sampleHashes.push(row.hash);
+        trackTarget(match.targets, row);
         state.matches.set(rule.type, match);
       }
     }
@@ -173,6 +203,7 @@ export class ClusterAccumulator {
             codes: { ...match.codes },
             sampleHashes: [...match.sampleHashes],
             accountFailures: state.failures,
+            ...topTarget(match.targets),
           },
         });
       }
