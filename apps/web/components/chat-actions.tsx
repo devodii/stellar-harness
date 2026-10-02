@@ -7,7 +7,7 @@ export interface ChatActions extends RenderContext {
   sendPrompt: (text: string) => void;
 }
 
-const NOOP_ACTIONS: ChatActions = { decisions: {}, sendPrompt: () => {} };
+const NOOP_ACTIONS: ChatActions = { sendPrompt: () => {} };
 
 const ChatActionsContext = React.createContext<ChatActions>(NOOP_ACTIONS);
 

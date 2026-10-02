@@ -55,25 +55,13 @@ const ASSISTANT: HarnessUIMessage = {
   ],
 };
 
-const APPROVAL: HarnessUIMessage = {
-  id: 'u2',
-  role: 'user',
-  parts: [
-    { type: 'text', text: 'Approve plan plan-1 (demo).' },
-    {
-      type: 'data-plan-approval',
-      data: { type: 'plan-approval', planId: 'plan-1', decision: 'approve' },
-    },
-  ],
-};
-
 const meta: Meta<typeof ChatMessage> = {
   component: ChatMessage,
   title: 'chat/ChatMessage',
   args: { message: ASSISTANT },
   decorators: [
     (Story) => (
-      <ChatActionsProvider value={{ decisions: {}, sendPrompt: fn() }}>
+      <ChatActionsProvider value={{ sendPrompt: fn() }}>
         <div className="max-w-3xl">
           <Story />
         </div>
@@ -88,8 +76,6 @@ type Story = StoryObj<typeof ChatMessage>;
 export const Assistant: Story = {};
 
 export const User: Story = { args: { message: USER } };
-
-export const PlanApproval: Story = { args: { message: APPROVAL } };
 
 export const Streaming: Story = {
   args: {

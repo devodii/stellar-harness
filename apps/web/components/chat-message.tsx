@@ -5,7 +5,6 @@ import { Attachment, AttachmentPreview, Attachments } from '@/components/ai-elem
 import { Message, MessageContent, MessageResponse } from '@/components/ai-elements/message';
 import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ai-elements/reasoning';
 import { Source, Sources, SourcesContent, SourcesTrigger } from '@/components/ai-elements/sources';
-import { BracketTag } from '@/components/bracket-tag';
 import { ContextChip } from '@/components/context-chip';
 import { SwipeToReply } from '@/components/swipe-to-reply';
 import { ToolCall } from '@/components/tool-call';
@@ -41,14 +40,6 @@ function MessagePart({
   }
   if (part.type === 'data-context') {
     return <ContextChip context={part.data} className="bg-background" />;
-  }
-  if (part.type === 'data-plan-approval') {
-    return (
-      <BracketTag
-        label={`${part.data.decision === 'approve' ? 'approved' : 'declined'} ${part.data.planId}`}
-        tone={part.data.decision === 'approve' ? 'success' : 'destructive'}
-      />
-    );
   }
   if (isToolUIPart(part)) return <ToolCall part={part} />;
   return null;

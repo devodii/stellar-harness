@@ -43,7 +43,7 @@ const meta: Meta<typeof ToolCall> = {
   args: { part: done },
   decorators: [
     (Story) => (
-      <ChatActionsProvider value={{ decisions: {}, sendPrompt: fn(), onDecide: fn() }}>
+      <ChatActionsProvider value={{ sendPrompt: fn() }}>
         <Story />
       </ChatActionsProvider>
     ),

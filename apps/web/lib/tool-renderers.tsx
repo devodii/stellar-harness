@@ -15,14 +15,10 @@ import { SimulationCostView } from '@/components/simulation-cost-view';
 import { SummaryView } from '@/components/summary-view';
 import { ToolErrorRow } from '@/components/tool-error-row';
 import { TransactionView } from '@/components/transaction-view';
-import type { PlanDecision } from './plan-approval';
 import { TOOL_VIEW_SCHEMAS, ToolEnvelope, type ToolViewName } from './tool-views';
 
 export interface RenderContext {
-  decisions: Record<string, PlanDecision>;
-  onDecide?: (planId: string, decision: PlanDecision) => void;
   onFinding?: (finding: Finding) => void;
-  busy?: boolean;
 }
 
 export interface ToolRenderer {

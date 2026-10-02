@@ -60,6 +60,24 @@ describe('conversations', () => {
     expect(sanitizeConversations([valid, { id: 1 }, 'junk'])).toEqual([valid]);
     expect(sanitizeConversations('not an array')).toEqual([]);
   });
+
+  it('strips data parts from retired message formats', () => {
+    const stored = {
+      ...newConversation('old'),
+      messages: [
+        {
+          id: 'u1',
+          role: 'user',
+          parts: [
+            { type: 'text', text: 'hello' },
+            { type: 'data-retired', data: {} },
+          ],
+        },
+      ],
+    };
+    const [conversation] = sanitizeConversations([stored]);
+    expect(conversation?.messages[0]?.parts).toEqual([{ type: 'text', text: 'hello' }]);
+  });
 });
 
 describe('compactImages', () => {

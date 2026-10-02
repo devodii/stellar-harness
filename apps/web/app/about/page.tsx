@@ -1,9 +1,9 @@
+import { ROADMAP_NOTE } from '@harness/schema';
 import type { Metadata } from 'next';
 import type * as React from 'react';
 import { Container } from '@/components/container';
 import { PageHeader } from '@/components/page-header';
 import { StatLabel } from '@/components/stat';
-import { APPROVAL_NOTE } from '@/lib/plan-approval';
 
 export const metadata: Metadata = { title: 'About · Stellar Harness' };
 
@@ -59,7 +59,7 @@ export default function AboutPage() {
           <li>Simulation results and unsigned XDR are shown for inspection only.</li>
           <li>No database: chats stay in this browser&apos;s local storage.</li>
         </ul>
-        <p className="font-mono text-xs text-muted-foreground">{APPROVAL_NOTE}</p>
+        <p className="font-mono text-xs text-muted-foreground">{ROADMAP_NOTE}</p>
       </Section>
     </Container>
   );
