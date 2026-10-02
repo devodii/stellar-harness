@@ -2,6 +2,7 @@
 
 import type * as React from 'react';
 import { AppSidebar } from '@/components/app-sidebar';
+import { ConnectSheetProvider } from '@/components/connect-sheet';
 import { LiveHeaderStrip } from '@/components/live-header-strip';
 import { NetworkTag } from '@/components/network-tag';
 import { TopBar } from '@/components/top-bar';
@@ -15,12 +16,14 @@ export interface AppShellProps {
 
 export function AppShell({ children, sidebar, strip }: AppShellProps) {
   return (
-    <SidebarProvider className="h-svh">
-      {sidebar ?? <AppSidebar />}
-      <SidebarInset className="min-h-0 min-w-0">
-        <TopBar strip={strip ?? <LiveHeaderStrip />} badge={<NetworkTag />} />
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</div>
-      </SidebarInset>
-    </SidebarProvider>
+    <ConnectSheetProvider>
+      <SidebarProvider className="h-svh">
+        {sidebar ?? <AppSidebar />}
+        <SidebarInset className="min-h-0 min-w-0">
+          <TopBar strip={strip ?? <LiveHeaderStrip />} badge={<NetworkTag />} />
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</div>
+        </SidebarInset>
+      </SidebarProvider>
+    </ConnectSheetProvider>
   );
 }

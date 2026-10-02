@@ -1,6 +1,9 @@
+import { ok } from '@harness/schema';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { expect, fn, userEvent, within } from 'storybook/test';
 import { formatPercent, formatSeconds } from '@/lib/format';
 import { BracketTag } from './bracket-tag';
+import { ConnectSheetProvider } from './connect-sheet';
 import { LiveStrip } from './live-strip';
 import { ThemeProvider } from './theme-provider';
 import { TopBar } from './top-bar';
@@ -25,11 +28,13 @@ const meta: Meta<typeof TopBar> = {
   decorators: [
     (Story) => (
       <ThemeProvider attribute="class">
-        <SidebarProvider className="min-h-0">
-          <div className="w-full">
-            <Story />
-          </div>
-        </SidebarProvider>
+        <ConnectSheetProvider requestPilot={fn(async () => ok({ count: 3 }))}>
+          <SidebarProvider className="min-h-0">
+            <div className="w-full">
+              <Story />
+            </div>
+          </SidebarProvider>
+        </ConnectSheetProvider>
       </ThemeProvider>
     ),
   ],
@@ -44,4 +49,12 @@ export const Empty: Story = { args: { strip: undefined } };
 
 export const OnTestnet: Story = {
   args: { badge: <BracketTag label="testnet" tone="warning" /> },
+};
+
+export const OpensConnectSheet: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'connect organisation' }));
+    await expect(await within(document.body).findByText('Connect your organisation')).toBeVisible();
+  },
 };
