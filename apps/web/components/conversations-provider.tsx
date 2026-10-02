@@ -6,6 +6,7 @@ import { useMounted } from '@/hooks/use-mounted';
 import {
   CONVERSATIONS_KEY,
   type Conversation,
+  compactImages,
   removeConversation,
   sanitizeConversations,
   upsertConversation,
@@ -31,7 +32,7 @@ export function ConversationsProvider({ children }: { children: React.ReactNode 
   const commit = React.useCallback(
     (next: Conversation[]) => {
       latest.current = next;
-      setStored(next);
+      setStored(compactImages(next));
     },
     [setStored],
   );
