@@ -148,3 +148,5 @@ Every call made without explicit direction is tagged `@decision` so it can be re
 - `@decision` With `DATABASE_URL` set, the scanner reads and writes snapshots, findings, derived rows, previews, run records and the HTTP cache in Postgres; checkpoints and CSV exports stay on disk. A mainnet report rebuilt from Postgres matches the file-based report.
 
 - `@decision` The chat model comes from a provider registry (`AI_PROVIDER` = `openai` or `anthropic`, default `openai`; `AI_MODEL` overrides the default `gpt-5.5` or `claude-sonnet-5`). Only the selected provider's key is required.
+
+- `@decision` The chat uses OpenAI only (`gpt-5.5`, `apps/web/lib/model.ts`); the Anthropic provider and the `AI_PROVIDER`/`AI_MODEL` switches were removed to keep configuration minimal. The web app loads the repository root `.env` through `@next/env`, so one env file serves the scanner and the web app.
