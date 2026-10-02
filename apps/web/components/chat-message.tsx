@@ -1,6 +1,7 @@
 'use client';
 
-import { isToolUIPart } from 'ai';
+import { type FileUIPart, isToolUIPart } from 'ai';
+import { Attachment, AttachmentPreview, Attachments } from '@/components/ai-elements/attachments';
 import { Message, MessageContent, MessageResponse } from '@/components/ai-elements/message';
 import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ai-elements/reasoning';
 import { Source, Sources, SourcesContent, SourcesTrigger } from '@/components/ai-elements/sources';
@@ -9,6 +10,8 @@ import { ContextChip } from '@/components/context-chip';
 import { SwipeToReply } from '@/components/swipe-to-reply';
 import { ToolCall } from '@/components/tool-call';
 import type { HarnessPart, HarnessUIMessage } from '@/lib/chat';
+
+const imageKey = (image: FileUIPart) => `${image.filename ?? 'image'}-${image.url.slice(-32)}`;
 
 export interface ChatMessageProps {
   message: HarnessUIMessage;
@@ -53,9 +56,15 @@ function MessagePart({
 
 export function ChatMessage({ message, streaming = false, onReply }: ChatMessageProps) {
   const sources = message.parts.filter((part) => part.type === 'source-url');
+  const images = message.parts.filter(
+    (part): part is FileUIPart => part.type === 'file' && part.mediaType.startsWith('image/'),
+  );
   const parts = message.parts
     .map((part, index) => ({ part, key: `${message.id}-${index}` }))
-    .filter(({ part }) => part.type !== 'source-url' && part.type !== 'step-start');
+    .filter(
+      ({ part }) =>
+        part.type !== 'source-url' && part.type !== 'step-start' && part.type !== 'file',
+    );
 
   const body = (
     <Message
@@ -65,6 +74,15 @@ export function ChatMessage({ message, streaming = false, onReply }: ChatMessage
       <MessageContent
         className={message.role === 'user' ? 'gap-3 group-[.is-user]:bg-muted' : 'w-full gap-3'}
       >
+        {images.length > 0 && (
+          <Attachments variant="grid" className="ml-0">
+            {images.map((image) => (
+              <Attachment key={imageKey(image)} data={{ ...image, id: imageKey(image) }}>
+                <AttachmentPreview />
+              </Attachment>
+            ))}
+          </Attachments>
+        )}
         {parts.map(({ part, key }, position) => (
           <MessagePart
             key={key}
