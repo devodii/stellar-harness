@@ -16,7 +16,7 @@ Resume here: read this file and `DECISIONS.md` first.
 
 ## Deleted in patch 02
 
-- Web features: the findings explorer and drawer, `/about`, the live strip, the chat list and local storage history, plans and handoffs, the connect sheet, the theme toggle and dark theme, the network picker, image attachments, and every component that only served them (timeline, data table, swipe to reply, json view, page header, stat tiles and the rest).
+- Web features: the findings explorer and drawer, `/about`, the live strip, the chat list and local storage history, plans and handoffs, the connect sheet, the network picker, image attachments, and every component that only served them (timeline, data table, swipe to reply, json view, page header, stat tiles and the rest).
 - API routes: `findings`, `summary`, `live`, `network`, `waitlist`.
 - Tools: `getTransaction`, `explainFailure`, `queryFindings`, `getSummary`, `searchEcosystem`, `planFix`, `getNetworkStatus`, and the old `stellar-tools` internals (now owned by the scanner).
 - Schema and storage: findings, summaries, snapshots, plans, JSON file and SQLite storage, the old Postgres findings store and its import scripts.
@@ -24,7 +24,7 @@ Resume here: read this file and `DECISIONS.md` first.
 
 ## Kept
 
-The engineering kit stays: `apiHandler` with validation, rate limits and error masking on every route; the validated env loader; the pino logger; `fetchJson` and `Result` on the client; `memo` and `ttlCache`; the core shadcn primitives (select, input, button, checkbox, dialog, sheet, drawer, tooltip, popover, command and the rest); the RHF and Zod form fields with `useZodForm`; the responsive sheet; the AI Elements the chat uses; Storybook with a story for every component.
+The engineering kit stays: `apiHandler` with validation, rate limits and error masking on every route; the validated env loader; the pino logger; `fetchJson` and `Result` on the client; `memo` and `ttlCache`; the core shadcn primitives (select, input, button, checkbox, dialog, sheet, drawer, tooltip, popover, command and the rest); the RHF and Zod form fields with `useZodForm`; the responsive sheet; the AI Elements the chat uses; Storybook with a story for every component; the light and dark themes with the toggle.
 
 ## The screen
 
@@ -37,7 +37,7 @@ apps/web/app/api/pilot/route.ts               stores a pilot request in Postgres
 apps/web/lib/harness.ts                       server singletons and cached live reads for the watched panel
 apps/web/lib/db.ts                            Postgres client, migrated on first use
 apps/web/lib/pilot.ts                         client call for a pilot request, returning a Result
-apps/web/components/header.tsx                wordmark, organisation and network, policy hint, pilot sheet
+apps/web/components/header.tsx                wordmark, organisation and network, policy hint, pilot sheet, theme toggle
 apps/web/components/watch-panel.tsx           accounts, contracts, anchor and proposed actions
 apps/web/components/action-card.tsx           a proposed action with disabled execute and approve
 apps/web/components/chat.tsx                  suggestions, messages and the composer
