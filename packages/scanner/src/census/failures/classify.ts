@@ -1,4 +1,5 @@
-import { formatStroops, reserveShortfallStroops } from '@harness/stellar-tools';
+import { formatStroops } from '../../core/amount';
+import { reserveShortfallStroops } from '../../core/reserve';
 import type { AccountActivity } from './clusters';
 import type { HorizonAccount, HorizonPort, Runner } from './ports';
 

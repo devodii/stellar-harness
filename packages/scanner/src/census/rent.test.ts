@@ -1,5 +1,4 @@
 import { NETWORK_PROFILES, ok } from '@harness/schema';
-import { decodeEnvelopeSummary } from '@harness/stellar-tools';
 import {
   DEFAULT_SIMULATION_SOURCE,
   type HorizonAccount,
@@ -7,6 +6,7 @@ import {
 } from '@harness/stellar-tools/contracts';
 import { fakeFetcher, fakeHorizon, fakeRpc } from '@harness/stellar-tools/contracts/testing';
 import { describe, expect, it } from 'vitest';
+import { decodeEnvelopeSummary } from '../decode';
 import coingecko from './__fixtures__/coingecko-xlm-usd.json';
 import simulation from './__fixtures__/rpc-simulate-extend-365d.json';
 import { contractRow, memorySinks, sequentialRun, ttl } from './contracts/testing';
