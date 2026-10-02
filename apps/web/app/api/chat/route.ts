@@ -1,20 +1,44 @@
-import { openai } from '@ai-sdk/openai';
+import { createOpenAI } from '@ai-sdk/openai';
 import { SYSTEM_PROMPT } from '@harness/agent';
+import { appError } from '@harness/schema';
 import { convertToModelMessages, stepCountIs, streamText, type UIMessage } from 'ai';
+import { z } from 'zod';
+import { apiHandler } from '@/lib/api-handler';
+import { getChatEnv } from '@/lib/env';
 import { tools } from '@/lib/harness';
+import { logger } from '@/lib/log';
 
+export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-export async function POST(request: Request) {
-  const { messages }: { messages: UIMessage[] } = await request.json();
-  const result = streamText({
-    model: openai(process.env.OPENAI_MODEL ?? 'gpt-4.1'),
-    instructions: SYSTEM_PROMPT,
-    messages: await convertToModelMessages(messages, { tools }),
-    tools,
-    stopWhen: stepCountIs(8),
-  });
-  return result.toUIMessageStreamResponse({
-    onError: (error) => (error instanceof Error ? error.message : 'The agent failed.'),
-  });
-}
+const ChatBody = z.object({ messages: z.array(z.custom<UIMessage>()).min(1) });
+
+const loadChatEnv = () => {
+  try {
+    return getChatEnv();
+  } catch (error) {
+    throw appError('INTERNAL', error instanceof Error ? error.message : 'Chat is not configured');
+  }
+};
+
+export const POST = apiHandler({
+  name: 'chat.stream',
+  schema: { body: ChatBody },
+  rateLimit: { limit: 30, windowSeconds: 60 },
+  handler: async ({ body, requestId }) => {
+    const env = loadChatEnv();
+    const result = streamText({
+      model: createOpenAI({ apiKey: env.OPENAI_API_KEY })(env.OPENAI_MODEL),
+      instructions: SYSTEM_PROMPT,
+      messages: await convertToModelMessages(body.messages, { tools }),
+      tools,
+      stopWhen: stepCountIs(8),
+    });
+    return result.toUIMessageStreamResponse({
+      onError: (error) => {
+        logger.error({ requestId, error }, 'chat stream failed');
+        return error instanceof Error ? error.message : 'The agent stream failed.';
+      },
+    });
+  },
+});
