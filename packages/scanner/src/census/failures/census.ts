@@ -1,4 +1,11 @@
-import { appError, err, ok, type Result, type Snapshot } from '@harness/schema';
+import {
+  appError,
+  err,
+  type FailuresSummary,
+  ok,
+  type Result,
+  type Snapshot,
+} from '@harness/schema';
 import { type FailureAggregate, FailureAggregator } from './aggregate';
 import { DEFAULT_CHUNK_LEDGERS, type LedgerChunk, planChunks, scanChunk } from './chunks';
 import { type ClassificationGap, classifyAccounts } from './classify';
@@ -23,6 +30,7 @@ import {
   resumeStateFor,
 } from './progress';
 import { DERIVED_FAILED_TX, DERIVED_LEDGER_TOTALS, FailedTx, LedgerTotal } from './rows';
+import { summarizeAggregate } from './summary';
 import {
   DEFAULT_FAILURE_WINDOW,
   type FailureWindow,
@@ -83,6 +91,7 @@ export type FailuresCensusResult = {
   window: FailureWindow;
   checkpoint: FailuresCheckpoint;
   aggregate: FailureAggregate;
+  summary: FailuresSummary;
   findings: FindingDraft[];
   stats: FailuresCensusStats;
   gaps: {
@@ -258,6 +267,7 @@ export const runFailuresCensus = async (
     window,
     checkpoint: checkpointState(),
     aggregate,
+    summary: summarizeAggregate(aggregate, window, findings),
     findings,
     stats: {
       ledgers: aggregate.ledgersScanned,

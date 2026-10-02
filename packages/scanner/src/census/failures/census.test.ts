@@ -92,6 +92,11 @@ describe('runFailuresCensus', () => {
       preventable: { total: 37, byCode: { tx_bad_seq: 26, op_no_trust: 11 } },
       other: { total: 1 },
     });
+    expect(value.summary).toMatchObject({
+      windowEnd: '2026-10-02T00:00:00.000Z',
+      ledgersScanned: 100,
+      clusters: { count: 2, anchorDistribution: 0, domains: [] },
+    });
     expect(value.stats).toMatchObject({
       ledgers: 100,
       tx: 238,
