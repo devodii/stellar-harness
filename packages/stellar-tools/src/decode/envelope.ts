@@ -25,7 +25,7 @@ const memoValue = (memo: Transaction['memo']): string | null => {
   const value = memo.value;
   if (value === null || value === undefined) return null;
   if (typeof value === 'string') return value;
-  return Buffer.from(value).toString('base64');
+  return Buffer.from(value).toString(memo.type === 'text' ? 'utf8' : 'base64');
 };
 
 const timeBoundsOf = (tx: Transaction): TimeBounds | null => {
