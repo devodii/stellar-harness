@@ -8,7 +8,8 @@
     "./contracts": "./src/contracts/index.ts",
     "./contracts/testing": "./src/contracts/fakes.ts",
     "./ports": "./src/ports.ts",
-    "./anchors": "./src/anchors/index.ts"
+    "./anchors": "./src/anchors/index.ts",
+    "./anchors/testing": "./src/anchors/testing.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
