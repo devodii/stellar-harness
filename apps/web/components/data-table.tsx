@@ -107,7 +107,7 @@ export function DataTable<TData, TValue>({
       ) : rows.length === 0 ? (
         emptyState
       ) : (
-        <div className="overflow-x-auto rounded-md border border-border">
+        <div className="overflow-x-auto border-y border-border">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((group) => (
@@ -220,7 +220,7 @@ const slots = (count: number, prefix: string) =>
 
 function DataTableSkeleton({ columnCount, rowCount }: { columnCount: number; rowCount: number }) {
   return (
-    <div className="space-y-2 rounded-md border border-border p-3">
+    <div className="space-y-3 border-y border-border py-3">
       {slots(rowCount, 'row-').map((r) => (
         <div key={r.id} className="flex gap-3">
           {slots(columnCount, 'col-').map((c) => (
