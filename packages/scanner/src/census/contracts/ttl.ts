@@ -1,9 +1,4 @@
-import {
-  classifyTtl,
-  codeKeyXdr,
-  instanceKeyXdr,
-  type TtlClock,
-} from '../../stellar/contracts';
+import { classifyTtl, codeKeyXdr, instanceKeyXdr, type TtlClock } from '../../stellar/contracts';
 import type { LedgerEntryResult, RpcPort, Run } from './ports';
 import type { ContractRow } from './schemas';
 
