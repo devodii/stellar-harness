@@ -355,7 +355,7 @@
     "expected": {
       "result": {
         "tx": "tx_failed",
-        "ops": ["op_trapped"],
+        "ops": ["function_trapped"],
         "feeBump": true,
         "feeCharged": "13856"
       },
@@ -387,7 +387,7 @@
     "expected": {
       "result": {
         "tx": "tx_failed",
-        "ops": ["op_resource_limit_exceeded"],
+        "ops": ["resource_limit_exceeded"],
         "feeBump": true,
         "feeCharged": "31291"
       },

@@ -38,7 +38,7 @@ describe('FailureAggregator', () => {
       failedRow({ ledger: 100, codes: ['tx_failed', 'op_underfunded', 'op_underfunded'] }),
       failedRow({ ledger: 100, codes: ['tx_failed', 'op_over_source_max'] }),
       failedRow({ ledger: 100, codes: ['tx_bad_seq'] }),
-      failedRow({ ledger: 101, codes: ['tx_failed', 'op_no_trust', 'op_trapped'] }),
+      failedRow({ ledger: 101, codes: ['tx_failed', 'op_no_trust', 'function_trapped'] }),
     ]);
 
     expect(aggregator.result()).toEqual({
@@ -52,7 +52,7 @@ describe('FailureAggregator', () => {
         op_over_source_max: 1,
         tx_bad_seq: 1,
         op_no_trust: 1,
-        op_trapped: 1,
+        function_trapped: 1,
       },
       preventable: { total: 3, byCode: { op_underfunded: 1, tx_bad_seq: 1, op_no_trust: 1 } },
       other: { total: 1 },
