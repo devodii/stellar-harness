@@ -8,6 +8,24 @@ import { formatDecimal } from '@/lib/format';
 export const COMING_SOON =
   "coming soon · execution runs under the organisation's smart-account policy via Stellar Wallets Kit agent mode";
 
+const AGENT_MODE_ISSUE = 'https://github.com/Creit-Tech/Stellar-Wallets-Kit/issues/111';
+
+function ComingSoon() {
+  return (
+    <span className="font-mono">
+      coming soon · execution runs under the organisation&apos;s smart-account policy via{' '}
+      <a
+        href={AGENT_MODE_ISSUE}
+        target="_blank"
+        rel="noreferrer"
+        className="underline underline-offset-2"
+      >
+        Stellar Wallets Kit agent mode
+      </a>
+    </span>
+  );
+}
+
 const policyLabel = (action: Action): string =>
   action.withinPolicy ? 'within policy' : 'needs approval';
 
@@ -18,7 +36,7 @@ const costLabel = (action: Action): string =>
 
 function ActionButtons() {
   return (
-    <Hint hint={<span className="font-mono">{COMING_SOON}</span>}>
+    <Hint hint={<ComingSoon />}>
       <span className="inline-flex gap-2">
         <Button size="xs" disabled>
           Execute
