@@ -1,0 +1,24 @@
+services:
+  scanner:
+    build:
+      context: .
+      dockerfile: Dockerfile.scanner
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./data:/app/data
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      HARNESS_DATA_DIR: /app/data
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./data:/app/data:ro
