@@ -68,8 +68,8 @@ describe('computeAnchorsSummary', () => {
         requestedSeps: [1, 10],
         ranSeps: [1, 10],
         perSep: {
-          '1': { passed: 5, failed: 0, skipped: 0, names: [] },
-          '10': { passed: 8, failed: 1, skipped: 0, names: ['x'] },
+          '1': { passed: 5, failed: 0, skipped: 0, blocked: 0, names: [] },
+          '10': { passed: 8, failed: 1, skipped: 0, blocked: 0, names: ['x'] },
         },
         excludedSeps: [],
         excludedTests: [],
