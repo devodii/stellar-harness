@@ -10,14 +10,13 @@ const badSeq = makeFinding('TX_BAD_SEQ_CLUSTER', { tags: ['channel_pattern'] });
 const anchor = makeFinding('ANCHOR_TOML_UNREACHABLE', { severity: 'critical', tags: ['anchor'] });
 
 const seeded = () => new MemoryStorage({ findings: [archived, badSeq, anchor] });
-const policy = { spendCapXlm: 5 };
 
 describe('planFix tool', () => {
   it('plans a stored finding', async () => {
     const result = await invokeTool(
       planFix,
       { findingId: archived.findingId },
-      { storage: seeded(), policy },
+      { storage: seeded() },
     );
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -26,16 +25,12 @@ describe('planFix tool', () => {
   });
 
   it('returns NOT_FOUND for an unknown finding', async () => {
-    const result = await invokeTool(
-      planFix,
-      { findingId: 'f'.repeat(64) },
-      { storage: seeded(), policy },
-    );
+    const result = await invokeTool(planFix, { findingId: 'f'.repeat(64) }, { storage: seeded() });
     expect(result).toMatchObject({ ok: false, error: { code: 'NOT_FOUND' } });
   });
 
   it('rejects a malformed finding id', async () => {
-    const result = await invokeTool(planFix, { findingId: 'abc' }, { storage: seeded(), policy });
+    const result = await invokeTool(planFix, { findingId: 'abc' }, { storage: seeded() });
     expect(result).toMatchObject({ ok: false, error: { code: 'INVALID_INPUT' } });
   });
 });

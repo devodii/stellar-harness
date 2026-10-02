@@ -20,11 +20,11 @@ export const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   searchEcosystem:
     'Search Stellar ecosystem projects and repositories (stellarlight.xyz, mainnet only). In the product, Raven (the SDF MCP server) is the fuller knowledge gateway and would be wired here.',
   simulateExtendTtl:
-    'Simulate extending a contract instance and code TTL by N days. Returns the resource fee, estimated XLM and unsigned XDR for display. Nothing is submitted.',
+    'Simulate extending a contract instance and code TTL by N days. Returns the operation in plain language, the resource fee, estimated XLM and footprint. Nothing is signed or sent.',
   simulateRestore:
-    'Simulate restoring an archived contract instance or code. Returns the resource fee, estimated XLM and unsigned XDR for display. Nothing is submitted.',
+    'Simulate restoring an archived contract instance or code. Returns the operation in plain language, the resource fee, estimated XLM and footprint. Nothing is signed or sent.',
   buildPaymentPreflight:
     'Pre-flight a payment: check accounts, trustlines, authorization, balance, reserve and limits. Returns blockers with fixes and an alternative plan when blocked.',
   planFix:
-    'Build a step by step fix plan for a finding, naming the tools and arguments for each step, with the policy boundary when approval is required.',
+    'Build a step by step fix plan for a finding: read and simulate steps with their tools and arguments, ending in a handoff that names who holds the authority to act and what it would cost.',
 };
