@@ -202,9 +202,14 @@ const renderAppendix = (exports: readonly ExportPreview[]): string =>
     exports.map((preview) => `- [\`${preview.path}\`](${preview.path})`).join('\n'),
   );
 
+export const reportTitle = ({ snapshot }: Summary): string =>
+  snapshot.network === 'mainnet'
+    ? 'Stellar Harness report'
+    : `Stellar Harness report (${snapshot.network})`;
+
 export const renderReport = (inputs: ReportInputs): string =>
   sections(
-    heading(1, 'Stellar Harness report'),
+    heading(1, reportTitle(inputs.summary)),
     renderSnapshot(inputs.summary),
     renderHeadline(inputs.summary),
     renderFailures(inputs.summary, inputs.exports),
