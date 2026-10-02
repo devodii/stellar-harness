@@ -1,22 +1,21 @@
-import { MemoryStorage } from '@harness/storage';
 import { describe, expect, it } from 'vitest';
 import { APPROVAL_NOTE, createAgentTools, planProtocol, systemPrompt } from './index';
+import { createTestContext } from './testing';
 
 describe('@harness/agent', () => {
   it('exports the agent surface', () => {
     expect(typeof systemPrompt).toBe('string');
     expect(APPROVAL_NOTE).toContain('passkey signature');
-    const tools = createAgentTools({
-      storage: new MemoryStorage(),
-      policy: { spendCapXlm: 5 },
-      stellarlight: { get: async () => ({}) },
-    });
+    const tools = createAgentTools(createTestContext());
     expect(Object.keys(tools).sort()).toEqual([
       'explainFailure',
+      'getContractTtl',
       'getSummary',
       'planFix',
       'queryFindings',
       'searchEcosystem',
+      'simulateExtendTtl',
+      'simulateRestore',
     ]);
   });
 

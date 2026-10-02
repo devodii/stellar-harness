@@ -5,6 +5,7 @@ import { MemoryStorage } from '@harness/storage';
 import { generateText, stepCountIs } from 'ai';
 import { MockLanguageModelV4 } from 'ai/test';
 import { describe, expect, it } from 'vitest';
+import { createTestContext } from './testing';
 import { createAgentTools, type ToolEnvelope } from './tools';
 
 const finding: Finding = {
@@ -20,11 +21,7 @@ const finding: Finding = {
   tags: ['scf_funded'],
 };
 
-const ctx = {
-  storage: new MemoryStorage({ findings: [finding] }),
-  policy: { spendCapXlm: 5 },
-  stellarlight: { get: async () => ({}) },
-};
+const ctx = createTestContext({ storage: new MemoryStorage({ findings: [finding] }) });
 const options = { toolCallId: 'call_1', messages: [], context: {} };
 
 describe('createAgentTools', () => {
