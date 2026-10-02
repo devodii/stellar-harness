@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import { Instrument_Serif, Outfit } from 'next/font/google';
 import type * as React from 'react';
+import { AppShell } from '@/components/app-shell';
+import { ConversationsProvider } from '@/components/conversations-provider';
+import { Providers } from '@/components/providers';
 import './globals.css';
 
 const outfit = Outfit({ variable: '--font-outfit', subsets: ['latin'] });
@@ -13,7 +16,7 @@ const instrumentSerif = Instrument_Serif({
 
 export const metadata: Metadata = {
   title: 'Stellar Harness',
-  description: 'An operator harness for Stellar mainnet.',
+  description: 'An operator harness for Stellar mainnet: detect, plan and simulate. Read-only.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -23,7 +26,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${outfit.variable} ${instrumentSerif.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="h-full font-sans">
+        <Providers>
+          <ConversationsProvider>
+            <AppShell>{children}</AppShell>
+          </ConversationsProvider>
+        </Providers>
+      </body>
     </html>
   );
 }
