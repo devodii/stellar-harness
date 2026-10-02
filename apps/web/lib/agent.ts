@@ -1,14 +1,11 @@
 import 'server-only';
-import {
-  createAgentContext,
-  createAgentTools,
-  createLiveClients,
-  systemPrompt,
-} from '@harness/agent';
+
+export { systemPromptFor } from '@harness/agent';
+
+import { createAgentContext, createAgentTools, createLiveClients } from '@harness/agent';
 import type { Network } from '@harness/schema';
 import { loadNetworkConfig, readPolicy } from '@harness/stellar-tools';
 import { memoBy } from './memo';
-import { withNetworkContext } from './network-prompt';
 import { getStorage } from './storage';
 
 export const getNetworkConfig = memoBy((network: Network) =>
@@ -28,6 +25,3 @@ export const getAgentTools = memoBy((network: Network) =>
     }),
   ),
 );
-
-export const systemPromptFor = (network: Network): string =>
-  withNetworkContext(systemPrompt, network);

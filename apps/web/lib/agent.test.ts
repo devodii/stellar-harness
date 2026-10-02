@@ -22,6 +22,6 @@ describe('per-network agent wiring', () => {
   });
 
   it('tells the model which network it is on', () => {
-    expect(systemPromptFor('testnet')).toContain('Network: testnet.');
+    expect(systemPromptFor('testnet')).toContain('Every tool reads Stellar testnet.');
   });
 });
