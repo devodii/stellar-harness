@@ -6,6 +6,9 @@ import {
   contextFromFinding,
   contextToModelText,
   EVIDENCE_BUDGET,
+  excerptOf,
+  REPLY_EXCERPT_LENGTH,
+  replyContext,
 } from './chat-context';
 
 const finding = (evidence: Record<string, unknown> = { daysLeft: 12 }): Finding => ({
@@ -50,5 +53,22 @@ describe('chat context', () => {
     const text = dataPartToModelText({ type: 'data-context', data: context });
     expect(text?.text).toBe(contextToModelText(context));
     expect(text?.text).toContain(`findingId ${'f'.repeat(64)}`);
+  });
+
+  it('quotes a plain excerpt of the replied message', () => {
+    const reply = replyContext('m1', '## Plan\n**Extend** the `TTL` now.\n\n```ts\ncode\n```');
+    expect(reply).toEqual({ kind: 'reply', messageId: 'm1', excerpt: 'Plan Extend the TTL now.' });
+    expect(contextToModelText(reply)).toContain('> Plan Extend the TTL now.');
+  });
+
+  it('caps long excerpts', () => {
+    const excerpt = excerptOf('word '.repeat(200));
+    expect(excerpt.length).toBeLessThanOrEqual(REPLY_EXCERPT_LENGTH + 1);
+    expect(excerpt.endsWith('…')).toBe(true);
+  });
+
+  it('dedupes replies to the same message', () => {
+    const reply = replyContext('m1', 'text');
+    expect(addContext([reply], replyContext('m1', 'text'))).toHaveLength(1);
   });
 });
