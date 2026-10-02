@@ -37,6 +37,17 @@ export const Critical: Story = {
   args: { context: { ...finding, type: 'CONTRACT_INSTANCE_ARCHIVED', severity: 'critical' } },
 };
 
+const reply: ChatContext = {
+  kind: 'reply',
+  messageId: 'm1',
+  excerpt:
+    'The instance expires in 12 days. Extending it to 12 months costs about 49.16 XLM in resource fees; the plan below needs approval because it submits.',
+};
+
+export const Reply: Story = { args: { context: reply } };
+
+export const ReplyRemovable: Story = { args: { context: reply, onRemove: fn() } };
+
 export const List: StoryObj<typeof ContextChipList> = {
   render: () => (
     <div className="max-w-md">
