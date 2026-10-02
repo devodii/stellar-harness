@@ -20,7 +20,11 @@ const finding: Finding = {
   tags: ['scf_funded'],
 };
 
-const ctx = { storage: new MemoryStorage({ findings: [finding] }), policy: { spendCapXlm: 5 } };
+const ctx = {
+  storage: new MemoryStorage({ findings: [finding] }),
+  policy: { spendCapXlm: 5 },
+  stellarlight: { get: async () => ({}) },
+};
 const options = { toolCallId: 'call_1', messages: [], context: {} };
 
 describe('createAgentTools', () => {

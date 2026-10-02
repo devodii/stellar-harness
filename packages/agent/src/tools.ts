@@ -7,7 +7,9 @@ import {
   type PolicyContext,
   planFix,
   queryFindings,
+  type StellarlightContext,
   type StorageContext,
+  searchEcosystem,
   type ToolDefinition,
 } from '@harness/stellar-tools';
 import {
@@ -45,13 +47,14 @@ export const toAiTool = <TInput extends z.ZodType, TOutput extends z.ZodType, TC
     },
   });
 
-export type AgentToolContext = StorageContext & PolicyContext & DecodeContext;
+export type AgentToolContext = StorageContext & PolicyContext & DecodeContext & StellarlightContext;
 
 export const createAgentTools = <TContext extends AgentToolContext>(ctx: TContext) => ({
   planFix: toAiTool(planFix, ctx),
   queryFindings: toAiTool(queryFindings, ctx),
   getSummary: toAiTool(getSummary, ctx),
   explainFailure: toAiTool(explainFailure, ctx),
+  searchEcosystem: toAiTool(searchEcosystem, ctx),
 });
 
 export type AgentTools = ReturnType<typeof createAgentTools>;
