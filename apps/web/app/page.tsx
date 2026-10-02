@@ -1,3 +1,10 @@
+import { Suspense } from 'react';
+import { ChatPage } from '@/components/chat-page';
+
 export default function Page() {
-  return <main>Stellar Harness</main>;
+  return (
+    <Suspense>
+      <ChatPage />
+    </Suspense>
+  );
 }
