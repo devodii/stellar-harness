@@ -70,7 +70,7 @@ export function PlanView({ plan, decision, onDecide, disabled, className }: Plan
       <PlanHeader className="px-3">
         <div className="min-w-0 space-y-1">
           <PlanTitle className="text-sm">{plan.title}</PlanTitle>
-          <PlanDescription className="font-mono text-xs">{plan.subject}</PlanDescription>
+          <PlanDescription className="font-mono text-xs break-all">{plan.subject}</PlanDescription>
         </div>
         <PlanAction className="flex items-center gap-2">
           <BracketTag label={state.replace('_', ' ')} tone={STATE_TONE[state]} />
