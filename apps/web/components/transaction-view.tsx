@@ -4,8 +4,8 @@ import { KeyValueList } from '@/components/key-value-list';
 import { ResultCard } from '@/components/result-card';
 import { ResultCodes } from '@/components/result-codes';
 import { StatLabel } from '@/components/stat';
+import { useExplorer } from '@/hooks/use-explorer';
 import { formatDateTime, formatInt } from '@/lib/format';
-import { explorerUrl } from '@/lib/links';
 import type { TransactionView as TransactionViewData } from '@/lib/tool-views';
 
 const timeboundsText = (timebounds: TransactionViewData['timebounds']): string => {
@@ -16,6 +16,7 @@ const timeboundsText = (timebounds: TransactionViewData['timebounds']): string =
 };
 
 export function TransactionView({ transaction }: { transaction: TransactionViewData }) {
+  const { explorerUrl } = useExplorer();
   return (
     <ResultCard
       title={
