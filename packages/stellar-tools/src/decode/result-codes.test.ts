@@ -77,12 +77,14 @@ describe('decodeResultCodes with real mainnet samples', () => {
   });
 
   it('maps soroban host function failures', () => {
-    expect(decodeResultCodes(sample('op_trapped').resultXdr).ops).toContain('op_trapped');
-    expect(decodeResultCodes(sample('code:op_entry_archived').resultXdr).ops).toEqual([
-      'op_entry_archived',
+    expect(decodeResultCodes(sample('function_trapped').resultXdr).ops).toContain(
+      'function_trapped',
+    );
+    expect(decodeResultCodes(sample('code:entry_archived').resultXdr).ops).toEqual([
+      'entry_archived',
     ]);
-    expect(decodeResultCodes(sample('code:op_resource_limit_exceeded').resultXdr).ops).toEqual([
-      'op_resource_limit_exceeded',
+    expect(decodeResultCodes(sample('code:resource_limit_exceeded').resultXdr).ops).toEqual([
+      'resource_limit_exceeded',
     ]);
   });
 
@@ -160,18 +162,18 @@ describe('innerOpCode', () => {
     ['pathPaymentStrictSend', 'pathPaymentStrictSendOfferCrossSelf', 'op_cross_self'],
     ['accountMerge', 'accountMergeHasSubEntries', 'op_has_sub_entries'],
     ['accountMerge', 'accountMergeSeqnumTooFar', 'op_seq_num_too_far'],
-    ['allowTrust', 'allowTrustNoTrustLine', 'op_no_trustline'],
+    ['allowTrust', 'allowTrustNoTrustLine', 'op_no_trust'],
     ['allowTrust', 'allowTrustTrustNotRequired', 'op_not_required'],
     ['manageData', 'manageDataNameNotFound', 'op_data_name_not_found'],
     ['beginSponsoringFutureReserves', 'beginSponsoringFutureReservesRecursive', 'op_recursive'],
     ['endSponsoringFutureReserves', 'endSponsoringFutureReservesNotSponsored', 'op_not_sponsored'],
-    ['invokeHostFunction', 'invokeHostFunctionTrapped', 'op_trapped'],
+    ['invokeHostFunction', 'invokeHostFunctionTrapped', 'function_trapped'],
     [
       'invokeHostFunction',
       'invokeHostFunctionInsufficientRefundableFee',
-      'op_insufficient_refundable_fee',
+      'insufficient_refundable_fee',
     ],
-    ['extendFootprintTtl', 'extendFootprintTtlResourceLimitExceeded', 'op_resource_limit_exceeded'],
+    ['extendFootprintTtl', 'extendFootprintTtlResourceLimitExceeded', 'resource_limit_exceeded'],
     ['restoreFootprint', 'restoreFootprintMalformed', 'op_malformed'],
   ])('%s %s -> %s', (operation, name, code) => {
     expect(innerOpCode(operation, name)).toBe(code);

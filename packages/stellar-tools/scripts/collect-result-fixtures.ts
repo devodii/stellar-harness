@@ -42,7 +42,8 @@ const TARGETS: Record<string, (match: Match) => string | null> = {
     m.failing.some((f) => f.code === 'op_low_reserve') ? 'op_low_reserve' : null,
   op_line_full: (m) => (m.failing.some((f) => f.code === 'op_line_full') ? 'op_line_full' : null),
   fee_bump_inner_failed: (m) => (m.feeBump ? m.tx : null),
-  op_trapped: (m) => (m.failing.some((f) => f.code === 'op_trapped') ? 'op_trapped' : null),
+  function_trapped: (m) =>
+    m.failing.some((f) => f.code === 'function_trapped') ? 'function_trapped' : null,
   path_payment_failure: (m) => m.failing.find((f) => PATH_PAYMENTS.has(f.opType))?.code ?? null,
   manage_offer_failure: (m) => m.failing.find((f) => OFFERS.has(f.opType))?.code ?? null,
 };

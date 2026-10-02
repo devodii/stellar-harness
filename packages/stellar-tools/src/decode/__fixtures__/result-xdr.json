@@ -55,8 +55,8 @@
     "resultXdr": "AAAAAAAAAMj////zQEHXzFK/S8IKFZZisCt8atc4Psc/iNs2cAljq/k1ph0AAAAAAAAAAP////8AAAABAAAAAAAAAAL////0AAAAAAAAAAA="
   },
   {
-    "target": "op_trapped",
-    "code": "op_trapped",
+    "target": "function_trapped",
+    "code": "function_trapped",
     "hash": "1dd85986fbc39927cd31477edb3a70f01d8c32b8bac6919f4e7f42fff4fab342",
     "ledger": 64665914,
     "resultXdr": "AAAAAAAANiD////zQWnxhjcL03FoC15k8AJKOLLj0du/5S/VWkVN0U+ww4MAAAAAAAAAAP////8AAAABAAAAAAAAABj////+AAAAAAAAAAA=",
@@ -95,8 +95,8 @@
     "opType": "path_payment_strict_receive"
   },
   {
-    "target": "code:op_sell_not_authorized",
-    "code": "op_sell_not_authorized",
+    "target": "code:sell_not_authorized",
+    "code": "sell_not_authorized",
     "hash": "e1d2533c50c6d8fd3f0d84379514d5e467e11a4e140bf3e35c3946b44156f193",
     "ledger": 64655008,
     "resultXdr": "AAAAAAAAAGT/////AAAAAQAAAAAAAAAD/////AAAAAA=",
@@ -151,8 +151,8 @@
     "opType": "payment"
   },
   {
-    "target": "code:op_resource_limit_exceeded",
-    "code": "op_resource_limit_exceeded",
+    "target": "code:resource_limit_exceeded",
+    "code": "resource_limit_exceeded",
     "hash": "ee05aba4fb375140106fa0eba83e99bd1db1728cca61e993eefd0a7e714f8d05",
     "ledger": 64619108,
     "resultXdr": "AAAAAAAAfFr/////AAAAAQAAAAAAAAAY/////QAAAAA=",
@@ -215,16 +215,16 @@
     "opType": "manage_sell_offer"
   },
   {
-    "target": "code:op_entry_archived",
-    "code": "op_entry_archived",
+    "target": "code:entry_archived",
+    "code": "entry_archived",
     "hash": "c9d7f2aa53e8cb97ede8642fb541b2d61430e58444f90de87dc36747c8fae5ec",
     "ledger": 64708090,
     "resultXdr": "AAAAAAACQNX/////AAAAAQAAAAAAAAAY/////AAAAAA=",
     "opType": "invoke_host_function"
   },
   {
-    "target": "code:op_buy_not_authorized",
-    "code": "op_buy_not_authorized",
+    "target": "code:buy_not_authorized",
+    "code": "buy_not_authorized",
     "hash": "11ee06e9aa7e10bb742223a2db0fa1884a32cc6fe9fc480bcdd6ba777d563592",
     "ledger": 64715814,
     "resultXdr": "AAAAAAAAAGT/////AAAAAQAAAAAAAAAD////+wAAAAA=",
