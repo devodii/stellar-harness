@@ -1,0 +1,311 @@
+{
+  "partners": {
+    "meta": {
+      "source": "https://stellarlight.xyz/partners",
+      "generatedAt": "2026-10-02T00:10:22.163Z",
+      "filters": {
+        "type": "anchor",
+        "sector": null,
+        "region": null,
+        "ramps": null,
+        "accepting": null,
+        "all": true,
+        "q": null,
+        "limit": 100,
+        "offset": 0
+      },
+      "counts": {
+        "returned": 24,
+        "total": 24,
+        "filteredOut": 0
+      }
+    },
+    "partners": [
+      {
+        "slug": "etherfuse",
+        "name": "Etherfuse",
+        "partnerType": "anchor",
+        "websiteUrl": "https://etherfuse.com",
+        "regions": ["latam"],
+        "assets": ["USTRY", "CETES", "TESOURO", "MEX", "CETESZ", "EUROB", "KTB", "GILTS", "MEXe"],
+        "seps": [],
+        "tomlSourceUrl": "https://etherfuse.com/.well-known/stellar.toml",
+        "tomlFetchedAt": "2026-09-29",
+        "tomlConfidence": {
+          "score": 0.9,
+          "label": "high",
+          "ageDays": 3
+        },
+        "rampTypes": ["on-ramp", "off-ramp"],
+        "country": "Mexico",
+        "url": "https://stellarlight.xyz/partners/etherfuse"
+      },
+      {
+        "slug": "transparent-network",
+        "name": "Transparent Network",
+        "partnerType": "anchor",
+        "websiteUrl": "https://prozora.network",
+        "regions": ["europe"],
+        "assets": ["UAH"],
+        "seps": [],
+        "tomlSourceUrl": "https://dcm.systems/.well-known/stellar.toml",
+        "tomlFetchedAt": "2026-09-29",
+        "tomlConfidence": {
+          "score": 0.9,
+          "label": "high",
+          "ageDays": 3
+        },
+        "rampTypes": null,
+        "country": "Ukraine",
+        "url": "https://stellarlight.xyz/partners/transparent-network"
+      }
+    ]
+  },
+  "partnersEmpty": {
+    "meta": {
+      "source": "https://stellarlight.xyz/partners",
+      "generatedAt": "2026-10-02T00:10:23.858Z",
+      "filters": {
+        "type": "on-off-ramp",
+        "sector": null,
+        "region": null,
+        "ramps": null,
+        "accepting": null,
+        "all": true,
+        "q": null,
+        "limit": 100,
+        "offset": 0
+      },
+      "counts": {
+        "returned": 0,
+        "total": 0,
+        "filteredOut": 0
+      }
+    },
+    "partners": []
+  },
+  "projects": {
+    "meta": {
+      "source": "https://stellarlight.xyz/directory",
+      "generatedAt": "2026-10-02T00:23:19.975Z",
+      "filters": {
+        "q": "",
+        "category": null,
+        "type": null,
+        "status": null,
+        "scfAwarded": true,
+        "scfAwardedOnly": true,
+        "limit": 50,
+        "offset": 0
+      },
+      "counts": {
+        "returned": 50,
+        "total": 597,
+        "semantic": 0
+      },
+      "matchMode": "all"
+    },
+    "projects": [
+      {
+        "id": "6943366130bcaa9def8ef71c",
+        "name": "Lobstr",
+        "slug": "lobstr",
+        "category": "User-Facing App",
+        "status": "Live",
+        "scfAwarded": true,
+        "scfTotalAwardedUSD": 232000,
+        "scfAwardedRounds": [2, 17, 22],
+        "scfRoundAwards": [
+          {
+            "round": 2,
+            "awardName": null,
+            "amountUSD": null,
+            "awardType": "Legacy v1.0 Award"
+          },
+          {
+            "round": 17,
+            "awardName": null,
+            "amountUSD": 144000,
+            "awardType": "Legacy v4.0 Award"
+          },
+          {
+            "round": 22,
+            "awardName": null,
+            "amountUSD": 88000,
+            "awardType": "Legacy v5.0 Community Award"
+          }
+        ],
+        "onchain": null,
+        "anchorProfile": null,
+        "types": ["Wallet"],
+        "links": {
+          "website": "https://lobstr.co/",
+          "github": "https://github.com/lobstrco",
+          "twitter": "https://x.com/lobstr"
+        },
+        "score": 1,
+        "url": "https://stellarlight.xyz/project/lobstr"
+      },
+      {
+        "id": "6943361c30bcaa9def8ef08f",
+        "name": "Reflector",
+        "slug": "reflector",
+        "category": "Infrastructure",
+        "status": "Live",
+        "scfAwarded": true,
+        "scfTotalAwardedUSD": 444840,
+        "scfAwardedRounds": [15, 20, 26, 29],
+        "scfRoundAwards": [
+          {
+            "round": 15,
+            "awardName": null,
+            "amountUSD": 148840,
+            "awardType": "Legacy v4.0 Award"
+          },
+          {
+            "round": 20,
+            "awardName": null,
+            "amountUSD": 96000,
+            "awardType": "Legacy v5.0 Community Award"
+          },
+          {
+            "round": 26,
+            "awardName": null,
+            "amountUSD": 100000,
+            "awardType": "Legacy v5.0 Community Award"
+          },
+          {
+            "round": 29,
+            "awardName": null,
+            "amountUSD": 100000,
+            "awardType": "Legacy v5.0 Community Award"
+          }
+        ],
+        "onchain": {
+          "assetCode": null,
+          "issuer": null,
+          "assetHolders": null,
+          "assetHoldersDelta": null,
+          "assetSupply": null,
+          "assetTrustlines": null,
+          "assetPayments": null,
+          "assetPaymentsAmount": null,
+          "assetPaymentsDelta": null,
+          "assetTrades": null,
+          "contracts": [
+            {
+              "address": "CAFJZQWSED6YAWZU3GWRTOCNPPCGBN32L7QV43XX5LZLFTK6JLN34DLN",
+              "label": "price oracle",
+              "events": 57495,
+              "eventsDelta": 403,
+              "subinvocationsDelta": 3083,
+              "subinvocations": 277079,
+              "storageEntries": 987,
+              "createdAt": "2024-03-04T14:46:17.000Z",
+              "verifiedRepo": "https://github.com/reflector-network/reflector-contract"
+            },
+            {
+              "address": "CBLLEW7HD2RWATVSMLAGWM4G3WCHSHDJ25ALP4DI6LULV5TU35N2CIZA",
+              "label": "price oracle",
+              "events": 136567,
+              "eventsDelta": 1051,
+              "subinvocationsDelta": 4335,
+              "subinvocations": 276406,
+              "storageEntries": 70,
+              "createdAt": "2024-08-02T18:53:35.000Z",
+              "verifiedRepo": null
+            }
+          ],
+          "source": "stellar.expert",
+          "asOf": "2026-09-29T12:35:07.916Z",
+          "prevAsOf": "2026-09-28T03:03:16.790Z",
+          "deltaDays": 1.4
+        },
+        "anchorProfile": null,
+        "types": ["Oracle"],
+        "links": {
+          "website": "https://reflector.network/",
+          "github": "https://github.com/reflector-network",
+          "twitter": "https://x.com/in_reflector",
+          "discord": "https://discord.gg/v2ggfdty2d"
+        },
+        "score": 1,
+        "url": "https://stellarlight.xyz/project/reflector"
+      }
+    ]
+  },
+  "repos": {
+    "meta": {
+      "source": "https://stellarlight.xyz/directory",
+      "generatedAt": "2026-10-02T00:23:24.370Z",
+      "filters": {
+        "q": "",
+        "language": null,
+        "minScore": 0,
+        "activity": null,
+        "limit": 100,
+        "offset": 0
+      },
+      "counts": {
+        "returned": 100,
+        "total": 200
+      },
+      "matchMode": "all"
+    },
+    "repos": [
+      {
+        "fullName": "reflector-network/reflector-contract",
+        "url": "https://github.com/reflector-network/reflector-contract",
+        "primaryLanguage": "Rust",
+        "stars": 12,
+        "lastCommitAt": "2026-07-23T10:33:13.000Z",
+        "activityState": "maintained",
+        "project": {
+          "slug": "reflector",
+          "name": "Reflector"
+        },
+        "scfAwarded": true,
+        "repoScore": 87,
+        "repoScoreLabel": "high",
+        "kind": "contract",
+        "codeInUse": {
+          "contracts": 1,
+          "events": 44447,
+          "eventsDelta": 743,
+          "subinvocations": 183156,
+          "subinvocationsDelta": 3601,
+          "asOf": "2026-08-13T21:23:10.127Z"
+        },
+        "codeVerified": {
+          "isDeployableContract": true,
+          "sorobanSdkVersion": null,
+          "mainnetContractId": "CAFJZQWSED6YAWZU3GWRTOCNPPCGBN32L7QV43XX5LZLFTK6JLN34DLN",
+          "scannedAt": "2026-08-14T21:48:55.664Z"
+        }
+      },
+      {
+        "fullName": "stellar/go-stellar-sdk",
+        "url": "https://github.com/stellar/go-stellar-sdk",
+        "primaryLanguage": "Go",
+        "stars": 1383,
+        "lastCommitAt": "2026-09-27T16:32:20.000Z",
+        "activityState": "active",
+        "project": {
+          "slug": "go-stellar-sdk",
+          "name": "Go Stellar SDK"
+        },
+        "scfAwarded": false,
+        "repoScore": 100,
+        "repoScoreLabel": "high",
+        "kind": "application",
+        "codeInUse": null,
+        "codeVerified": {
+          "isDeployableContract": false,
+          "sorobanSdkVersion": null,
+          "mainnetContractId": null,
+          "scannedAt": "2026-09-28T20:36:14.640Z"
+        }
+      }
+    ]
+  }
+}
