@@ -1,11 +1,10 @@
 import type { Finding, PreventableCode } from '@harness/schema';
 import { evidenceNumber, evidenceString, sampleTxHash } from '../evidence';
-import { build, notice, type Recipe, read, type StepDraft, simulate, submit } from '../step';
+import { handoff, type Recipe, read, type StepDraft, simulate } from '../step';
 
 export const CHANNEL_STARTING_BALANCE_XLM = 1.5;
 export const MIN_CHANNELS = 2;
 export const MAX_CHANNELS = 10;
-export const RESERVE_TOP_UP_XLM = 2;
 
 const readAccount = (finding: Finding) =>
   read('getAccount', 'Read the source account: sequence, balances, thresholds and signers.', {
@@ -50,137 +49,82 @@ export const channelCount = (finding: Finding): number => {
   return Math.min(MAX_CHANNELS, Math.max(MIN_CHANNELS, Math.ceil(collisions / 10)));
 };
 
-const configNotice = (finding: Finding, change: string) =>
-  notice(change, { account: finding.subject, fix: finding.suggestedAction });
+const clusterRecipe =
+  (
+    title: (account: string) => string,
+    code: PreventableCode,
+    summary: string,
+    withPreflight = false,
+  ): Recipe =>
+  (finding) => ({
+    title: title(finding.subject),
+    steps: [
+      readAccount(finding),
+      readSample(finding, code),
+      ...(withPreflight ? preflight(finding) : []),
+    ],
+    handoff: handoff('account_signer', summary),
+  });
 
 export const TX_RECIPES = {
   TX_BAD_SEQ_CLUSTER: (finding) => {
     const channels = channelCount(finding);
     return {
       title: `Provision channel accounts for ${finding.subject}`,
-      estimatedCostXlm: channels * CHANNEL_STARTING_BALANCE_XLM,
-      steps: [
-        readAccount(finding),
-        readSample(finding, 'tx_bad_seq'),
-        readCluster(finding),
-        build(
-          'Build a channel pool config: one in-flight transaction per channel, serialized per source.',
-          {
-            operation: 'channelPool',
-            source: finding.subject,
-            channels,
-          },
-        ),
-        build(
-          `Build create_account operations for ${channels} channel accounts funded by the source.`,
-          {
-            operation: 'createAccount',
-            funder: finding.subject,
-            count: channels,
-            startingBalanceXlm: CHANNEL_STARTING_BALANCE_XLM,
-          },
-        ),
-        submit('Submit the channel account creation once the policy owner approves and signs.'),
-      ],
+      steps: [readAccount(finding), readSample(finding, 'tx_bad_seq'), readCluster(finding)],
+      handoff: handoff(
+        'account_signer',
+        `The account signers create ${channels} channel accounts (${CHANNEL_STARTING_BALANCE_XLM} XLM starting balance each) and send one in-flight transaction per channel.`,
+      ),
     };
   },
-  TX_INSUFFICIENT_FEE_CLUSTER: (finding) => ({
-    title: `Set a fee policy for ${finding.subject}`,
-    steps: [
-      readAccount(finding),
-      readSample(finding, 'tx_insufficient_fee'),
-      build('Build a fee-bump template the account can wrap retries in, capped by policy.', {
-        operation: 'feeBump',
-        feeSource: finding.subject,
-      }),
-      configNotice(finding, 'Draft a fee policy: bid from recent surge fees, fee-bump on retry.'),
-    ],
-  }),
-  TX_TOO_LATE_CLUSTER: (finding) => ({
-    title: `Fix timebounds for ${finding.subject}`,
-    steps: [
-      readAccount(finding),
-      readSample(finding, 'tx_too_late'),
-      configNotice(
-        finding,
-        'Draft a timebound policy: set max time after signatures are collected, fee-bump if queued.',
-      ),
-    ],
-  }),
-  TX_BAD_AUTH_CLUSTER: (finding) => ({
-    title: `Fix signing for ${finding.subject}`,
-    steps: [
-      readAccount(finding),
-      readSample(finding, 'tx_bad_auth'),
-      configNotice(
-        finding,
-        'Draft a signing checklist: required signers and weights against the account thresholds.',
-      ),
-    ],
-  }),
-  OP_NO_TRUST_CLUSTER: (finding) => ({
-    title: `Pre-flight trustlines for payments from ${finding.subject}`,
-    steps: [
-      readAccount(finding),
-      readSample(finding, 'op_no_trust'),
-      ...preflight(finding),
-      configNotice(
-        finding,
-        'Draft a pre-flight rule: check the destination trustline before every payment.',
-      ),
-    ],
-  }),
-  OP_UNDERFUNDED_CLUSTER: (finding) => ({
-    title: `Monitor float for ${finding.subject}`,
-    steps: [
-      readAccount(finding),
-      readSample(finding, 'op_underfunded'),
-      configNotice(
-        finding,
-        'Draft a float alert: threshold per asset and a treasury rebalance rule.',
-      ),
-    ],
-  }),
-  OP_NO_DESTINATION_CLUSTER: (finding) => ({
-    title: `Pre-flight destinations for ${finding.subject}`,
-    steps: [
-      readAccount(finding),
-      readSample(finding, 'op_no_destination'),
-      ...preflight(finding),
-      configNotice(
-        finding,
-        'Draft a pre-flight rule: check the destination exists, create and fund it under policy or hold.',
-      ),
-    ],
-  }),
+  TX_INSUFFICIENT_FEE_CLUSTER: clusterRecipe(
+    (account) => `Set fee bidding for ${account}`,
+    'tx_insufficient_fee',
+    'The account signers bid fees from recent surge pricing and wrap retries in a fee bump signed by the fee source.',
+  ),
+  TX_TOO_LATE_CLUSTER: clusterRecipe(
+    (account) => `Fix timebounds for ${account}`,
+    'tx_too_late',
+    'The account signers set the max time bound after signatures are collected and fee-bump transactions that queue.',
+  ),
+  TX_BAD_AUTH_CLUSTER: clusterRecipe(
+    (account) => `Fix signing for ${account}`,
+    'tx_bad_auth',
+    'The account signers collect signatures whose weights meet the account thresholds before each transaction is sent.',
+  ),
+  OP_NO_TRUST_CLUSTER: clusterRecipe(
+    (account) => `Pre-flight trustlines for payments from ${account}`,
+    'op_no_trust',
+    'The sending account checks the destination trustline before every payment; only the destination can add it with change_trust.',
+    true,
+  ),
+  OP_UNDERFUNDED_CLUSTER: clusterRecipe(
+    (account) => `Monitor float for ${account}`,
+    'op_underfunded',
+    'The account signers set a per-asset float alert and rebalance from treasury before balances run short.',
+  ),
+  OP_NO_DESTINATION_CLUSTER: clusterRecipe(
+    (account) => `Pre-flight destinations for ${account}`,
+    'op_no_destination',
+    'The sending account checks the destination exists before paying, and funds it with create_account (1 XLM minimum) or holds the payment.',
+    true,
+  ),
   OP_LOW_RESERVE_CLUSTER: (finding) => {
-    const topUpXlm =
-      evidenceNumber(finding.evidence, 'reserveShortfallXlm', 'shortfallXlm') ?? RESERVE_TOP_UP_XLM;
+    const shortfallXlm = evidenceNumber(finding.evidence, 'reserveShortfallXlm', 'shortfallXlm');
     return {
       title: `Top up the XLM reserve on ${finding.subject}`,
-      estimatedCostXlm: topUpXlm,
-      steps: [
-        readAccount(finding),
-        readSample(finding, 'op_low_reserve'),
-        build(`Build a ${topUpXlm} XLM payment to ${finding.subject} from the treasury.`, {
-          operation: 'payment',
-          to: finding.subject,
-          asset: 'XLM',
-          amount: String(topUpXlm),
-        }),
-        submit('Submit the top-up once the policy owner approves and signs.'),
-      ],
+      steps: [readAccount(finding), readSample(finding, 'op_low_reserve')],
+      handoff: handoff(
+        'account_signer',
+        'The account signers keep enough XLM above the minimum balance (0.5 XLM per subentry) so operations stop failing on reserve.',
+        shortfallXlm,
+      ),
     };
   },
-  OP_LINE_FULL_CLUSTER: (finding) => ({
-    title: `Pre-flight trustline limits for ${finding.subject}`,
-    steps: [
-      readAccount(finding),
-      readSample(finding, 'op_line_full'),
-      configNotice(
-        finding,
-        'Draft a pre-flight rule: compare amount with the destination trustline limit, split or hold.',
-      ),
-    ],
-  }),
+  OP_LINE_FULL_CLUSTER: clusterRecipe(
+    (account) => `Pre-flight trustline limits for ${account}`,
+    'op_line_full',
+    'The sending account compares each amount with the destination trustline limit and splits or holds the payment; only the destination can raise its limit.',
+  ),
 } satisfies Record<string, Recipe>;

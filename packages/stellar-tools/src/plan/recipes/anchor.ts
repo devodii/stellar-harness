@@ -1,11 +1,11 @@
 import type { Finding, FindingType } from '@harness/schema';
 import { evidenceString } from '../evidence';
-import { notice, type Recipe, read, type StepDraft } from '../step';
+import { handoff, type Recipe, read, type StepDraft } from '../step';
 
 type AnchorFindingType = Extract<FindingType, `ANCHOR_${string}`>;
 
-const probe = (finding: Finding, description: string): StepDraft =>
-  read('probeAnchor', description, {
+const probe = (finding: Finding): StepDraft =>
+  read('probeAnchor', 'Re-run the conformance probe to confirm the current state.', {
     domain: finding.subject,
     runAnchorTests: finding.type === 'ANCHOR_TESTS_FAILED',
   });
@@ -21,68 +21,69 @@ const accountReads = (finding: Finding): StepDraft[] => {
 };
 
 const anchorRecipe =
-  (title: string, problem: string): Recipe =>
+  (title: string, summary: (domain: string) => string): Recipe =>
   (finding) => ({
     title: `${title} on ${finding.subject}`,
-    steps: [
-      probe(finding, 'Re-run the conformance probe to confirm the current state.'),
-      ...accountReads(finding),
-      notice(`Draft a notice to the anchor operator: ${problem}`, {
-        domain: finding.subject,
-        findingType: finding.type,
-        fix: finding.suggestedAction,
-      }),
-      probe(finding, 'Re-run the probe after the operator reports a fix to verify it.'),
-    ],
+    steps: [probe(finding), ...accountReads(finding)],
+    handoff: handoff('anchor_operator', summary(finding.subject)),
   });
 
 export const ANCHOR_RECIPES = {
   ANCHOR_TOML_UNREACHABLE: anchorRecipe(
     'Restore stellar.toml',
-    'stellar.toml is not served at /.well-known/stellar.toml.',
+    (domain) =>
+      `The anchor operator serves stellar.toml at https://${domain}/.well-known/stellar.toml over valid TLS.`,
   ),
   ANCHOR_TOML_MISSING_SIGNING_KEY: anchorRecipe(
     'Publish SIGNING_KEY',
-    'stellar.toml has no SIGNING_KEY, so SEP-10 cannot be verified.',
+    () =>
+      'The anchor operator adds SIGNING_KEY to stellar.toml so SEP-10 challenges can be verified.',
   ),
   ANCHOR_TOML_NO_ACCOUNTS: anchorRecipe(
     'List accounts and issuers',
-    'stellar.toml lists no ACCOUNTS and no CURRENCIES issuers.',
+    () => 'The anchor operator lists its ACCOUNTS and every CURRENCIES issuer in stellar.toml.',
   ),
   ANCHOR_HOME_DOMAIN_MISMATCH: anchorRecipe(
     'Align home_domain',
-    'a listed account has a home_domain that does not match the anchor domain.',
+    (domain) =>
+      `The anchor operator sets home_domain to ${domain} on each listed account with set_options signed by that account.`,
   ),
   ANCHOR_ISSUER_FLAGS: anchorRecipe(
     'Review issuer flags',
-    'issuer flags should match the asset policy published in stellar.toml.',
+    () =>
+      'The anchor operator sets issuer flags (auth required, revocable, clawback) to match the asset terms in stellar.toml.',
   ),
   ANCHOR_NO_SEP_ENDPOINTS: anchorRecipe(
     'Publish SEP endpoints',
-    'stellar.toml lists none of the SEP endpoints.',
+    () =>
+      'The anchor operator lists the SEP endpoints it runs (WEB_AUTH_ENDPOINT, TRANSFER_SERVER_SEP0024, ANCHOR_QUOTE_SERVER, DIRECT_PAYMENT_SERVER) in stellar.toml.',
   ),
   ANCHOR_INFO_UNREADABLE: anchorRecipe(
     'Fix /info',
-    'the transfer server /info endpoint does not return readable JSON.',
+    () => 'The anchor operator makes the transfer server /info endpoint return valid JSON.',
   ),
   ANCHOR_SEP10_CHALLENGE_FAILS: anchorRecipe(
     'Fix the SEP-10 challenge',
-    'the web auth challenge is missing or does not verify against SIGNING_KEY.',
+    () =>
+      'The anchor operator fixes WEB_AUTH_ENDPOINT so it returns a challenge signed by the SIGNING_KEY in stellar.toml.',
   ),
   ANCHOR_SEP38_PRICES_FAILS: anchorRecipe(
     'Fix SEP-38 /info',
-    'the quote server /info endpoint does not return assets.',
+    () => 'The anchor operator makes the SEP-38 quote server /info return the assets it prices.',
   ),
   ANCHOR_SEP31_INFO_FAILS: anchorRecipe(
     'Fix SEP-31 /info',
-    'the direct payment server /info endpoint does not return receive assets.',
+    () =>
+      'The anchor operator makes the SEP-31 direct payment server /info return the assets it receives.',
   ),
   ANCHOR_TESTS_FAILED: anchorRecipe(
     'Fix failing anchor tests',
-    'stellar-anchor-tests fail for at least one supported SEP.',
+    () =>
+      'The anchor operator fixes the failing stellar-anchor-tests cases for each SEP it supports and reruns the suite.',
   ),
   ANCHOR_TLS_OR_CORS_BROKEN: anchorRecipe(
     'Fix TLS and CORS',
-    'stellar.toml or /info is served without valid TLS or Access-Control-Allow-Origin.',
+    () =>
+      'The anchor operator serves stellar.toml and /info over valid TLS with Access-Control-Allow-Origin: *.',
   ),
 } satisfies Record<AnchorFindingType, Recipe>;

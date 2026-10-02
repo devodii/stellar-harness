@@ -1,32 +1,36 @@
+import { ROADMAP_NOTE } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
 import { makeFinding } from '../__fixtures__/findings';
 import { contractRef, evidenceNumber, evidenceString, sampleTxHash } from './evidence';
-import { build, linkSteps, read, simulate, submit, withNetwork } from './step';
+import { assemblePlan, HANDOFF_TOOL, handoff, read, simulate } from './step';
 
-describe('linkSteps', () => {
-  it('links builds to the last simulation and submits to the last build', () => {
-    const steps = linkSteps([
-      read('getContractTtl', 'r', {}),
-      simulate('simulateExtendTtl', 's', {}),
-      build('b', {}),
-      submit('x'),
+describe('assemblePlan', () => {
+  const draft = {
+    title: 'Extend TTL',
+    steps: [read('getContractTtl', 'r', {}), simulate('simulateExtendTtl', 's', {})],
+    handoff: handoff('any_payer', 'Any account can pay.', 0.25),
+  };
+
+  it('numbers the steps and appends the single handoff step', () => {
+    const plan = assemblePlan('plan_x', 'CSUBJECT', draft);
+    expect(plan.steps.map((step) => [step.id, step.kind, step.tool])).toEqual([
+      ['s1', 'read', 'getContractTtl'],
+      ['s2', 'simulate', 'simulateExtendTtl'],
+      ['s3', 'handoff', HANDOFF_TOOL],
     ]);
-    expect(steps[2]?.args).toEqual({ fromStep: 's2' });
-    expect(steps[3]?.args).toEqual({ fromStep: 's3' });
+    expect(plan.steps.at(-1)?.description).toBe(
+      'Hand off to any account willing to pay the fee; the harness stops here.',
+    );
   });
 
-  it('leaves explicit links and unlinked builds alone', () => {
-    const steps = linkSteps([build('b', { fromStep: 's9' }), build('c', {})]);
-    expect(steps[0]?.args).toEqual({ fromStep: 's9' });
-    expect(steps[1]?.args).toEqual({});
-  });
-});
-
-describe('withNetwork', () => {
-  it('names the network on submit steps only', () => {
-    const steps = withNetwork([build('b', {}), submit('x')], 'testnet');
-    expect(steps[0]?.args).toEqual({});
-    expect(steps[1]?.args).toEqual({ network: 'testnet' });
+  it('adds the fixed roadmap note and keeps the cost only when given', () => {
+    expect(assemblePlan('plan_x', 'CSUBJECT', draft).handoff).toEqual({
+      summary: 'Any account can pay.',
+      requiredAuthority: 'any_payer',
+      estimatedCostXlm: 0.25,
+      roadmapNote: ROADMAP_NOTE,
+    });
+    expect(handoff('contract_admin', 'Admin acts.')).not.toHaveProperty('estimatedCostXlm');
   });
 });
 
