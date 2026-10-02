@@ -1,11 +1,14 @@
+import { appError, err, ok } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
 import fixtures from './__fixtures__/horizon.json';
 import { createHorizonClient } from './horizon';
+import type { RpcHealth } from './rpc';
 import {
   daysForLedgers,
   ledgersForDays,
   measureCloseSeconds,
   readGitSha,
+  rpcLedgers,
   takeSnapshot,
 } from './snapshot';
 import { jsonResponse, mockHttp } from './test-utils';
@@ -41,6 +44,60 @@ describe('takeSnapshot', () => {
     const { horizon } = horizonFrom(() => jsonResponse({ status: 404 }, 404));
     const result = await takeSnapshot({ horizon }, { gitSha: 'x' });
     expect(result.ok).toBe(false);
+  });
+});
+
+describe('takeSnapshot with a network and an rpc fallback', () => {
+  const testnetHealth = {
+    status: 'healthy',
+    latestLedger: 4_979_339,
+    latestLedgerCloseTime: 1_790_920_282,
+    oldestLedger: 4_858_380,
+    oldestLedgerCloseTime: 1_790_315_487,
+    ledgerRetentionWindow: 120_960,
+  };
+  const rpc = (health: RpcHealth | null) => ({
+    getHealth: async () => (health ? ok(health) : err(appError('UPSTREAM_FAILED', 'rpc down'))),
+  });
+  const horizonDown = () =>
+    horizonFrom(() => {
+      throw new TypeError('fetch failed');
+    }).horizon;
+
+  it('records the selected network', async () => {
+    const { horizon } = horizonFrom((url) =>
+      jsonResponse(url.pathname === '/ledgers' ? fixtures.latestLedger : fixtures.ledger),
+    );
+    const result = await takeSnapshot({ horizon }, { gitSha: 'x', network: 'testnet' });
+    expect(result.ok && result.value.network).toBe('testnet');
+  });
+
+  it('measures the close time over the rpc retention window when horizon is down', async () => {
+    const result = await takeSnapshot(
+      { horizon: horizonDown(), rpc: rpc(testnetHealth) },
+      { gitSha: 'x', network: 'testnet' },
+    );
+    expect(result).toEqual({
+      ok: true,
+      value: {
+        snapshotLedger: 4_979_339,
+        snapshotTime: '2026-10-02T05:51:22.000Z',
+        ledgerCloseSeconds: 5,
+        gitSha: 'x',
+        network: 'testnet',
+      },
+    });
+  });
+
+  it('returns the horizon error when rpc fails too', async () => {
+    const result = await takeSnapshot({ horizon: horizonDown(), rpc: rpc(null) }, { gitSha: 'x' });
+    expect(result.ok).toBe(false);
+  });
+
+  it('rejects rpc health without close times', async () => {
+    const { latestLedgerCloseTime: _, ...partial } = testnetHealth;
+    const result = await rpcLedgers(rpc(partial));
+    expect(result.ok ? null : result.error.message).toMatch(/no ledger close times/);
   });
 });
 
