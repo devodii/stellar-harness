@@ -89,9 +89,19 @@ describe('takeSnapshot with a network and an rpc fallback', () => {
     });
   });
 
-  it('returns the horizon error when rpc fails too', async () => {
+  it('returns the rpc error when both sources fail', async () => {
     const result = await takeSnapshot({ horizon: horizonDown(), rpc: rpc(null) }, { gitSha: 'x' });
     expect(result.ok).toBe(false);
+  });
+
+  it('goes straight to rpc when told to skip horizon', async () => {
+    const { horizon, calls } = horizonFrom(() => jsonResponse(fixtures.latestLedger));
+    const result = await takeSnapshot(
+      { horizon, rpc: rpc(testnetHealth) },
+      { gitSha: 'x', network: 'testnet', skipHorizon: true },
+    );
+    expect(result.ok && result.value.snapshotLedger).toBe(4_979_339);
+    expect(calls).toEqual([]);
   });
 
   it('rejects rpc health without close times', async () => {
