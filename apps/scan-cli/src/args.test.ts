@@ -24,6 +24,7 @@ describe('parseScanArgs', () => {
         '--window',
         '1d',
         '--no-cache',
+        '--new-snapshot',
         '--concurrency',
         'horizon.stellar.org=4',
         '--concurrency',
@@ -34,6 +35,7 @@ describe('parseScanArgs', () => {
       limit: 20,
       windowSeconds: 86_400,
       noCache: true,
+      newSnapshot: true,
       concurrency: { 'horizon.stellar.org': 4, 'mainnet.sorobanrpc.com': 6 },
     });
   });
