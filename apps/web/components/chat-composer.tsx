@@ -69,9 +69,6 @@ export function ChatComposer({
       <PromptInputFooter>
         <PromptInputTools>
           <NetworkSwitch />
-          <span className="font-mono text-[11px] text-muted-foreground">
-            · read-only · nothing is signed
-          </span>
         </PromptInputTools>
         <PromptInputSubmit status={status} onStop={onStop} disabled={disabled} />
       </PromptInputFooter>
