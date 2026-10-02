@@ -3,17 +3,17 @@
 import { cn } from 'cn';
 import { AccentBlock } from '@/components/accent-block';
 import { BracketTag } from '@/components/bracket-tag';
-import { PlanView, type PlanViewProps } from '@/components/plan-view';
+import { PlanView } from '@/components/plan-view';
 import { ResultSection } from '@/components/result-section';
 import { StatLabel } from '@/components/stat';
 import { TONE_TEXT } from '@/lib/tone';
 import type { PaymentPreflightView as PaymentPreflightData } from '@/lib/tool-views';
 
-export interface PaymentPreflightViewProps extends Omit<PlanViewProps, 'plan' | 'className'> {
+export interface PaymentPreflightViewProps {
   preflight: PaymentPreflightData;
 }
 
-export function PaymentPreflightView({ preflight, ...planProps }: PaymentPreflightViewProps) {
+export function PaymentPreflightView({ preflight }: PaymentPreflightViewProps) {
   return (
     <div className="space-y-3">
       <ResultSection
@@ -62,7 +62,7 @@ export function PaymentPreflightView({ preflight, ...planProps }: PaymentPreflig
           </div>
         )}
       </ResultSection>
-      {preflight.alternative && <PlanView plan={preflight.alternative} {...planProps} />}
+      {preflight.alternative && <PlanView plan={preflight.alternative} />}
     </div>
   );
 }
