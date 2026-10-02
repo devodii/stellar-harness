@@ -1,7 +1,7 @@
 import { appError, err, ok } from '@harness/schema';
 import type { DecodedResultCodes, EnvelopeSummary } from '@harness/stellar-tools';
 import type { Decoders } from '../extract';
-import type { RpcPort, RpcTransaction, Runner } from '../ports';
+import type { HorizonAccount, HorizonPort, RpcPort, RpcTransaction, Runner } from '../ports';
 
 export const sequentialRunner: Runner = async (tasks, worker) => {
   const results = [];
@@ -68,6 +68,38 @@ export const syntheticTx = (
   resultXdr: `res-${ledger}-${order}`,
   createdAt: ledger * 5,
 });
+
+export type HorizonOperationsPage = {
+  _embedded: { records: { type: string; funder?: string }[] };
+};
+
+export const firstOperationOf = (page: HorizonOperationsPage) => {
+  const record = page._embedded.records[0];
+  return record ? { type: record.type, funder: record.funder } : null;
+};
+
+export type FakeHorizonData = {
+  accounts?: Record<string, HorizonAccount | null>;
+  firstOperations?: Record<string, { type: string; funder?: string } | null>;
+  failing?: Set<string>;
+};
+
+export const fakeHorizon = (data: FakeHorizonData) => {
+  const calls: string[] = [];
+  const port: HorizonPort = {
+    account: async (id) => {
+      calls.push(`account:${id}`);
+      if (data.failing?.has(id)) return err(appError('UPSTREAM_TIMEOUT', 'horizon timeout'));
+      return ok(data.accounts?.[id] ?? null);
+    },
+    firstOperation: async (id) => {
+      calls.push(`firstOperation:${id}`);
+      if (data.failing?.has(id)) return err(appError('UPSTREAM_TIMEOUT', 'horizon timeout'));
+      return ok(data.firstOperations?.[id] ?? null);
+    },
+  };
+  return { port, calls };
+};
 
 export type RecordedSample = {
   envelopeXdr: string;
