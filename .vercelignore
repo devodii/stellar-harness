@@ -10,3 +10,5 @@ data/exports
 data/findings.jsonl
 data/summary.json
 REPORT.md
+data-testnet
+REPORT.testnet.md

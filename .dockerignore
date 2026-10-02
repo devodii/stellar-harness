@@ -11,3 +11,5 @@ data
 **/*.tsbuildinfo
 .pnpm-store
 REPORT.md
+data-testnet
+REPORT.testnet.md
