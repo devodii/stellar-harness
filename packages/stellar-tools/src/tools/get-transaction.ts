@@ -1,10 +1,11 @@
 import { type AppError, appError, err, ok, type Result } from '@harness/schema';
 import { z } from 'zod';
-import { defineTool, fail } from '../tool';
+import { fail } from '../tool';
 import type { EnvelopeTimeBounds } from './decoder-schemas';
-import { GetTransactionInput, GetTransactionOutput, MemoType } from './failures-schemas';
+import { defineNamedTool } from './define';
 import type { TransactionToolContext } from './network-context';
 import { readFeeCharged } from './result-fee';
+import { type GetTransactionOutput, MemoType } from './schemas';
 
 export type RawTransaction = {
   origin: 'rpc' | 'horizon';
@@ -157,13 +158,9 @@ export const toTransactionOutput = (
 
 const toolError = (error: AppError): never => fail(error.code, error.message, error.meta);
 
-export const getTransaction = defineTool({
-  name: 'getTransaction',
-  description:
-    'Look up a mainnet transaction by hash (Soroban RPC within its retention window, Horizon otherwise) and return its envelope summary, success flag, decoded result codes, operations, fees, ledger and timebounds.',
-  input: GetTransactionInput,
-  output: GetTransactionOutput,
-  run: async ({ hash }, ctx: TransactionToolContext) => {
+export const getTransaction = defineNamedTool(
+  'getTransaction',
+  async ({ hash }, ctx: TransactionToolContext) => {
     const raw = await findTransaction(ctx, hash.toLowerCase());
     if (!raw.ok) return toolError(raw.error);
     try {
@@ -173,4 +170,4 @@ export const getTransaction = defineTool({
       return fail('UPSTREAM_FAILED', `Could not decode transaction ${hash}: ${message}`);
     }
   },
-});
+);
