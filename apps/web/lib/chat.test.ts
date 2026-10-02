@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { firstUserText, type HarnessUIMessage, planDecisions } from './chat';
+import { dataPartToModelText, firstUserText, type HarnessUIMessage, planDecisions } from './chat';
 import { approvalText, planApproval } from './plan-approval';
 
 const approval = (
@@ -27,6 +27,17 @@ describe('chat helpers', () => {
   it('ignores approvals that are not from the user', () => {
     const message = { ...approval('1', 'p1', 'approve'), role: 'assistant' as const };
     expect(planDecisions([message])).toEqual({});
+  });
+
+  it('turns an approval data part into json text the agent can parse', () => {
+    const data = planApproval('p3', 'approve');
+    const part = dataPartToModelText({ type: 'data-plan-approval', data });
+    expect(part).toEqual({ type: 'text', text: JSON.stringify(data) });
+    expect(JSON.parse(part?.text ?? '')).toEqual({
+      type: 'plan-approval',
+      planId: 'p3',
+      decision: 'approve',
+    });
   });
 
   it('reads the first text part', () => {
