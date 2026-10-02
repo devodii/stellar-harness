@@ -34,6 +34,12 @@ export const dataPartToModelText = (part: DataUIPart<HarnessDataParts>): TextPar
 export const messageContexts = (message: HarnessUIMessage): ChatContext[] =>
   message.parts.flatMap((part) => (part.type === 'data-context' ? [part.data] : []));
 
+export const messageText = (message: HarnessUIMessage): string =>
+  message.parts
+    .flatMap((part) => (part.type === 'text' ? [part.text] : []))
+    .join('\n')
+    .trim();
+
 export const firstUserText = (message: HarnessUIMessage | undefined): string | null => {
   const part = message?.parts.find((candidate) => candidate.type === 'text');
   return part?.type === 'text' ? part.text : null;
