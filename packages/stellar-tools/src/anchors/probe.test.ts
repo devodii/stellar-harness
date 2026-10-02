@@ -122,6 +122,32 @@ describe('probeAnchor', () => {
     expect(horizon.calls).toEqual([]);
   });
 
+  it('probes testnet tomls when testnet is selected', async () => {
+    const domain = 'testanchor.stellar.org';
+    const fetch = fakeFetcher({
+      [`https://${domain}/.well-known/stellar.toml`]: tomlRoute(domain),
+    });
+    const output = await probeAnchor(domain, {
+      fetch,
+      horizon: fakeHorizon({}),
+      network: 'testnet',
+    });
+    expect(output.tags).toEqual([]);
+    expect(output.stages.some((s) => s.error?.includes('testnet_toml'))).toBe(false);
+    expect(fetch.calls.length).toBeGreaterThan(1);
+  });
+
+  it('tags mainnet tomls and skips network probes on testnet', async () => {
+    const fetch = fakeFetcher({
+      'https://clpx.finance/.well-known/stellar.toml': tomlRoute('clpx.finance'),
+    });
+    const horizon = fakeHorizon({});
+    const output = await probeAnchor('clpx.finance', { fetch, horizon, network: 'testnet' });
+    expect(output.tags).toEqual(['mainnet_toml']);
+    expect(output.stages.slice(1).every((s) => s.error === 'skipped: mainnet_toml')).toBe(true);
+    expect(horizon.calls).toEqual([]);
+  });
+
   it('reports a missing SIGNING_KEY', async () => {
     const toml = readFixture('toml/clpx.finance.toml').replace(/^SIGNING_KEY=.*$/m, '');
     const output = await probeAnchor('clpx.finance', {
