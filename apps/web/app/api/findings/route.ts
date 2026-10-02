@@ -1,6 +1,7 @@
 import { ok } from '@harness/schema';
 import { apiHandler } from '@/lib/api-handler';
 import { FindingsQueryParams, type FindingsResponse } from '@/lib/api-schemas';
+import { getRequestNetwork } from '@/lib/network';
 import { getStorage } from '@/lib/storage';
 
 export const dynamic = 'force-dynamic';
@@ -11,7 +12,7 @@ export const GET = apiHandler({
   schema: { query: FindingsQueryParams },
   rateLimit: { limit: 120, windowSeconds: 60 },
   handler: async ({ query }) => {
-    const page = await getStorage().queryFindings({
+    const page = await getStorage(await getRequestNetwork()).queryFindings({
       type: query.type,
       severity: query.severity,
       tags: query.tag,

@@ -1,4 +1,4 @@
-import { ok } from '@harness/schema';
+import { DEFAULT_NETWORK, ok } from '@harness/schema';
 import { apiHandler } from '@/lib/api-handler';
 import type { SummaryResponse } from '@/lib/api-schemas';
 import { getServerEnv } from '@/lib/env';
@@ -29,7 +29,10 @@ export const GET = apiHandler({
   rateLimit: { limit: 240, windowSeconds: 60 },
   cacheControl: 'public, max-age=5, s-maxage=5',
   handler: async () => {
-    const [ledger, summary] = await Promise.all([latestLedger(), summaryCache.get(readSummary)]);
+    const [ledger, summary] = await Promise.all([
+      latestLedger(),
+      summaryCache.get(() => readSummary(DEFAULT_NETWORK)),
+    ]);
     return ok(buildLive(ledger, summary));
   },
 });
