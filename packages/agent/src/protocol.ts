@@ -1,4 +1,14 @@
-import { type AppError, appError, err, ok, type PlanState, type Result } from '@harness/schema';
+import {
+  type AppError,
+  appError,
+  err,
+  ok,
+  type Plan,
+  type PlanState,
+  type PlanStep,
+  type PlanStepKind,
+  type Result,
+} from '@harness/schema';
 import { z } from 'zod';
 
 export const PLAN_EVENTS = [
@@ -44,3 +54,37 @@ export const replay = (events: PlanEvent[]): Result<PlanState, AppError> =>
     (current, event) => (current.ok ? transition(current.value, event) : current),
     ok(INITIAL_PLAN_STATE),
   );
+
+const safeJson = (text: string): unknown => {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+};
+
+export const PlanDecision = z.enum(['approve', 'decline']);
+export type PlanDecision = z.infer<typeof PlanDecision>;
+
+export const PlanApproval = z.object({
+  type: z.literal('plan-approval'),
+  planId: z.string().min(1),
+  decision: PlanDecision,
+});
+export type PlanApproval = z.infer<typeof PlanApproval>;
+
+export const parsePlanApproval = (value: unknown): PlanApproval | null => {
+  const candidate = typeof value === 'string' ? safeJson(value) : value;
+  const parsed = PlanApproval.safeParse(candidate);
+  return parsed.success ? parsed.data : null;
+};
+
+export const applyApproval = (
+  state: PlanState,
+  approval: PlanApproval,
+): Result<PlanState, AppError> => transition(state, approval.decision);
+
+export const DEMO_EXECUTABLE_KINDS: ReadonlySet<PlanStepKind> = new Set(['read', 'simulate']);
+
+export const demoExecutableSteps = (plan: Plan): PlanStep[] =>
+  plan.steps.filter((step) => DEMO_EXECUTABLE_KINDS.has(step.kind));
