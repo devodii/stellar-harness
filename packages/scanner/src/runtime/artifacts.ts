@@ -1,5 +1,5 @@
 import { readdir, readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { type CsvColumn, exportPath, writeCsv } from '../core/derived';
 import { writeJsonAtomic } from '../core/state';
 import type { CensusRun, ExportPreview, MethodEntry } from '../report/inputs';
@@ -39,7 +39,7 @@ export const writeExport = async <T>(
   await writeCsv(path, rows, columns);
   const preview: ExportPreview = {
     name,
-    path: `data/exports/${name}.csv`,
+    path: `${basename(dataDir)}/exports/${name}.csv`,
     columns: columns.map(csvHeader),
     rowCount: rows.length,
     rows: rows
