@@ -9,7 +9,7 @@ describe('@harness/agent', () => {
     expect(APPROVAL_NOTE).toContain('passkey signature');
     const tools = createAgentTools(createTestContext());
     expect(Object.keys(tools).sort()).toEqual([...TOOL_NAMES].sort());
-    expect(Object.keys(tools)).toHaveLength(12);
+    expect(Object.keys(tools)).toHaveLength(13);
   });
 
   it('exposes the plan protocol as one object', () => {

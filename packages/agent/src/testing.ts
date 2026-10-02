@@ -1,4 +1,4 @@
-import { NETWORK_PROFILES } from '@harness/schema';
+import { NETWORK_PROFILES, ok } from '@harness/schema';
 import { createPortDecoders } from '@harness/stellar-tools';
 import { fakeFetcher, fakeHorizon, fakeRpc } from '@harness/stellar-tools/contracts/testing';
 import { MemoryStorage } from '@harness/storage';
@@ -18,5 +18,15 @@ export const createTestContext = (overrides: Partial<AgentToolContext> = {}): Ag
   horizonUrl: 'https://horizon.test',
   ...createPortDecoders(NETWORK_PROFILES.mainnet.passphrase),
   latestLedger: async () => TEST_LEDGER,
+  networkStatus: {
+    latestLedger: async () => ok({ sequence: TEST_LEDGER, protocolVersion: 29 }),
+    health: async () =>
+      ok({
+        status: 'healthy',
+        oldestLedger: TEST_LEDGER - 120_960,
+        ledgerRetentionWindow: 120_960,
+      }),
+    horizonLedger: async () => ok({ sequence: TEST_LEDGER }),
+  },
   ...overrides,
 });
