@@ -39,5 +39,5 @@ export * from './tools/simulate-extend-ttl';
 export * from './tools/simulate-restore';
 export * from './ports';
 export * from './tools/amount';
-export * from './tools/failures-schemas';
+export * from './tools/decoder-schemas';
 export * from './tools/result-fee';
