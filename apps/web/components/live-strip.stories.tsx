@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import * as React from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { formatPercent, formatSeconds } from '@/lib/format';
 import { LiveStrip, type LiveStripItem } from './live-strip';
 
@@ -8,7 +9,14 @@ const ITEMS: LiveStripItem[] = [
   { id: 'close', label: 'close', value: 5.9, format: formatSeconds },
   { id: 'failed', label: 'failed 7d', value: 120345, tone: 'destructive' },
   { id: 'preventable', label: 'preventable', value: 0.41, format: (n) => formatPercent(n) },
-  { id: 'archived', label: 'archived', value: 812, tone: 'warning' },
+  {
+    id: 'archived',
+    label: 'archived',
+    qualifier: 'active',
+    value: 240,
+    tone: 'warning',
+    title: '65,140 contract instances archived in total',
+  },
   { id: 'anchors', label: 'anchors failing', value: 17 },
 ];
 
@@ -22,6 +30,17 @@ export default meta;
 type Story = StoryObj<typeof LiveStrip>;
 
 export const Default: Story = {};
+
+export const ArchivedTotalOnHover: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('(active)')).toBeVisible();
+    await userEvent.hover(canvas.getByText('240'));
+    await expect(await within(document.body).findByRole('tooltip')).toHaveTextContent(
+      '65,140 contract instances archived in total',
+    );
+  },
+};
 
 export const Loading: Story = { args: { loading: true } };
 
