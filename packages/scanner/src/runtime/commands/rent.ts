@@ -1,17 +1,9 @@
 import { simulationSourceFor } from '@harness/stellar-tools/contracts';
-import { CONTRACT_ROWS_DERIVED } from '../../census/contracts/index';
-import { ContractRow } from '../../census/contracts/schemas';
 import { RENT_DERIVED, RENT_TOP_COLUMNS, runRentCensus } from '../../census/rent';
 import { writeCensusRecord, writeExport } from '../artifacts';
 import type { ScanContext } from '../context';
+import { readContractRows } from './contract-rows';
 import { measure } from './measure';
-
-const readContractRows = async (ctx: ScanContext): Promise<ContractRow[]> => {
-  const rows: ContractRow[] = [];
-  for await (const line of ctx.readDerived(CONTRACT_ROWS_DERIVED))
-    rows.push(ContractRow.parse(line));
-  return rows;
-};
 
 export const rentCommand = async (ctx: ScanContext) => {
   const { config, ports, snapshot } = ctx;
