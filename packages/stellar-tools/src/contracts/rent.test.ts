@@ -1,6 +1,7 @@
-import { ok } from '@harness/schema';
+import { appError, err, ok } from '@harness/schema';
 import { Networks, type Transaction, TransactionBuilder } from '@stellar/stellar-sdk';
 import { describe, expect, it } from 'vitest';
+import { accountLedgerKey } from '../core/account-entry';
 import account from './__fixtures__/horizon-account-circle.json';
 import extend365 from './__fixtures__/rpc-simulate-extend-365d.json';
 import extendArchived from './__fixtures__/rpc-simulate-extend-archived.json';
@@ -15,7 +16,14 @@ const ROUTER_WASM = '4c3db3ebd2d6a2ab23de1f622eaabb39501539b4611b68622ec4e47f76c
 const IDLE = 'CDZZZADKQPBUEBSTLON3M666R2Z73EMERP5KUBY6YETA76XZKSLSFDD4';
 const IDLE_WASM = '07097f83dae3b746db7dba3263d9cc334efb88a9a7d5450fb96ca19f33d284b0';
 const RECORDED_EXTEND_TO = 5_437_241;
-const source = { accountId: account.id, sequence: '144373126631784461' };
+const TESTNET_SOURCE = 'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5';
+const TESTNET_SOURCE_ENTRY =
+  'AAAAAAAAAABCPn0F8uyvv+wZKyFaPxvpau242OcCVKvjQT4CB95WsgAAAKJ1e2fpAAACqAAAABoAAAACAAAAAAAAAAIAAAAJY2VudHJlLmlvAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAADAAAAAAAfYIMAAAAAad/52A==';
+const source = {
+  accountId: account.id,
+  sequence: '144373126631784461',
+  networkPassphrase: Networks.PUBLIC,
+};
 
 const decode = (txXdr: string) => TransactionBuilder.fromXdr(txXdr, Networks.PUBLIC) as Transaction;
 
@@ -34,6 +42,22 @@ describe('buildFootprintTransaction', () => {
     );
     expect(tx.toXdr()).toBe(extend365.request.transaction);
     expect(tx.signatures).toHaveLength(0);
+  });
+
+  it('signs nothing but hashes against the source network passphrase', () => {
+    const keys = [contractInstanceKey(ROUTER)];
+    const action = { kind: 'extend', extendToLedgers: RECORDED_EXTEND_TO } as const;
+    const mainnet = buildFootprintTransaction(source, keys, action);
+    const testnet = buildFootprintTransaction(
+      { ...source, networkPassphrase: Networks.TESTNET },
+      keys,
+      action,
+    );
+    expect(testnet.networkPassphrase).toBe(Networks.TESTNET);
+    expect(testnet.toXdr()).toBe(mainnet.toXdr());
+    expect(Buffer.from(testnet.hash()).toString('hex')).not.toBe(
+      Buffer.from(mainnet.hash()).toString('hex'),
+    );
   });
 });
 
@@ -103,14 +127,43 @@ describe('simulateFootprint', () => {
 describe('fetchSimulationSource', () => {
   it('reads the sequence of an existing account', async () => {
     const horizon = fakeHorizon([account as HorizonAccount]);
-    expect(await fetchSimulationSource(horizon, account.id)).toEqual({
+    expect(
+      await fetchSimulationSource({ horizon, rpc: fakeRpc() }, account.id, Networks.PUBLIC),
+    ).toEqual({
       ok: true,
-      value: { accountId: account.id, sequence: account.sequence },
+      value: {
+        accountId: account.id,
+        sequence: account.sequence,
+        networkPassphrase: Networks.PUBLIC,
+      },
+    });
+  });
+
+  it('reads the sequence from RPC when Horizon is down', async () => {
+    const horizon = {
+      ...fakeHorizon(),
+      account: async () => err(appError('UPSTREAM_FAILED', 'connect ECONNREFUSED')),
+    };
+    const rpc = fakeRpc({
+      entries: [{ key: accountLedgerKey(TESTNET_SOURCE), xdr: TESTNET_SOURCE_ENTRY }],
+    });
+    const result = await fetchSimulationSource({ horizon, rpc }, TESTNET_SOURCE, Networks.TESTNET);
+    expect(result).toEqual({
+      ok: true,
+      value: {
+        accountId: TESTNET_SOURCE,
+        sequence: '2920577761306',
+        networkPassphrase: Networks.TESTNET,
+      },
     });
   });
 
   it('fails with NOT_FOUND for a missing account', async () => {
-    const result = await fetchSimulationSource(fakeHorizon(), account.id);
+    const result = await fetchSimulationSource(
+      { horizon: fakeHorizon(), rpc: fakeRpc() },
+      account.id,
+      Networks.PUBLIC,
+    );
     expect(result).toMatchObject({ ok: false, error: { code: 'NOT_FOUND' } });
   });
 });
