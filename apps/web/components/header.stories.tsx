@@ -1,12 +1,20 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, userEvent, within } from 'storybook/test';
 import { DEMO_ORG } from '@/demo-org';
+import { ConversationsProvider } from './conversations-provider';
 import { Header, policyLine } from './header';
 
 const meta: Meta<typeof Header> = {
   component: Header,
   title: 'components/Header',
   args: { org: DEMO_ORG },
+  decorators: [
+    (Story) => (
+      <ConversationsProvider>
+        <Story />
+      </ConversationsProvider>
+    ),
+  ],
 };
 export default meta;
 
