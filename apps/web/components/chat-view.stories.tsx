@@ -2,8 +2,9 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { fn } from 'storybook/test';
 import type { HarnessUIMessage } from '@/lib/chat';
 import { ChatView } from './chat-view';
+import { fakeContract } from './story-ids';
 
-const CONTRACT = 'CFAKECONTRACTFORSTORYBOOK0000000000000000000000000000ABC';
+const CONTRACT = fakeContract('story');
 
 const SUGGESTIONS = [
   { id: 'a', label: 'Why did tx abcd…ef01 fail?', prompt: 'Why did transaction abcdef01 fail?' },

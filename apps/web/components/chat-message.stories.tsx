@@ -3,8 +3,9 @@ import { fn } from 'storybook/test';
 import type { HarnessUIMessage } from '@/lib/chat';
 import { ChatActionsProvider } from './chat-actions';
 import { ChatMessage } from './chat-message';
+import { fakeAccount } from './story-ids';
 
-const FAKE_ACCOUNT = 'GFAKEACCOUNTFORSTORYBOOK0000000000000000000000000000ACC';
+const FAKE_ACCOUNT = fakeAccount('story');
 
 const USER: HarnessUIMessage = {
   id: 'u1',
