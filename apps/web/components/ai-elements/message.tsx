@@ -22,9 +22,9 @@ export const MessageContent = ({ className, ...props }: ComponentProps<'div'>) =
   <div className={cn('flex w-full min-w-0 flex-col gap-3 text-sm', className)} {...props} />
 );
 
-export const MessageResponse = ({
-  className,
-  ...props
-}: ComponentProps<typeof Streamdown>) => (
-  <Streamdown className={cn('size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0', className)} {...props} />
+export const MessageResponse = ({ className, ...props }: ComponentProps<typeof Streamdown>) => (
+  <Streamdown
+    className={cn('size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0', className)}
+    {...props}
+  />
 );
