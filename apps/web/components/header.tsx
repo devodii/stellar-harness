@@ -2,7 +2,7 @@ import type { Org } from '@harness/schema';
 import { PilotSheet } from '@/components/pilot-sheet';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
-const policySummary = ({ policy }: Org): string =>
+const policyLine = ({ policy }: Org): string =>
   `daily ${policy.dailySpendXlm} XLM · approval above ${policy.approvalAboveXlm} XLM · ${policy.allowedOperations.join(', ')}`;
 
 export function Header({ org }: { org: Org }) {
@@ -17,7 +17,7 @@ export function Header({ org }: { org: Org }) {
           <TooltipTrigger asChild>
             <span className="cursor-default rounded-full border px-2.5 py-0.5 text-xs">Policy</span>
           </TooltipTrigger>
-          <TooltipContent className="font-mono">{policySummary(org)}</TooltipContent>
+          <TooltipContent className="font-mono">{policyLine(org)}</TooltipContent>
         </Tooltip>
         <PilotSheet />
       </div>

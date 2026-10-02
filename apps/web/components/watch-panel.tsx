@@ -5,7 +5,7 @@ import { CopyId } from '@/components/copy-id';
 import { formatXlm } from '@/lib/format';
 import type { Watch, WatchedContract } from '@/lib/harness';
 
-const anchorSummary = (probe: AnchorProbe | null): string => {
+const anchorStatus = (probe: AnchorProbe | null): string => {
   if (!probe) return 'unavailable';
   const failing = probe.stages.find((stage) => stage.status === 'fail');
   if (failing) return `${failing.name} failed`;
@@ -70,7 +70,7 @@ export function WatchPanel({ watch, anchorDomain }: { watch: Watch; anchorDomain
         <Section title="Anchor">
           <li>
             <p className="text-sm">{anchorDomain}</p>
-            <p className="font-mono text-xs">{anchorSummary(watch.anchor)}</p>
+            <p className="font-mono text-xs">{anchorStatus(watch.anchor)}</p>
           </li>
         </Section>
       )}

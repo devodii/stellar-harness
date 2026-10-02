@@ -106,7 +106,7 @@ function ToolOutput({ part }: { part: ToolPart }) {
   }
 }
 
-const argsSummary = (input: unknown): string =>
+const formatArgs = (input: unknown): string =>
   Object.values(input && typeof input === 'object' ? input : {})
     .map((value) =>
       typeof value === 'string' && value.length > 20 ? truncateId(value) : String(value),
@@ -125,7 +125,7 @@ export function ToolCall({ part }: { part: Part }) {
   return (
     <Tool open>
       <ToolHeader
-        title={`${getToolName(part)}(${argsSummary(part.input)})`}
+        title={`${getToolName(part)}(${formatArgs(part.input)})`}
         status={statusOf(part)}
       />
       {part.state === 'output-error' && (
