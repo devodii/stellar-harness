@@ -19,8 +19,8 @@ if (existsSync(rootEnv)) process.loadEnvFile(rootEnv);
 
 const globals = globalThis as typeof globalThis & { harnessStorage?: MemoryStorage };
 globals.harnessStorage ??= new MemoryStorage(DEMO_ORG);
-export const storage = globals.harnessStorage;
-export const clients = createClients(DEMO_ORG.network);
+const storage = globals.harnessStorage;
+const clients = createClients(DEMO_ORG.network);
 export const tools = createAgentTools(storage, clients);
 
 const cached = <T>(ttlMs: number, load: () => Promise<T>): (() => Promise<T>) => {
@@ -39,7 +39,7 @@ const cached = <T>(ttlMs: number, load: () => Promise<T>): (() => Promise<T>) =>
 
 const settle = <T>(promise: Promise<T>): Promise<T | null> => promise.catch(() => null);
 
-export type WatchedAccount = OrgAccount & { xlm: string | null };
+type WatchedAccount = OrgAccount & { xlm: string | null };
 export type WatchedContract = OrgContract & { ttl: ContractTtl | null };
 export type Watch = {
   accounts: WatchedAccount[];
