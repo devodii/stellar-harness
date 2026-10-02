@@ -36,7 +36,7 @@ export const createRpcPort = ({ rpc }: Pick<NetworkClients, 'rpc'>): RpcPort => 
         liveUntilLedgerSeq: entry.liveUntilLedgerSeq ?? undefined,
       })),
     })),
-  simulateTransaction: (txXdr) => rpc.simulateTransaction(txXdr, { cache: false }),
+  simulateTransaction: (txXdr) => rpc.simulateTransaction(txXdr),
   getTransactions: async ({ startLedger, cursor, limit }) =>
     rpc.getTransactions(cursor ? { cursor, limit } : { startLedger: startLedger ?? 0, limit }),
 });
