@@ -33,15 +33,13 @@ export class SqliteStorage implements Storage {
 
   async getFinding(findingId: string): Promise<Finding | null> {
     const row = this.#db.prepare('select body from findings where id = ?').get(findingId) as
-      | { body: string }
-      | undefined;
+      { body: string } | undefined;
     return row ? Finding.parse(JSON.parse(row.body)) : null;
   }
 
   async getSummary(): Promise<Summary | null> {
     const row = this.#db.prepare('select body from summary where id = 1').get() as
-      | { body: string }
-      | undefined;
+      { body: string } | undefined;
     return row ? Summary.parse(JSON.parse(row.body)) : null;
   }
 

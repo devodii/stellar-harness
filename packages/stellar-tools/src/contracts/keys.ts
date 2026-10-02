@@ -26,9 +26,7 @@ export const codeKeyXdr = (wasmHashHex: string): string =>
   encodeLedgerKey(contractCodeKey(wasmHashHex));
 
 export type ContractExecutableInfo =
-  | { kind: 'wasm'; wasmHash: string }
-  | { kind: 'stellar_asset' }
-  | { kind: 'external' };
+  { kind: 'wasm'; wasmHash: string } | { kind: 'stellar_asset' } | { kind: 'external' };
 
 export const parseInstanceExecutable = (entryDataXdr: string): ContractExecutableInfo | null => {
   let data: xdr.LedgerEntryData;

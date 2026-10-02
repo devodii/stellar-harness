@@ -15,5 +15,4 @@ export const toolResult = <T extends z.ZodType>(data: T) =>
   ]);
 
 export type ToolResult<T> =
-  | { ok: true; data: T; meta: ToolMeta }
-  | { ok: false; error: AppError; meta: ToolMeta };
+  { ok: true; data: T; meta: ToolMeta } | { ok: false; error: AppError; meta: ToolMeta };
