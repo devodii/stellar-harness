@@ -1,9 +1,10 @@
 'use client';
 
-import { CaretUpDownIcon, CheckIcon } from '@phosphor-icons/react/ssr';
+import { CaretUpDownIcon } from '@phosphor-icons/react/ssr';
 import { cn } from 'cn';
 import * as React from 'react';
 import * as RHF from 'react-hook-form';
+import { CheckMark } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -104,7 +105,7 @@ export function MultiSelectField<TValues extends RHF.FieldValues, TName extends 
                           onSelect={() => toggle(option.value)}
                           className="font-mono text-xs"
                         >
-                          <CheckIcon
+                          <CheckMark
                             className={cn(
                               'size-3.5',
                               selected.includes(option.value) ? 'opacity-100' : 'opacity-0',
