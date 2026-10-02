@@ -1,7 +1,6 @@
 'use client';
 
-import type { Finding } from '@harness/schema';
-import { severityRank } from '@harness/schema';
+import { type Finding, severityRank } from '@harness/schema';
 import { DatabaseIcon } from '@phosphor-icons/react/ssr';
 import type { ColumnDef } from '@tanstack/react-table';
 import type * as React from 'react';
