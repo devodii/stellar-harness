@@ -1,10 +1,12 @@
 import {
   Finding,
   type FindingQuery,
+  MEANINGFUL_INVOCATIONS,
   type Network,
   SEVERITIES,
   Snapshot,
   Summary,
+  WaitlistEntry,
 } from '@harness/schema';
 import { DEFAULT_LIMIT } from '../query';
 import type { FindingPage, Storage } from '../storage';
@@ -36,6 +38,11 @@ export class PostgresStorage implements Storage {
     if (query.severity?.length) filters.push(sql`severity = any(${query.severity}::text[])`);
     if (query.subject) filters.push(sql`subject = ${query.subject}`);
     if (query.tags?.length) filters.push(sql`tags @> ${query.tags}::text[]`);
+    if (query.meaningful) {
+      filters.push(
+        sql`(subject_kind = 'anchor_domain' or 'scf_funded' = any(tags) or coalesce((body->'evidence'->>'invocations')::numeric, 0) >= ${MEANINGFUL_INVOCATIONS})`,
+      );
+    }
     return filters.reduce((all, filter) => sql`${all} and ${filter}`);
   }
 
@@ -88,5 +95,18 @@ export class PostgresStorage implements Storage {
       select body from snapshots where network = ${this.network}
     `;
     return row ? Snapshot.parse(row.body) : null;
+  }
+
+  async putWaitlist(entry: WaitlistEntry): Promise<void> {
+    const valid = WaitlistEntry.parse(entry);
+    await this.#sql`
+      insert into waitlist (email, created_at, user_agent)
+      values (${valid.email}, ${valid.createdAt}, ${valid.userAgent})
+    `;
+  }
+
+  async countWaitlist(): Promise<number> {
+    const [row] = await this.#sql<{ total: number }[]>`select count(*)::int as total from waitlist`;
+    return row?.total ?? 0;
   }
 }

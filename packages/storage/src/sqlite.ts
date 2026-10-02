@@ -1,4 +1,10 @@
-import { Finding, type FindingQuery, type Snapshot, Summary } from '@harness/schema';
+import {
+  Finding,
+  type FindingQuery,
+  type Snapshot,
+  Summary,
+  WaitlistEntry,
+} from '@harness/schema';
 import Database from 'better-sqlite3';
 import { queryFindingRows } from './query';
 import type { FindingPage, Storage } from './storage';
@@ -12,6 +18,7 @@ export class SqliteStorage implements Storage {
     this.#db.exec(`
       create table if not exists findings (id text primary key, body text not null);
       create table if not exists summary (id integer primary key check (id = 1), body text not null);
+      create table if not exists waitlist (id integer primary key autoincrement, body text not null);
     `);
   }
 
@@ -51,5 +58,16 @@ export class SqliteStorage implements Storage {
 
   async getSnapshot(): Promise<Snapshot | null> {
     return (await this.getSummary())?.snapshot ?? null;
+  }
+
+  async putWaitlist(entry: WaitlistEntry): Promise<void> {
+    this.#db
+      .prepare('insert into waitlist (body) values (?)')
+      .run(JSON.stringify(WaitlistEntry.parse(entry)));
+  }
+
+  async countWaitlist(): Promise<number> {
+    const row = this.#db.prepare('select count(*) as total from waitlist').get() as { total: number };
+    return row.total;
   }
 }
