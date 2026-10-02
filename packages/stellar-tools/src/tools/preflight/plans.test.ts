@@ -1,4 +1,4 @@
-import { Plan } from '@harness/schema';
+import { Plan, ROADMAP_NOTE } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
 import { parseAsset } from '../assets';
 import { MISSING, USDC } from './__tests__/accounts';
@@ -37,68 +37,40 @@ describe('chooseAlternative', () => {
 });
 
 describe('alternativePlan', () => {
-  it('builds a CAP-33 sponsored trustline plan that passes the Plan schema', () => {
+  it('builds a sponsored trustline plan that hands off to the account signers', () => {
     const plan = alternativePlan(input(['op_no_trust']));
     if (!plan) throw new Error('expected a plan');
     expect(Plan.parse(plan)).toEqual(plan);
     expect(plan.subject).toBe(TO);
-    expect(plan.estimatedCostXlm).toBe(0.5);
     expect(plan.steps.map((s) => [s.id, s.kind, s.tool])).toEqual([
       ['s1', 'read', 'getAccount'],
-      ['s2', 'build', 'buildTransaction'],
-      ['s3', 'submit', 'submitTransaction'],
-      ['s4', 'read', 'buildPaymentPreflight'],
-      ['s5', 'build', 'buildTransaction'],
-      ['s6', 'submit', 'submitTransaction'],
+      ['s2', 'read', 'getAccount'],
+      ['s3', 'handoff', 'handoff'],
     ]);
-    expect(plan.steps[1]?.args.operations).toEqual([
-      { type: 'begin_sponsoring_future_reserves', source: FROM, sponsoredId: TO },
-      { type: 'change_trust', source: TO, asset: USDC },
-      { type: 'end_sponsoring_future_reserves', source: TO },
-    ]);
-    expect(plan.steps[2]?.args).toEqual({
-      fromStep: 's2',
-      network: 'mainnet',
-      signers: [FROM, TO],
-    });
-    expect(plan.steps[5]?.args).toMatchObject({ fromStep: 's5' });
+    expect(plan.steps[0]?.args).toEqual({ address: FROM });
+    expect(plan.steps[1]?.args).toEqual({ address: TO });
     expect(plan.steps.every((s) => s.status === 'pending')).toBe(true);
-    expect(plan.requiresApproval).toBe(true);
-    expect(plan.boundary).toEqual({
-      rule: 'submit_requires_approval',
-      reason: 'The plan submits a transaction; every submission needs explicit approval.',
-      threshold: '0 submissions without approval',
-      requested: '2 submissions',
+    expect(plan.handoff).toEqual({
+      summary:
+        "The destination signs a change_trust for USDC; the sender can sponsor its 0.5 XLM reserve (CAP-33), but the destination's signature is still required.",
+      requiredAuthority: 'account_signer',
+      estimatedCostXlm: 0.5,
+      roadmapNote: ROADMAP_NOTE,
     });
   });
 
-  it('submits on the network given in the input', () => {
-    const plan = alternativePlan({ ...input(['op_no_trust']), network: 'testnet' });
-    const submits = plan?.steps.filter((step) => step.kind === 'submit') ?? [];
-    expect(submits.map((step) => step.args.network)).toEqual(['testnet', 'testnet']);
-  });
-
-  it('builds a claimable balance plan with the destination as claimant', () => {
+  it('builds a claimable balance plan for the destination', () => {
     const plan = alternativePlan(input(['op_no_destination'], USDC, '25', MISSING));
-    expect(plan?.steps[1]?.args.operations).toEqual([
-      {
-        type: 'create_claimable_balance',
-        asset: USDC,
-        amount: '25',
-        claimants: [{ destination: MISSING, predicate: 'unconditional' }],
-      },
-    ]);
-    expect(plan?.boundary?.requested).toBe('1 submission');
+    expect(plan?.handoff.summary).toContain(`claimable balance of 25 USDC for ${MISSING}`);
+    expect(plan?.handoff.requiredAuthority).toBe('account_signer');
     expect(plan?.planId).toMatch(/^preflight-claimable_balance-[0-9a-f]{8}$/);
   });
 
   it('builds a create_account plan for XLM to a missing destination', () => {
     const plan = alternativePlan(input(['op_no_destination'], 'XLM', '5', MISSING));
     expect(plan?.title).toBe(`Create and fund ${MISSING} with 5 XLM`);
-    expect(plan?.steps[1]?.args.operations).toEqual([
-      { type: 'create_account', destination: MISSING, startingBalance: '5' },
-    ]);
-    expect(plan?.requiresApproval).toBe(true);
+    expect(plan?.handoff.summary).toContain('create_account');
+    expect(plan?.handoff.estimatedCostXlm).toBeUndefined();
   });
 
   it('returns no plan when the sender must act first', () => {
@@ -112,24 +84,5 @@ describe('alternativePlan', () => {
     expect(alternativePlan(input(['op_no_trust']))?.planId).not.toBe(
       alternativePlan(input(['op_no_trust'], USDC, '26'))?.planId,
     );
-  });
-});
-
-describe('alternative plan policy', () => {
-  it('asks approval for the submission under the default spend cap', () => {
-    expect(alternativePlan(input(['op_no_trust']))).toMatchObject({
-      requiresApproval: true,
-      boundary: { rule: 'submit_requires_approval', requested: '2 submissions' },
-    });
-  });
-
-  it('reports the spend cap when the reserve cost exceeds the policy', () => {
-    const plan = alternativePlan({ ...input(['op_no_trust']), policy: { spendCapXlm: 0.1 } });
-    expect(plan?.boundary).toEqual({
-      rule: 'spend_cap',
-      reason: 'Estimated cost exceeds the policy spend cap of 0.1 XLM.',
-      threshold: '0.1 XLM',
-      requested: '0.5 XLM',
-    });
   });
 });
