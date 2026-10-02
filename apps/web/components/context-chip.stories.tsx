@@ -41,7 +41,7 @@ const reply: ChatContext = {
   kind: 'reply',
   messageId: 'm1',
   excerpt:
-    'The instance expires in 12 days. Extending it to 12 months costs about 49.16 XLM in resource fees; the plan below needs approval because it submits.',
+    'The instance expires in 12 days. Extending it to 12 months costs about 49.16 XLM in resource fees; the plan below hands it to whoever pays.',
 };
 
 export const Reply: Story = { args: { context: reply } };

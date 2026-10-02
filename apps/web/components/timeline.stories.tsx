@@ -21,16 +21,16 @@ const events: Event[] = [
   },
   {
     id: 'c',
-    label: 'build',
-    detail: 'Build the unsigned transaction',
-    tone: 'pending',
+    label: 'simulate',
+    detail: 'Simulate RestoreFootprint for the wasm code',
+    tone: 'failed',
     ledger: 64_723_482,
   },
   {
     id: 'd',
-    label: 'submit',
-    detail: 'Submit after approval',
-    tone: 'blocked',
+    label: 'handoff',
+    detail: 'Hand the extension to whoever pays for it',
+    tone: 'pending',
     ledger: 64_723_483,
   },
 ];
@@ -60,7 +60,7 @@ export const Collapsed: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole('button', { name: /show 2 more/i }));
-    await expect(canvas.getByText('Submit after approval')).toBeVisible();
+    await expect(canvas.getByText('Hand the extension to whoever pays for it')).toBeVisible();
   },
 };
 
