@@ -15,9 +15,13 @@ export function Header({ org }: { org: Org }) {
       <div className="flex items-center justify-end gap-4">
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className="cursor-default rounded-full border px-2.5 py-0.5 text-xs">Policy</span>
+            <button type="button" className="cursor-default rounded-full border px-2.5 py-0.5 text-xs">
+              Policy
+            </button>
           </TooltipTrigger>
-          <TooltipContent className="font-mono">{policyLine(org)}</TooltipContent>
+          <TooltipContent side="bottom" className="font-mono">
+            {policyLine(org)}
+          </TooltipContent>
         </Tooltip>
         <PilotSheet />
       </div>
