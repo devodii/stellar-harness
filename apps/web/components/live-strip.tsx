@@ -1,14 +1,15 @@
 import { cn } from 'cn';
 import { MonoNumber } from '@/components/mono-number';
-import { StatLabel, type StatTone } from '@/components/stat';
+import { StatLabel } from '@/components/stat';
 import { Skeleton } from '@/components/ui/skeleton';
+import { TONE_TEXT, type Tone } from '@/lib/tone';
 
 export interface LiveStripItem {
   id: string;
   label: string;
   value: number | null | undefined;
   format?: (value: number) => string;
-  tone?: StatTone;
+  tone?: Tone;
   title?: string;
 }
 
@@ -18,13 +19,6 @@ export interface LiveStripProps {
   loading?: boolean;
   className?: string;
 }
-
-const TONE_CLASS: Record<StatTone, string> = {
-  default: 'text-foreground',
-  success: 'text-success',
-  warning: 'text-warning',
-  destructive: 'text-destructive',
-};
 
 export function LiveStrip({ items, live = false, loading = false, className }: LiveStripProps) {
   return (
@@ -54,7 +48,7 @@ export function LiveStrip({ items, live = false, loading = false, className }: L
                 format={item.format}
                 className={cn(
                   'inline-block text-xs animate-in fade-in slide-in-from-bottom-1 duration-500',
-                  TONE_CLASS[item.tone ?? 'default'],
+                  TONE_TEXT[item.tone ?? 'default'],
                 )}
               />
             )}
