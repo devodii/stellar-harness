@@ -1,4 +1,3 @@
-import { AnchorStage } from '@harness/schema';
 import { z } from 'zod';
 import { FindingType } from './finding';
 import { Snapshot } from './snapshot';
@@ -48,6 +47,20 @@ export const FailuresSummary = z.object({
   }),
 });
 export type FailuresSummary = z.infer<typeof FailuresSummary>;
+
+export const ANCHOR_STAGES = [
+  'toml',
+  'accounts',
+  'endpoints',
+  'info',
+  'sep10',
+  'sep38',
+  'sep31',
+  'cors',
+  'tests',
+] as const;
+export const AnchorStage = z.enum(ANCHOR_STAGES);
+export type AnchorStage = z.infer<typeof AnchorStage>;
 
 export const FailingAnchor = z.object({
   domain: z.string(),
