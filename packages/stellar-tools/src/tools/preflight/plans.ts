@@ -1,11 +1,5 @@
-import {
-  DEFAULT_NETWORK,
-  type Network,
-  Plan,
-  type PlanStep,
-  type PlanStepKind,
-} from '@harness/schema';
-import { DEFAULT_SPEND_CAP_XLM, evaluatePolicy, type Policy } from '../../plan/policy';
+import type { Plan } from '@harness/schema';
+import { assemblePlan, handoff, type PlanDraft, read } from '../../plan/step';
 import { formatStroops, toStroops } from '../amount';
 import { assetId, type ParsedAsset } from '../assets';
 import { BASE_RESERVE_STROOPS } from '../reserve';
@@ -19,11 +13,7 @@ export type AlternativeInput = {
   asset: ParsedAsset;
   amount: string;
   blockers: PreflightCode[];
-  policy?: Policy;
-  network?: Network;
 };
-
-const DEFAULT_POLICY: Policy = { spendCapXlm: DEFAULT_SPEND_CAP_XLM };
 
 const SOURCE_SIDE: ReadonlySet<PreflightCode> = new Set([
   'tx_no_source_account',
@@ -49,21 +39,6 @@ export const chooseAlternative = (input: AlternativeInput): AlternativeKind | nu
   return null;
 };
 
-type StepDraft = Omit<PlanStep, 'id' | 'status'> & { status?: PlanStep['status'] };
-
-const step = (
-  kind: PlanStepKind,
-  tool: string,
-  description: string,
-  args: Record<string, unknown>,
-): StepDraft => ({ kind, tool, description, args });
-
-const submitStep = (input: AlternativeInput, description: string, signers: string[]): StepDraft =>
-  step('submit', 'submitTransaction', description, {
-    network: input.network ?? DEFAULT_NETWORK,
-    signers,
-  });
-
 const stableId = (parts: string[]): string => {
   let hash = 0x811c9dc5;
   for (const char of parts.join('|')) {
@@ -73,146 +48,58 @@ const stableId = (parts: string[]): string => {
   return hash.toString(16).padStart(8, '0');
 };
 
-const finalize = (
-  input: AlternativeInput,
-  kind: AlternativeKind,
-  title: string,
-  drafts: StepDraft[],
-  estimatedCostXlm?: number,
-): Plan => {
-  const steps: PlanStep[] = drafts.map((draft, index) => {
-    const id = `s${index + 1}`;
-    const previousBuild = drafts.slice(0, index).findLastIndex((d) => d.kind === 'build');
-    const args =
-      draft.kind === 'submit' && previousBuild >= 0
-        ? { fromStep: `s${previousBuild + 1}`, ...draft.args }
-        : draft.args;
-    return { ...draft, id, args, status: draft.status ?? 'pending' };
-  });
-  const costed = estimatedCostXlm !== undefined ? { estimatedCostXlm } : {};
-  return Plan.parse({
-    planId: `preflight-${kind}-${stableId([input.from, input.to, assetId(input.asset), input.amount])}`,
-    title,
-    subject: input.to,
-    steps,
-    ...costed,
-    ...evaluatePolicy({ steps, ...costed }, input.policy ?? DEFAULT_POLICY),
-  });
-};
-
 const assetLabel = (asset: ParsedAsset) => (asset.native ? 'XLM' : asset.code);
 
-const paymentSteps = (input: AlternativeInput): StepDraft[] => [
-  step(
-    'build',
-    'buildTransaction',
-    `Build the ${input.amount} ${assetLabel(input.asset)} payment.`,
-    {
-      source: input.from,
-      operations: [
-        {
-          type: 'payment',
-          destination: input.to,
-          asset: assetId(input.asset),
-          amount: input.amount,
-        },
-      ],
-    },
-  ),
-  submitStep(input, 'Submit the payment once the policy owner approves and signs.', [input.from]),
-];
+const readSource = (input: AlternativeInput) =>
+  read('getAccount', 'Read the source account balances and reserve.', { address: input.from });
 
-const sponsoredTrustline = (input: AlternativeInput): Plan => {
-  const asset = assetId(input.asset);
-  return finalize(
-    input,
-    'sponsored_trustline',
-    `Sponsor a ${assetLabel(input.asset)} trustline for ${input.to}, then pay`,
-    [
-      step('read', 'getAccount', 'Read the destination account and its trustlines.', {
-        address: input.to,
-      }),
-      step(
-        'build',
-        'buildTransaction',
-        `Build a CAP-33 sponsored trustline: ${input.from} pays the ${RESERVE_XLM} XLM reserve, ${input.to} co-signs the change_trust.`,
-        {
-          source: input.from,
-          operations: [
-            { type: 'begin_sponsoring_future_reserves', source: input.from, sponsoredId: input.to },
-            { type: 'change_trust', source: input.to, asset },
-            { type: 'end_sponsoring_future_reserves', source: input.to },
-          ],
-        },
-      ),
-      submitStep(input, 'Submit the sponsorship once approved and signed by both accounts.', [
-        input.from,
-        input.to,
-      ]),
-      step('read', 'buildPaymentPreflight', 'Re-run the pre-flight against the new trustline.', {
-        from: input.from,
-        to: input.to,
-        asset,
-        amount: input.amount,
-      }),
-      ...paymentSteps(input),
+const sponsoredTrustline = (input: AlternativeInput): PlanDraft => {
+  const label = assetLabel(input.asset);
+  return {
+    title: `Sponsor a ${label} trustline for ${input.to}, then pay`,
+    steps: [
+      readSource(input),
+      read('getAccount', 'Read the destination account and its trustlines.', { address: input.to }),
     ],
-    RESERVE_XLM,
-  );
+    handoff: handoff(
+      'account_signer',
+      `The destination signs a change_trust for ${label}; the sender can sponsor its ${RESERVE_XLM} XLM reserve (CAP-33), but the destination's signature is still required.`,
+      RESERVE_XLM,
+    ),
+  };
 };
 
-const claimableBalance = (input: AlternativeInput): Plan =>
-  finalize(
-    input,
-    'claimable_balance',
-    `Send ${input.amount} ${assetLabel(input.asset)} to ${input.to} as a claimable balance`,
-    [
-      step('read', 'getAccount', 'Read the destination account state.', { address: input.to }),
-      step(
-        'build',
-        'buildTransaction',
-        `Build create_claimable_balance: ${input.to} can claim once its trustline accepts the asset.`,
-        {
-          source: input.from,
-          operations: [
-            {
-              type: 'create_claimable_balance',
-              asset: assetId(input.asset),
-              amount: input.amount,
-              claimants: [{ destination: input.to, predicate: 'unconditional' }],
-            },
-          ],
-        },
-      ),
-      submitStep(input, 'Submit the claimable balance once the policy owner approves and signs.', [
-        input.from,
-      ]),
+const claimableBalance = (input: AlternativeInput): PlanDraft => {
+  const label = assetLabel(input.asset);
+  return {
+    title: `Send ${input.amount} ${label} to ${input.to} as a claimable balance`,
+    steps: [
+      readSource(input),
+      read('getAccount', 'Read the destination account state.', { address: input.to }),
     ],
-    RESERVE_XLM,
-  );
+    handoff: handoff(
+      'account_signer',
+      `The sender's signers create a claimable balance of ${input.amount} ${label} for ${input.to}, claimable once its trustline accepts the asset (${RESERVE_XLM} XLM reserve until claimed).`,
+      RESERVE_XLM,
+    ),
+  };
+};
 
-const createAccount = (input: AlternativeInput): Plan =>
-  finalize(input, 'create_account', `Create and fund ${input.to} with ${input.amount} XLM`, [
-    step('read', 'getAccount', 'Confirm the destination is still not on the ledger.', {
+const createAccount = (input: AlternativeInput): PlanDraft => ({
+  title: `Create and fund ${input.to} with ${input.amount} XLM`,
+  steps: [
+    readSource(input),
+    read('getAccount', 'Confirm the destination is still not on the ledger.', {
       address: input.to,
     }),
-    step(
-      'build',
-      'buildTransaction',
-      'Build create_account with the payment as starting balance.',
-      {
-        source: input.from,
-        operations: [
-          { type: 'create_account', destination: input.to, startingBalance: input.amount },
-        ],
-      },
-    ),
-    submitStep(input, 'Submit the account creation once the policy owner approves and signs.', [
-      input.from,
-    ]),
-  ]);
+  ],
+  handoff: handoff(
+    'account_signer',
+    `The sender's signers fund ${input.to} with create_account, using the ${input.amount} XLM payment as its starting balance.`,
+  ),
+});
 
-const BUILDERS: Record<AlternativeKind, (input: AlternativeInput) => Plan> = {
+const BUILDERS: Record<AlternativeKind, (input: AlternativeInput) => PlanDraft> = {
   sponsored_trustline: sponsoredTrustline,
   claimable_balance: claimableBalance,
   create_account: createAccount,
@@ -220,5 +107,7 @@ const BUILDERS: Record<AlternativeKind, (input: AlternativeInput) => Plan> = {
 
 export const alternativePlan = (input: AlternativeInput): Plan | undefined => {
   const kind = chooseAlternative(input);
-  return kind ? BUILDERS[kind](input) : undefined;
+  if (!kind) return undefined;
+  const id = stableId([input.from, input.to, assetId(input.asset), input.amount]);
+  return assemblePlan(`preflight-${kind}-${id}`, input.to, BUILDERS[kind](input));
 };
