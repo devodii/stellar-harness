@@ -24,7 +24,7 @@ describe('explainCodes', () => {
   });
 
   it('uses a category action for non preventable codes', () => {
-    const result = explainCodes({ tx: 'tx_failed', ops: ['op_entry_archived'] });
+    const result = explainCodes({ tx: 'tx_failed', ops: ['entry_archived'] });
     expect(result.preventable).toBe(false);
     expect(result.suggestedAction).toMatch(/restore any archived entries/);
   });
@@ -36,7 +36,7 @@ describe('explainCodes', () => {
   });
 
   it('prefers the preventable cause for the action when several ops fail', () => {
-    const result = explainCodes({ tx: 'tx_failed', ops: ['op_trapped', 'op_underfunded'] });
+    const result = explainCodes({ tx: 'tx_failed', ops: ['function_trapped', 'op_underfunded'] });
     expect(result.suggestedAction).toBe(ACTION_BY_CODE.op_underfunded);
   });
 
