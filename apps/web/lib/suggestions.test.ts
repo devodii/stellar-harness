@@ -1,7 +1,7 @@
 import { emptySummary, type Network } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
 import { MAINNET_FALLBACKS } from './mainnet-fallbacks';
-import { buildSuggestions } from './suggestions';
+import { buildSuggestions, SCF_LIFETIME_QUESTION } from './suggestions';
 import { TESTNET_FALLBACKS } from './testnet-fallbacks';
 
 const snapshotFor = (network: Network) => ({
@@ -39,6 +39,34 @@ describe('buildSuggestions', () => {
     expect(suggestions[5]?.prompt).toBe(
       `What does it cost to keep ${MAINNET_FALLBACKS.contract} alive for 12 months?`,
     );
+  });
+
+  it('asks the SCF lifetime question and steers it to a simulation and handoff', () => {
+    const [, chip] = buildSuggestions(null);
+    expect(chip?.label).toBe(
+      'Which SCF-funded contracts are archived or expiring within 30 days, and what would restoring them cost?',
+    );
+    expect(chip?.prompt.startsWith(SCF_LIFETIME_QUESTION)).toBe(true);
+    expect(chip?.prompt).toMatch(/Simulate/);
+    expect(prompts().join(' ')).not.toMatch(/approv|polic|submit/i);
+  });
+
+  it('seeds contracts only from SCF-funded projects in the scan', () => {
+    const base = emptySummary(snapshotFor('mainnet'));
+    const scf = 'CFAKESCFCONTRACT0000000000000000000000000000000000000000';
+    const summary = {
+      ...withFailingAnchor('mainnet'),
+      contracts: {
+        ...base.contracts,
+        total: 10,
+        scfFunded: {
+          ...base.contracts.scfFunded,
+          total: 1,
+          projects: [{ slug: 'funded', name: 'Funded', round: 30, contracts: [scf] }],
+        },
+      },
+    };
+    expect(buildSuggestions(summary)[5]?.prompt).toContain(scf);
   });
 
   it('prefers subjects from the scan summary', () => {
