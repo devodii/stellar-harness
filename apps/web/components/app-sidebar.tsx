@@ -5,6 +5,7 @@ import { ChatsIcon, InfoIcon, ListMagnifyingGlassIcon, PlusIcon } from '@phospho
 import { generateId } from 'ai';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import * as React from 'react';
 import { ChatList, type ChatListItem } from '@/components/chat-list';
 import { useConversations } from '@/components/conversations-provider';
 import { useNetwork } from '@/components/network-provider';
@@ -21,6 +22,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from '@/components/ui/sidebar';
+import { useMounted } from '@/hooks/use-mounted';
 import { chatHref, NAV } from '@/lib/routes';
 
 const NAV_ICONS: Record<(typeof NAV)[number]['href'], Icon> = {
@@ -36,6 +38,7 @@ export interface AppSidebarViewProps {
   loading?: boolean;
   onNewChat: () => void;
   onDelete: (id: string) => void;
+  chats?: React.ReactNode;
 }
 
 export function AppSidebarView({
@@ -45,6 +48,7 @@ export function AppSidebarView({
   loading,
   onNewChat,
   onDelete,
+  chats,
 }: AppSidebarViewProps) {
   const { network } = useNetwork();
   return (
@@ -85,13 +89,15 @@ export function AppSidebarView({
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <ChatList
-          items={conversations}
-          activeId={activeId}
-          hrefFor={chatHref}
-          onDelete={onDelete}
-          loading={loading}
-        />
+        {chats ?? (
+          <ChatList
+            items={conversations}
+            activeId={activeId}
+            hrefFor={chatHref}
+            onDelete={onDelete}
+            loading={loading}
+          />
+        )}
       </SidebarContent>
       <SidebarFooter className="px-3 pb-3 group-data-[collapsible=icon]:hidden">
         <p className="font-mono text-[11px] text-muted-foreground">{network} · read-only</p>
@@ -101,24 +107,46 @@ export function AppSidebarView({
   );
 }
 
-export function AppSidebar() {
+function SidebarChats() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { conversations, ready, remove } = useConversations();
+  const mounted = useMounted();
   const activeId = pathname === '/' ? searchParams.get('c') : null;
 
   return (
-    <AppSidebarView
-      pathname={pathname}
-      conversations={conversations}
+    <ChatList
+      items={mounted ? conversations : []}
       activeId={activeId}
-      loading={!ready}
-      onNewChat={() => router.push(chatHref(generateId()))}
+      hrefFor={chatHref}
+      loading={!mounted || !ready}
       onDelete={(id) => {
         remove(id);
         if (id === activeId) router.push('/');
       }}
+    />
+  );
+}
+
+export function AppSidebar() {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  return (
+    <AppSidebarView
+      pathname={pathname}
+      conversations={[]}
+      activeId={null}
+      onNewChat={() => router.push(chatHref(generateId()))}
+      onDelete={() => {}}
+      chats={
+        <React.Suspense
+          fallback={<ChatList items={[]} activeId={null} hrefFor={chatHref} loading />}
+        >
+          <SidebarChats />
+        </React.Suspense>
+      }
     />
   );
 }
