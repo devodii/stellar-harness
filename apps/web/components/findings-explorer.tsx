@@ -5,11 +5,11 @@ import { ChatsIcon } from '@phosphor-icons/react/ssr';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 import { z } from 'zod';
-import { DetailDrawer } from '@/components/detail-drawer';
 import { FilterBar, type FilterField } from '@/components/filter-bar';
 import { FindingDetail } from '@/components/finding-detail';
 import { FindingsTable } from '@/components/findings-table';
 import { InlineAlert } from '@/components/inline-alert';
+import { ResponsiveSheet } from '@/components/responsive-sheet';
 import { Button } from '@/components/ui/button';
 import { type FindingsFilter, useFindings } from '@/hooks/use-findings';
 import { FINDINGS_PAGE_SIZE } from '@/lib/api-schemas';
@@ -78,12 +78,12 @@ export function FindingsExplorer() {
           onPageChange: setPageIndex,
         }}
       />
-      <DetailDrawer
+      <ResponsiveSheet
         open={selected !== null}
         onOpenChange={(open) => !open && setSelected(null)}
         title={selected?.type.toLowerCase() ?? ''}
         description={
-          selected ? <span className="font-mono text-xs">{selected.subject}</span> : null
+          selected ? <span className="font-mono text-xs break-all">{selected.subject}</span> : null
         }
         footer={
           selected && (
@@ -102,7 +102,7 @@ export function FindingsExplorer() {
         }
       >
         {selected && <FindingDetail finding={selected} />}
-      </DetailDrawer>
+      </ResponsiveSheet>
     </div>
   );
 }
