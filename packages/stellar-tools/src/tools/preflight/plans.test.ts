@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { parseAsset } from '../assets';
 import { MISSING, USDC } from './__tests__/accounts';
 import type { PreflightCode } from './checks';
-import { alternativePlan, chooseAlternative, submitBoundary } from './plans';
+import { alternativePlan, chooseAlternative } from './plans';
 
 const FROM = 'GDFUPCI2KNGHHVM5OL4G5LM7WDJJYIJZTAPQWAQ66DX4KJZZQLE2ET5M';
 const TO = 'GASWSYFT5UDG7JTJQI2CGO6HF5KQIQAP5L6JCNM3ETMUFIARTQ73ATMB';
@@ -109,10 +109,21 @@ describe('alternativePlan', () => {
   });
 });
 
-describe('submitBoundary', () => {
-  it('requires no approval without submit steps', () => {
-    expect(submitBoundary([{ kind: 'read' }, { kind: 'build' }])).toEqual({
-      requiresApproval: false,
+describe('alternative plan policy', () => {
+  it('asks approval for the submission under the default spend cap', () => {
+    expect(alternativePlan(input(['op_no_trust']))).toMatchObject({
+      requiresApproval: true,
+      boundary: { rule: 'submit_requires_approval', requested: '2 submissions' },
+    });
+  });
+
+  it('reports the spend cap when the reserve cost exceeds the policy', () => {
+    const plan = alternativePlan({ ...input(['op_no_trust']), policy: { spendCapXlm: 0.1 } });
+    expect(plan?.boundary).toEqual({
+      rule: 'spend_cap',
+      reason: 'Estimated cost exceeds the policy spend cap of 0.1 XLM.',
+      threshold: '0.1 XLM',
+      requested: '0.5 XLM',
     });
   });
 });
