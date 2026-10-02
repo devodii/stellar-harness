@@ -13,9 +13,6 @@ import { measure } from './measure';
 
 export const REPO_SCORE_FLOOR = 40;
 
-export const GITHUB_NETWORK_SKIP =
-  'GitHub issues are network independent; census 5 runs on mainnet only';
-
 const skipGithub = async (ctx: ScanContext, reason: string) => {
   ctx.log(`[github] ${reason}; census 5 skipped`);
   await writeCensusRecord(ctx.persistence, {
@@ -42,7 +39,6 @@ const skipGithub = async (ctx: ScanContext, reason: string) => {
 
 export const githubCommand = async (ctx: ScanContext) => {
   const { config, ports, snapshot, options } = ctx;
-  if (config.NETWORK !== 'mainnet') return skipGithub(ctx, GITHUB_NETWORK_SKIP);
   const token = options.env?.GITHUB_TOKEN ?? process.env.GITHUB_TOKEN;
   if (!token) return skipGithub(ctx, 'GITHUB_TOKEN not set');
 

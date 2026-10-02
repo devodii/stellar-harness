@@ -32,21 +32,12 @@ describe('parseScanArgs', () => {
       ]),
     ).toEqual({
       command: 'failures',
-      network: 'mainnet',
       limit: 20,
       windowSeconds: 86_400,
       noCache: true,
       newSnapshot: true,
       concurrency: { 'horizon.stellar.org': 4, 'mainnet.sorobanrpc.com': 6 },
     });
-  });
-
-  it('selects testnet', () => {
-    expect(parseScanArgs(['anchors', '--network', 'testnet']).network).toBe('testnet');
-  });
-
-  it('rejects unknown networks', () => {
-    expect(() => parseScanArgs(['anchors', '--network', 'futurenet'])).toThrow(/--network/);
   });
 
   it('rejects unknown commands and bad flags', () => {

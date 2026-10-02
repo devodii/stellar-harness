@@ -15,9 +15,9 @@ const memoryCache = (): Cache => {
 
 describe('selectCache', () => {
   it('uses the disk cache under the data directory by default', () => {
-    const cache = selectCache({ dataDir: '/tmp/data-testnet' });
+    const cache = selectCache({ dataDir: '/tmp/data' });
     expect(cache).toBeInstanceOf(DiskCache);
-    expect((cache as DiskCache).root).toBe(join('/tmp/data-testnet', 'cache'));
+    expect((cache as DiskCache).root).toBe(join('/tmp/data', 'cache'));
   });
 
   it('uses an injected cache', () => {
@@ -37,7 +37,7 @@ describe('scanPorts', () => {
     const fetch: typeof globalThis.fetch = async (input, init) => {
       const url = String(input);
       calls.push(url);
-      if (url.startsWith('https://horizon-testnet.stellar.org')) {
+      if (url.startsWith('https://horizon.stellar.org')) {
         throw Object.assign(new TypeError('fetch failed'), {
           cause: Object.assign(new Error('connect ECONNREFUSED'), { code: 'ECONNREFUSED' }),
         });
@@ -49,7 +49,7 @@ describe('scanPorts', () => {
         { status: 200, headers: { 'content-type': 'application/json' } },
       );
     };
-    const clients = createClients(loadNetworkConfig({}, 'testnet'), {
+    const clients = createClients(loadNetworkConfig({}), {
       cache: new NoCache(),
       fetch,
       log: () => {},
@@ -59,6 +59,6 @@ describe('scanPorts', () => {
       'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5',
     );
     expect(result).toEqual({ ok: true, value: null });
-    expect(calls.at(-1)).toBe('https://soroban-testnet.stellar.org');
+    expect(calls.at(-1)).toBe('https://mainnet.sorobanrpc.com');
   });
 });

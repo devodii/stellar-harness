@@ -1,5 +1,4 @@
 import { parseArgs } from 'node:util';
-import { DEFAULT_NETWORK, NETWORKS, type Network } from '@harness/scanner';
 import { parseDuration } from './duration';
 
 export const CENSUSES = ['anchors', 'failures', 'contracts', 'rent', 'github', 'report'] as const;
@@ -17,7 +16,6 @@ export const ALL_ORDER: readonly Census[] = [
 
 export type ScanArgs = {
   command: Command;
-  network: Network;
   limit?: number;
   windowSeconds?: number;
   noCache: boolean;
@@ -25,7 +23,7 @@ export type ScanArgs = {
   concurrency: Record<string, number>;
 };
 
-export const USAGE = `usage: harness-scan <${[...CENSUSES, 'all'].join('|')}> [--network mainnet|testnet] [--limit N] [--window 7d] [--no-cache] [--new-snapshot] [--concurrency host=N]`;
+export const USAGE = `usage: harness-scan <${[...CENSUSES, 'all'].join('|')}> [--limit N] [--window 7d] [--no-cache] [--new-snapshot] [--concurrency host=N]`;
 
 const isCommand = (value: string): value is Command =>
   value === 'all' || (CENSUSES as readonly string[]).includes(value);
@@ -47,7 +45,6 @@ export const parseScanArgs = (argv: string[]): ScanArgs => {
     args: argv,
     allowPositionals: true,
     options: {
-      network: { type: 'string', default: DEFAULT_NETWORK },
       limit: { type: 'string' },
       window: { type: 'string' },
       'no-cache': { type: 'boolean', default: false },
@@ -59,11 +56,6 @@ export const parseScanArgs = (argv: string[]): ScanArgs => {
   const [command] = positionals;
   if (!command || !isCommand(command)) throw new Error(USAGE);
 
-  const network = NETWORKS.find((candidate) => candidate === values.network);
-  if (!network) {
-    throw new Error(`Invalid --network "${values.network}", expected ${NETWORKS.join(' or ')}`);
-  }
-
   const limit = values.limit === undefined ? undefined : Number(values.limit);
   if (limit !== undefined && (!Number.isInteger(limit) || limit < 1)) {
     throw new Error(`Invalid --limit "${values.limit}"`);
@@ -71,7 +63,6 @@ export const parseScanArgs = (argv: string[]): ScanArgs => {
 
   return {
     command,
-    network,
     limit,
     windowSeconds: values.window === undefined ? undefined : parseDuration(values.window),
     noCache: values['no-cache'],

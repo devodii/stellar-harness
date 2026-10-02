@@ -8,7 +8,6 @@ import {
 import { formatProgress, runTasks } from '../core/runner';
 import { createStateStore } from '../core/state';
 import type { Snapshot } from '../schema';
-import { DEFAULT_NETWORK, type Network } from '../schema';
 import {
   type Cache,
   createClients,
@@ -29,7 +28,6 @@ import { createPorts, type Ports } from './ports';
 
 export type ScanOptions = {
   dataDir: string;
-  network?: Network;
   cache?: Cache;
   noCache?: boolean;
   newSnapshot?: boolean;
@@ -129,8 +127,7 @@ export const scanPorts = (
 
 export const createScanContext = async (options: ScanOptions): Promise<ScanContext> => {
   const log = options.log ?? ((line: string) => process.stderr.write(`${line}\n`));
-  const network = options.network ?? DEFAULT_NETWORK;
-  const config = loadNetworkConfig(options.env, network);
+  const config = loadNetworkConfig(options.env);
   const persistence = filePersistence(options.dataDir);
   const gaps: HttpGap[] = [];
   const clients = createClients(config, {

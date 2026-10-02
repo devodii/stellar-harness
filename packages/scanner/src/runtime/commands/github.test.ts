@@ -6,13 +6,13 @@ import { loadNetworkConfig } from '../../stellar';
 import { readCensusRecords } from '../artifacts';
 import type { ScanContext } from '../context';
 import { filePersistence } from '../persistence';
-import { GITHUB_NETWORK_SKIP, githubCommand } from './github';
+import { githubCommand } from './github';
 
-const context = async (network: 'mainnet' | 'testnet', env: Record<string, string> = {}) => {
+const context = async (env: Record<string, string> = {}) => {
   const dataDir = await mkdtemp(join(tmpdir(), 'harness-github-'));
   const lines: string[] = [];
   const ctx = {
-    config: loadNetworkConfig({}, network),
+    config: loadNetworkConfig({}),
     options: { dataDir, env },
     persistence: filePersistence(dataDir),
     log: (line: string) => lines.push(line),
@@ -21,20 +21,11 @@ const context = async (network: 'mainnet' | 'testnet', env: Record<string, strin
 };
 
 describe('githubCommand', () => {
-  it('skips off mainnet even with a token and records why', async () => {
-    const { ctx, dataDir } = await context('testnet', { GITHUB_TOKEN: 'token' });
-    expect(await githubCommand(ctx)).toEqual({ run: null, findings: 0 });
-    const [record] = await readCensusRecords(filePersistence(dataDir));
-    expect(record?.run.skipped).toBe(GITHUB_NETWORK_SKIP);
-    expect(record?.method.notes).toEqual([`Skipped: ${GITHUB_NETWORK_SKIP}.`]);
-    expect(record?.method.parameters).toEqual({ network: 'testnet' });
-  });
-
-  it('still skips mainnet without a token', async () => {
+  it('skips without a token', async () => {
     const previous = process.env.GITHUB_TOKEN;
     delete process.env.GITHUB_TOKEN;
     try {
-      const { ctx, dataDir } = await context('mainnet');
+      const { ctx, dataDir } = await context();
       await githubCommand(ctx);
       const [record] = await readCensusRecords(filePersistence(dataDir));
       expect(record?.run.skipped).toBe('GITHUB_TOKEN not set');
