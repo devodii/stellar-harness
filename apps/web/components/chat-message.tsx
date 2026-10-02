@@ -1,0 +1,81 @@
+'use client';
+
+import { isToolUIPart } from 'ai';
+import { Message, MessageContent, MessageResponse } from '@/components/ai-elements/message';
+import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ai-elements/reasoning';
+import { Source, Sources, SourcesContent, SourcesTrigger } from '@/components/ai-elements/sources';
+import { BracketTag } from '@/components/bracket-tag';
+import { ToolCall } from '@/components/tool-call';
+import type { HarnessPart, HarnessUIMessage } from '@/lib/chat';
+
+export interface ChatMessageProps {
+  message: HarnessUIMessage;
+  streaming?: boolean;
+}
+
+function MessagePart({
+  part,
+  streaming,
+  isLast,
+}: {
+  part: HarnessPart;
+  streaming: boolean;
+  isLast: boolean;
+}) {
+  if (part.type === 'text') {
+    return <MessageResponse isAnimating={streaming && isLast}>{part.text}</MessageResponse>;
+  }
+  if (part.type === 'reasoning') {
+    return (
+      <Reasoning defaultOpen={false} isStreaming={streaming && isLast} className="mb-0">
+        <ReasoningTrigger />
+        <ReasoningContent>{part.text}</ReasoningContent>
+      </Reasoning>
+    );
+  }
+  if (part.type === 'data-plan-approval') {
+    return (
+      <BracketTag
+        label={`${part.data.decision === 'approve' ? 'approved' : 'declined'} ${part.data.planId}`}
+        tone={part.data.decision === 'approve' ? 'success' : 'destructive'}
+      />
+    );
+  }
+  if (isToolUIPart(part)) return <ToolCall part={part} />;
+  return null;
+}
+
+export function ChatMessage({ message, streaming = false }: ChatMessageProps) {
+  const sources = message.parts.filter((part) => part.type === 'source-url');
+  const parts = message.parts
+    .map((part, index) => ({ part, key: `${message.id}-${index}` }))
+    .filter(({ part }) => part.type !== 'source-url' && part.type !== 'step-start');
+
+  return (
+    <Message
+      from={message.role}
+      className={message.role === 'assistant' ? 'max-w-full' : undefined}
+    >
+      <MessageContent className="w-full gap-3">
+        {parts.map(({ part, key }, position) => (
+          <MessagePart
+            key={key}
+            part={part}
+            streaming={streaming}
+            isLast={position === parts.length - 1}
+          />
+        ))}
+      </MessageContent>
+      {sources.length > 0 && (
+        <Sources>
+          <SourcesTrigger count={sources.length} />
+          <SourcesContent>
+            {sources.map((source) => (
+              <Source key={source.sourceId} href={source.url} title={source.title ?? source.url} />
+            ))}
+          </SourcesContent>
+        </Sources>
+      )}
+    </Message>
+  );
+}
