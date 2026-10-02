@@ -151,6 +151,11 @@ describe('buildPaymentPreflight', () => {
     expect(preflight.blockers[0]?.fix).toContain('trustline');
   });
 
+  it('resolves a bare asset code from the sender trustlines', async () => {
+    const preflight = await buildPaymentPreflight(fakeClients(), { ...payment, asset: 'usdc' });
+    expect(preflight.blockers.map((b) => b.code)).toEqual(['op_no_trust']);
+  });
+
   it('passes when the receiver trusts the asset and the sender holds it', () => {
     const result = checkPayment(payment, account([xlm('10'), usdc('30')]), account([usdc('0')]));
     expect(result).toEqual({ ok: true, blockers: [] });
