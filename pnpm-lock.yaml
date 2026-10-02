@@ -7,6 +7,13 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@harness/schema':
+        specifier: workspace:*
+        version: link:packages/schema
+      '@harness/storage':
+        specifier: workspace:*
+        version: link:packages/storage
     devDependencies:
       '@biomejs/biome':
         specifier: 2.5.15
