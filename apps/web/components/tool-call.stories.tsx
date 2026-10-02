@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { fn } from 'storybook/test';
 import { ChatActionsProvider } from './chat-actions';
+import { fakeContract } from './story-ids';
 import { ToolCall, type ToolCallPart } from './tool-call';
 
-const CONTRACT = 'CFAKECONTRACTFORSTORYBOOK0000000000000000000000000000ABC';
+const CONTRACT = fakeContract('story');
 const meta_ = { tool: 'getContractTtl', ms: 42 };
 
 const TTL = {
