@@ -63,19 +63,19 @@ export const anchorsCommand = async (ctx: ScanContext) => {
   const summary = computeAnchorsSummary({ domains: census.domains, rows, findings, tests });
 
   await writeExport(
-    options.dataDir,
+    ctx.persistence,
     'anchors_failing',
     anchorsFailingRows(summary, census.domains, findings),
     ANCHORS_FAILING_COLUMNS,
   );
   await writeExport(
-    options.dataDir,
+    ctx.persistence,
     'anchors_funnel',
     anchorsFunnelRows(summary),
     ANCHORS_FUNNEL_COLUMNS,
   );
 
-  await writeCensusRecord(options.dataDir, {
+  await writeCensusRecord(ctx.persistence, {
     run,
     summary,
     stats: {
