@@ -1,17 +1,16 @@
-import { defineTool, fail } from '../tool';
+import { fail } from '../tool';
 import { parseAsset } from './assets';
-import { BuildPaymentPreflightInput, BuildPaymentPreflightOutput } from './failures-schemas';
+import type { PolicyContext } from './context';
+import { defineNamedTool } from './define';
 import type { HorizonToolContext } from './network-context';
 import { evaluatePreflight } from './preflight/checks';
 import { alternativePlan } from './preflight/plans';
 
-export const buildPaymentPreflight = defineTool({
-  name: 'buildPaymentPreflight',
-  description:
-    'Pre-flight a mainnet payment without submitting anything: checks destination existence, trustline and authorization, limit headroom, source balance net of selling liabilities and the base reserve. Returns blockers with fixes and, when blocked, an alternative plan (sponsored trustline, claimable balance or create account) that requires approval.',
-  input: BuildPaymentPreflightInput,
-  output: BuildPaymentPreflightOutput,
-  run: async ({ from, to, asset, amount }, ctx: HorizonToolContext) => {
+export type PaymentPreflightContext = HorizonToolContext & Partial<PolicyContext>;
+
+export const buildPaymentPreflight = defineNamedTool(
+  'buildPaymentPreflight',
+  async ({ from, to, asset, amount }, ctx: PaymentPreflightContext) => {
     const [source, destination] = await Promise.all([
       ctx.horizon.account(from),
       ctx.horizon.account(to),
@@ -35,6 +34,7 @@ export const buildPaymentPreflight = defineTool({
       asset: parsedAsset,
       amount,
       blockers: blockers.map((blocker) => blocker.code),
+      ...(ctx.policy ? { policy: ctx.policy } : {}),
     });
     return {
       ok: blockers.length === 0,
@@ -43,4 +43,4 @@ export const buildPaymentPreflight = defineTool({
       ...(alternative ? { alternative } : {}),
     };
   },
-});
+);
