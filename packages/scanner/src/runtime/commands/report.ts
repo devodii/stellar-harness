@@ -13,6 +13,7 @@ import type { z } from 'zod';
 import { renderReport } from '../../report/render';
 import { type CensusRecord, readCensusRecords, readPreviews } from '../artifacts';
 import type { ScanContext } from '../context';
+import { backfillMeaningfulCounts } from './meaningful-backfill';
 
 const EXPORT_ORDER = [
   'failed_tx_by_code',
@@ -20,6 +21,7 @@ const EXPORT_ORDER = [
   'anchors_failing',
   'anchors_funnel',
   'contracts_archived',
+  'contracts_archived_meaningful',
   'contracts_expiring_30d',
   'contracts_scf_funded',
   'rent_top100',
@@ -51,7 +53,10 @@ export const buildSummary = async (ctx: ScanContext): Promise<Summary> => {
   }
   return Summary.parse({
     snapshot: ctx.snapshot,
-    contracts: summaryOf(records, 'contracts', ContractsSummary, empty.contracts),
+    contracts: await backfillMeaningfulCounts(
+      ctx,
+      summaryOf(records, 'contracts', ContractsSummary, empty.contracts),
+    ),
     failures: summaryOf(records, 'failures', FailuresSummary, empty.failures),
     anchors: summaryOf(records, 'anchors', AnchorsSummary, empty.anchors),
     rent: summaryOf(records, 'rent', RentSummary, empty.rent),
