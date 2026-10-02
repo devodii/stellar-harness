@@ -23,7 +23,7 @@ const ttlLabel = (entry: TtlEntryView): string => {
 function TtlEntry({ label, entry }: { label: string; entry: TtlEntryView }) {
   const tone = ttlTone(entry);
   return (
-    <div className="space-y-1.5 rounded-md border border-border p-2.5">
+    <div className="space-y-1.5">
       <div className="flex items-center justify-between">
         <Stat
           label={label}
@@ -58,7 +58,7 @@ export function ContractTtlView({ ttl }: { ttl: ContractTtlData }) {
       title={<Address value={ttl.contractId} href={explorerUrl('contract', ttl.contractId)} />}
       footer={`snapshot ledger ${formatInt(ttl.snapshotLedger)} · close ${formatSeconds(ttl.ledgerCloseSeconds)}`}
     >
-      <div className="grid gap-2 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 sm:divide-x sm:divide-border [&>*:last-child]:sm:pl-4">
         <TtlEntry label="instance" entry={ttl.instance} />
         <TtlEntry label="code" entry={ttl.code} />
       </div>
