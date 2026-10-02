@@ -41,7 +41,12 @@ export const measureCloseSeconds = (
   return Math.round((seconds / (later.sequence - earlier.sequence)) * 10_000) / 10_000;
 };
 
-export type SnapshotOptions = { gitSha?: string; sampleGap?: number; network?: Network };
+export type SnapshotOptions = {
+  gitSha?: string;
+  sampleGap?: number;
+  network?: Network;
+  skipHorizon?: boolean;
+};
 
 export type SnapshotClients = { horizon: HorizonClient; rpc?: Pick<RpcClient, 'getHealth'> };
 
@@ -79,11 +84,19 @@ export const rpcLedgers = async (
 
 export const takeSnapshot = async (
   clients: SnapshotClients,
-  { gitSha, sampleGap = SNAPSHOT_SAMPLE_GAP, network = DEFAULT_NETWORK }: SnapshotOptions = {},
+  {
+    gitSha,
+    sampleGap = SNAPSHOT_SAMPLE_GAP,
+    network = DEFAULT_NETWORK,
+    skipHorizon = false,
+  }: SnapshotOptions = {},
 ): Promise<Result<Snapshot>> => {
-  const fromHorizon = await horizonLedgers(clients.horizon, sampleGap);
+  const fromHorizon =
+    skipHorizon && clients.rpc
+      ? err(appError('UPSTREAM_FAILED', 'Horizon skipped'))
+      : await horizonLedgers(clients.horizon, sampleGap);
   const fromRpc = !fromHorizon.ok && clients.rpc ? await rpcLedgers(clients.rpc) : null;
-  const ledgers = fromRpc?.ok ? fromRpc : fromHorizon;
+  const ledgers = fromRpc ?? fromHorizon;
   if (!ledgers.ok) return ledgers;
   const { latest, earlier, source } = ledgers.value;
   const ledgerCloseSeconds = measureCloseSeconds(latest, earlier);
