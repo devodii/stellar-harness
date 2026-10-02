@@ -5,7 +5,7 @@ import { TONE_TEXT, type Tone } from '@/lib/tone';
 const GLYPH: Record<PlanStepStatus, { glyph: string; tone: Tone; label: string }> = {
   pending: { glyph: '○', tone: 'muted', label: 'pending' },
   done: { glyph: '●', tone: 'success', label: 'done' },
-  blocked: { glyph: '◐', tone: 'warning', label: 'blocked' },
+  error: { glyph: '×', tone: 'destructive', label: 'error' },
 };
 
 export interface StatusGlyphProps {
