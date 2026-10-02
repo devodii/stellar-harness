@@ -137,3 +137,12 @@ Every call made without explicit direction is tagged `@decision` so it can be re
 - `@decision` `pnpm db:import` copies an existing data directory into Postgres without modifying a single file (verified by byte and mtime checks); it is idempotent and resumable.
 - `@decision` `http_cache` stores the request url so a row rebuilds the full cache entry. jsonb cannot hold NUL characters: bodies with NUL are not cached, and NUL inside findings or rows becomes U+FFFD.
 - `@decision` The compose host port is `${POSTGRES_PORT:-5432}`; this machine already uses 5432, so local `.env` sets 55432.
+
+## Testnet
+
+- `@decision` The network is a first-class input: `harness-scan --network testnet`, a `harness-network` cookie in the web app, and per-network config, clients, storage and agent tools. Testnet stays read-only.
+- `@decision` On testnet, stellarlight and Medium sources, the SCF join and the GitHub census are skipped and the skip is written into each run record. Testnet anchors come from three SDF testnet anchors checked to serve a testnet toml, plus the stellar.expert testnet asset list.
+- `@decision` When Horizon is unavailable, account reads fall back to RPC ledger entries (XLM balance only), the snapshot is taken from RPC `getHealth`, and payment preflight refuses to guess trustlines. The scanner checks Horizon once at start and records the outcome.
+- `@decision` Simulation source accounts are per network: Circle's USDC issuer on mainnet and Circle's testnet USDC issuer on testnet.
+- `@decision` A 365-day extension whose resource fee exceeds the uint32 transaction fee field (about 429 XLM) cannot be assembled into one transaction; the simulated fee is kept as the estimate and the unsimulated draft is shown as the XDR.
+- `@decision` With `DATABASE_URL` set, the scanner reads and writes snapshots, findings, derived rows, previews, run records and the HTTP cache in Postgres; checkpoints and CSV exports stay on disk. A mainnet report rebuilt from Postgres matches the file-based report.
