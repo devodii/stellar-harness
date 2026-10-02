@@ -72,6 +72,12 @@ describe('alternativePlan', () => {
     });
   });
 
+  it('submits on the network given in the input', () => {
+    const plan = alternativePlan({ ...input(['op_no_trust']), network: 'testnet' });
+    const submits = plan?.steps.filter((step) => step.kind === 'submit') ?? [];
+    expect(submits.map((step) => step.args.network)).toEqual(['testnet', 'testnet']);
+  });
+
   it('builds a claimable balance plan with the destination as claimant', () => {
     const plan = alternativePlan(input(['op_no_destination'], USDC, '25', MISSING));
     expect(plan?.steps[1]?.args.operations).toEqual([
