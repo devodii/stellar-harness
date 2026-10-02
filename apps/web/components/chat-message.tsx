@@ -56,7 +56,9 @@ export function ChatMessage({ message, streaming = false }: ChatMessageProps) {
       from={message.role}
       className={message.role === 'assistant' ? 'max-w-full' : undefined}
     >
-      <MessageContent className="w-full gap-3">
+      <MessageContent
+        className={message.role === 'user' ? 'gap-3 border border-border' : 'w-full gap-3'}
+      >
         {parts.map(({ part, key }, position) => (
           <MessagePart
             key={key}
