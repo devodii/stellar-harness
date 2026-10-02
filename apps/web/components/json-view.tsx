@@ -1,35 +1,8 @@
+'use client';
+
 import { cn } from 'cn';
 import * as React from 'react';
-import { CopyButton } from '@/components/copy-button';
-import { TONE_TEXT } from '@/lib/tone';
-
-const TOKEN =
-  /("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(?:\s*:)?|\btrue\b|\bfalse\b|\bnull\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g;
-
-const tokenClass = (token: string): string => {
-  if (token.startsWith('"'))
-    return token.trimEnd().endsWith(':') ? 'text-foreground' : 'text-success';
-  if (token === 'null') return 'text-muted-foreground';
-  if (token === 'true' || token === 'false') return 'text-warning';
-  return TONE_TEXT.primary;
-};
-
-const highlight = (json: string): React.ReactNode[] => {
-  const nodes: React.ReactNode[] = [];
-  let last = 0;
-  for (const match of json.matchAll(TOKEN)) {
-    const index = match.index ?? 0;
-    if (index > last) nodes.push(json.slice(last, index));
-    nodes.push(
-      <span key={index} className={tokenClass(match[0])}>
-        {match[0]}
-      </span>,
-    );
-    last = index + match[0].length;
-  }
-  if (last < json.length) nodes.push(json.slice(last));
-  return nodes;
-};
+import { CodeBlock, CodeBlockCopyButton } from '@/components/ai-elements/code-block';
 
 const stringify = (value: unknown): string => {
   try {
@@ -46,25 +19,34 @@ export interface JsonViewProps {
   value: unknown;
   maxHeight?: number;
   copyable?: boolean;
+  showLineNumbers?: boolean;
   className?: string;
 }
 
-export function JsonView({ value, maxHeight = 360, copyable = true, className }: JsonViewProps) {
+export function JsonView({
+  value,
+  maxHeight = 360,
+  copyable = true,
+  showLineNumbers = false,
+  className,
+}: JsonViewProps) {
   const json = React.useMemo(() => stringify(value), [value]);
-  const nodes = React.useMemo(() => highlight(json), [json]);
 
   return (
-    <div className={cn('relative rounded-md border border-border bg-muted/40', className)}>
+    <CodeBlock
+      code={json}
+      language="json"
+      showLineNumbers={showLineNumbers}
+      translate="no"
+      style={{ maxHeight }}
+      className={cn('notranslate relative overflow-auto text-xs', className)}
+    >
       {copyable && (
-        <CopyButton value={json} label="Copy JSON" className="absolute top-1.5 right-1.5" />
+        <CodeBlockCopyButton
+          aria-label="Copy JSON"
+          className="absolute top-1.5 right-1.5 z-10 size-7"
+        />
       )}
-      <pre
-        translate="no"
-        style={{ maxHeight }}
-        className="notranslate overflow-auto p-3 pr-9 font-mono text-xs leading-relaxed text-muted-foreground"
-      >
-        <code>{nodes}</code>
-      </pre>
-    </div>
+    </CodeBlock>
   );
 }
