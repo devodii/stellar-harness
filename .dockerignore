@@ -1,0 +1,9 @@
+**/node_modules
+**/.next
+**/storybook-static
+**/dist
+data
+.git
+.env
+.env.*
+!.env.example
