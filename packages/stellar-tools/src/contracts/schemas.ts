@@ -5,11 +5,6 @@ export const ContractId = z
   .regex(/^C[A-Z2-7]{55}$/, 'Expected a Stellar contract address (C...)');
 export type ContractId = z.infer<typeof ContractId>;
 
-export const AccountId = z
-  .string()
-  .regex(/^G[A-Z2-7]{55}$/, 'Expected a Stellar account address (G...)');
-export type AccountId = z.infer<typeof AccountId>;
-
 export const WasmHash = z.string().regex(/^[0-9a-f]{64}$/, 'Expected a hex wasm hash');
 export type WasmHash = z.infer<typeof WasmHash>;
 
@@ -55,18 +50,25 @@ export const ContractExecutableKind = z.enum(['wasm', 'stellar_asset', 'external
 export type ContractExecutableKind = z.infer<typeof ContractExecutableKind>;
 
 export const GetContractTtlInput = z.object({ contractId: ContractId });
+export type GetContractTtlInput = z.infer<typeof GetContractTtlInput>;
+
+export const TtlEntry = z.object({
+  present: z.boolean(),
+  liveUntilLedgerSeq: count.nullable(),
+  ledgersLeft: z.number().int().nullable(),
+  daysLeft: z.number().nullable(),
+  archived: z.boolean(),
+});
+export type TtlEntry = z.infer<typeof TtlEntry>;
 
 export const GetContractTtlOutput = z.object({
   contractId: ContractId,
-  latestLedger: count,
-  ledgerCloseSeconds: z.number().positive(),
-  executable: ContractExecutableKind,
   wasmHash: WasmHash.nullable(),
-  instance: TtlStatus,
-  code: TtlStatus.nullable(),
+  instance: TtlEntry,
+  code: TtlEntry,
   invocations: count.nullable(),
-  subinvocations: count.nullable(),
-  sourceValidation: z.string().nullable(),
+  snapshotLedger: count,
+  ledgerCloseSeconds: z.number().positive(),
 });
 export type GetContractTtlOutput = z.infer<typeof GetContractTtlOutput>;
 
@@ -79,36 +81,45 @@ export type Footprint = z.infer<typeof Footprint>;
 export const RentEstimate = z.object({
   minResourceFeeStroops: count,
   estimatedXlm: z.number().nonnegative(),
-  unsignedXdr: z.string(),
+  unsignedXdr: z.string().min(1),
   footprint: Footprint,
   restorePreamble: z.object({ minResourceFeeStroops: count }).nullable(),
   latestLedger: count,
 });
 export type RentEstimate = z.infer<typeof RentEstimate>;
 
+export const MAX_EXTEND_DAYS = 730;
+
 export const SimulateExtendTtlInput = z.object({
   contractId: ContractId,
-  days: z.number().int().min(1).max(3650).default(365),
-  sourceAccount: AccountId.optional(),
+  days: z.number().int().positive().max(MAX_EXTEND_DAYS).default(365),
 });
+export type SimulateExtendTtlInput = z.infer<typeof SimulateExtendTtlInput>;
 
-export const SimulateExtendTtlOutput = RentEstimate.extend({
-  contractId: ContractId,
-  days: z.number().int().positive(),
-  extendToLedgers: count,
-  sourceAccount: AccountId,
-  wasmHash: WasmHash.nullable(),
-});
-export type SimulateExtendTtlOutput = z.infer<typeof SimulateExtendTtlOutput>;
+export const RestoreEntries = z.enum(['instance', 'code', 'both']);
+export type RestoreEntries = z.infer<typeof RestoreEntries>;
 
 export const SimulateRestoreInput = z.object({
   contractId: ContractId,
-  sourceAccount: AccountId.optional(),
+  entries: RestoreEntries.default('both'),
+});
+export type SimulateRestoreInput = z.infer<typeof SimulateRestoreInput>;
+
+const SimulationResult = z.object({
+  contractId: ContractId,
+  minResourceFeeStroops: count,
+  estimatedXlm: z.number().nonnegative(),
+  unsignedXdr: z.string().min(1),
+  footprint: Footprint,
 });
 
-export const SimulateRestoreOutput = RentEstimate.extend({
-  contractId: ContractId,
-  sourceAccount: AccountId,
-  wasmHash: WasmHash.nullable(),
+export const SimulateExtendTtlOutput = SimulationResult.extend({
+  days: z.number().int().positive(),
+  extendToLedgers: z.number().int().positive(),
+});
+export type SimulateExtendTtlOutput = z.infer<typeof SimulateExtendTtlOutput>;
+
+export const SimulateRestoreOutput = SimulationResult.extend({
+  entries: RestoreEntries,
 });
 export type SimulateRestoreOutput = z.infer<typeof SimulateRestoreOutput>;
