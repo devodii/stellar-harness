@@ -1,22 +1,14 @@
 import { cn } from 'cn';
 import type * as React from 'react';
 import { MonoNumber } from '@/components/mono-number';
-
-export type StatTone = 'default' | 'success' | 'warning' | 'destructive';
-
-const TONE_CLASS: Record<StatTone, string> = {
-  default: 'text-foreground',
-  success: 'text-success',
-  warning: 'text-warning',
-  destructive: 'text-destructive',
-};
+import { TONE_TEXT, type Tone } from '@/lib/tone';
 
 export interface StatProps {
   label: string;
   value: number | null | undefined;
   format?: (value: number) => string;
   hint?: React.ReactNode;
-  tone?: StatTone;
+  tone?: Tone;
   size?: 'sm' | 'md';
   className?: string;
 }
@@ -48,7 +40,7 @@ export function Stat({
       <MonoNumber
         value={value}
         format={format}
-        className={cn(size === 'sm' ? 'text-sm' : 'text-lg', TONE_CLASS[tone])}
+        className={cn(size === 'sm' ? 'text-sm' : 'text-lg', TONE_TEXT[tone])}
       />
       {hint && <span className="truncate text-xs text-muted-foreground">{hint}</span>}
     </div>
