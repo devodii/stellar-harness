@@ -48,6 +48,21 @@ describe('toFindingDraft', () => {
     });
   });
 
+  it('adds the reserve shortfall only to low reserve clusters', () => {
+    const classification: AccountClassification = {
+      account: 'GACCOUNT',
+      exists: true,
+      tags: [],
+      multisig: false,
+      reserveShortfallXlm: 0.0475819,
+    };
+    const lowReserve = { ...cluster, type: 'OP_LOW_RESERVE_CLUSTER' as const };
+    expect(toFindingDraft(lowReserve, classification).evidence.reserveShortfallXlm).toBe(0.0475819);
+    expect(toFindingDraft(cluster, classification).evidence).not.toHaveProperty(
+      'reserveShortfallXlm',
+    );
+  });
+
   it('works without a classification', () => {
     expect(toFindingDraft(cluster, undefined)).toMatchObject({
       evidence: cluster.evidence,
