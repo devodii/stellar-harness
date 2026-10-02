@@ -57,7 +57,8 @@ export function PilotSheet({
       title="request a pilot"
       trigger={
         <Button variant="link" size="sm" className="px-0">
-          request a pilot
+          <span className="sm:hidden">pilot</span>
+          <span className="hidden sm:inline">request a pilot</span>
         </Button>
       }
       description={<p className="text-sm text-muted-foreground">{PILOT_BODY}</p>}

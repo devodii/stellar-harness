@@ -3,6 +3,7 @@ import { expect, userEvent, within } from 'storybook/test';
 import { DEMO_ORG } from '@/demo-org';
 import { ConversationsProvider } from './conversations-provider';
 import { Header, policyLine } from './header';
+import { SidebarProvider } from './ui/sidebar';
 
 const meta: Meta<typeof Header> = {
   component: Header,
@@ -11,7 +12,9 @@ const meta: Meta<typeof Header> = {
   decorators: [
     (Story) => (
       <ConversationsProvider>
-        <Story />
+        <SidebarProvider className="min-h-0 flex-col">
+          <Story />
+        </SidebarProvider>
       </ConversationsProvider>
     ),
   ],
