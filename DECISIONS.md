@@ -87,3 +87,17 @@ Every call made without explicit direction is tagged `@decision` so it can be re
 - `@decision` Payment preflight blocks an XLM payment that would drop the source below its minimum balance plus fee as `op_low_reserve`. The reserve locked by a sponsored trustline or claimable balance is the plan's `estimatedCostXlm`. When the sender must act first, no alternative plan is offered.
 - `@decision` `getTransaction` reads RPC first and falls back to Horizon `/transactions/{hash}`.
 - `@decision` Measured: one `getTransactions` call (limit 200) covers about 1.08 ledgers. A 1-day window is about 17,000 calls (about 45 to 50 minutes at the ~6 calls/s public RPC sustains at concurrency 8); the brief's 10 minute target for 1 day is not reachable on the public endpoint without a dedicated RPC.
+
+## Census 3: anchors
+
+- `@decision` SCF rounds 41 to 45 come from the Medium RSS feed (`/feed/stellar-community`). Only projects whose recap mentions anchors, a SEP number or on/off-ramps are kept, resolved through stellarlight project search; unresolved names are listed. If Medium fails, stellarlight `scfAwarded=1` filtered by round and anchor type is the fallback.
+- `@decision` stellarlight `type=Anchor` projects are an extra domain source, merged into partners through `anchorProfile.slug`. stellar.expert assets are sorted by `trustlines` and use the record's `domain`, with Horizon `home_domain` as fallback.
+- `@decision` A partner's toml host beats its website host; `www.` is dropped; social and code hosts are ignored. Hosts that are IPs, carry a port or are single-label are rejected, which also limits SSRF through the web tool.
+- `@decision` Only testnet or futurenet passphrases tag `testnet_toml` and skip network probes; any other non-mainnet value is tagged `nonstandard_passphrase` and probing continues.
+- `@decision` A SEP-10 400 that requires `client_domain` counts as a pass with a note. SEP-10 and toml checks compare against the probed domain exactly, like the reference anchor tests.
+- `@decision` Anchor findings use the domain as subject; account mismatches and issuer flags are grouped into one finding per domain with the accounts listed in evidence.
+- `@decision` The funnel is cumulative. `perSep` keys are `sep1`, `sep6_24`, `sep10`, `sep31`, `sep38`, plus `tests:sepN` from anchor tests.
+- `@decision` Transitive endpoint hosts are probed one level deep as their own domains.
+- `@decision` `@stellar/anchor-tests` runs only an allowlist of tests that read or perform the SEP-10 handshake. Excluded because they write to third-party production servers: SEP-12 `PUT`/`DELETE /customer` and the `GET /customer` tests that depend on them, SEP-24 `/deposit`, `/withdraw` and the `/transaction(s)` tests that depend on them, SEP-38 `POST /quote` and its follow-up, SEP-10 account signer tests (friendbot and submission), and all of SEP-31 (it needs a configured sending anchor secret). Each saved report lists the exclusions with reasons; a test checks the allowlist against the installed library.
+- `@decision` The census runs anchor tests by default; the `probeAnchor` tool runs them only when asked.
+- `@decision` The SEP-10 challenge URL carries a fresh random account, so it never hits the cache; a warm rerun still makes those calls. The anchor-tests library uses its own HTTP client, so its runs are limited per domain instead of through the shared semaphore.
