@@ -41,6 +41,10 @@ export default function AboutPage() {
       <Section label="what the demo does">
         <ul className="list-disc space-y-1 pl-5">
           <li>Reads mainnet through Horizon, Soroban RPC, stellar.expert and Stellar Light.</li>
+          <li>
+            Switches to testnet from the prompt footer. Testnet data is kept apart from mainnet, and
+            the ecosystem directory stays mainnet-only.
+          </li>
           <li>Decodes failed transactions and explains their result codes in plain language.</li>
           <li>Probes anchor stellar.toml files and SEP endpoints, stage by stage.</li>
           <li>Simulates TTL extension and restore to price contract rent.</li>
