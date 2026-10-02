@@ -1,6 +1,4 @@
-import { randomBytes } from 'node:crypto';
 import { emptySummary, type Finding } from '@harness/schema';
-import postgres from 'postgres';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { queryFindingRows } from '../query';
 import { finding, snapshot, storageContract } from '../testing';
@@ -9,29 +7,19 @@ import { migrate } from './migrate';
 import { PgScanStore } from './scan-store';
 import type { Sql } from './sql';
 import { PostgresStorage } from './storage';
+import { createTestDatabase, TEST_DATABASE_URL, type TestDatabase } from './test-db';
 
-const url = process.env.TEST_DATABASE_URL;
-
-describe.skipIf(!url)('postgres', () => {
-  const schema = `harness_test_${randomBytes(4).toString('hex')}`;
-  let admin: Sql;
+describe.skipIf(!TEST_DATABASE_URL)('postgres', () => {
+  let db: TestDatabase;
   let sql: Sql;
-
-  const truncate = () =>
-    sql`truncate findings, summaries, snapshots, derived_rows, artifacts, http_cache`;
+  const truncate = () => db.truncate();
 
   beforeAll(async () => {
-    admin = postgres(url ?? '', { max: 1, onnotice: () => {} });
-    await admin`create schema ${admin(schema)}`;
-    sql = postgres(url ?? '', { max: 4, onnotice: () => {}, connection: { search_path: schema } });
-    await migrate(sql);
+    db = await createTestDatabase(TEST_DATABASE_URL ?? '');
+    sql = db.sql;
   });
 
-  afterAll(async () => {
-    await sql.end();
-    await admin`drop schema if exists ${admin(schema)} cascade`;
-    await admin.end();
-  });
+  afterAll(() => db.drop());
 
   it('applies migrations once', async () => {
     expect(await migrate(sql)).toEqual([]);
