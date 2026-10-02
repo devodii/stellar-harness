@@ -26,7 +26,7 @@ export function BracketTag({
       )}
       {...props}
     >
-      [{label}]
+      {`[${label}]`}
     </span>
   );
 }
