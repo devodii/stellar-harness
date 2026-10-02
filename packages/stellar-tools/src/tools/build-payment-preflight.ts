@@ -1,3 +1,4 @@
+import { type NetworkSelection, resolveNetwork } from '../core/network';
 import { fail } from '../tool';
 import { parseAsset } from './assets';
 import type { PolicyContext } from './context';
@@ -6,7 +7,9 @@ import type { HorizonToolContext } from './network-context';
 import { evaluatePreflight } from './preflight/checks';
 import { alternativePlan } from './preflight/plans';
 
-export type PaymentPreflightContext = HorizonToolContext & Partial<PolicyContext>;
+export type PaymentPreflightContext = HorizonToolContext &
+  Partial<PolicyContext> &
+  NetworkSelection;
 
 export const buildPaymentPreflight = defineNamedTool(
   'buildPaymentPreflight',
@@ -35,6 +38,7 @@ export const buildPaymentPreflight = defineNamedTool(
       amount,
       blockers: blockers.map((blocker) => blocker.code),
       ...(ctx.policy ? { policy: ctx.policy } : {}),
+      network: resolveNetwork(ctx).network,
     });
     return {
       ok: blockers.length === 0,
