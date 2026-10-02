@@ -55,6 +55,9 @@ export const upsertConversation = (
 export const removeConversation = (list: Conversation[], id: string): Conversation[] =>
   list.filter((item) => item.id !== id);
 
+export const sameMessages = (a: HarnessUIMessage[], b: HarnessUIMessage[]): boolean =>
+  a.length === b.length && JSON.stringify(a.at(-1)) === JSON.stringify(b.at(-1));
+
 export const withMessages = (
   conversation: Conversation,
   messages: HarnessUIMessage[],
