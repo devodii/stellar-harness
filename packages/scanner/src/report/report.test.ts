@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { emptySummary } from '../schema';
-import { formatPercent, renderReport, reportTitle, table } from './index';
+import { formatPercent, renderReport, table } from './index';
 
 const summary = emptySummary({
   snapshotLedger: 64722632,
@@ -121,13 +121,10 @@ describe('renderReport', () => {
   });
 });
 
-describe('reportTitle', () => {
-  it('names the network for testnet only', () => {
-    expect(reportTitle(summary)).toBe('Stellar Harness report');
-    const testnet = { ...summary, snapshot: { ...summary.snapshot, network: 'testnet' as const } };
-    expect(reportTitle(testnet)).toBe('Stellar Harness report (testnet)');
-    expect(renderReport({ summary: testnet, exports: [], methodology: [], runs: [] })).toMatch(
-      /^# Stellar Harness report \(testnet\)/,
+describe('renderReport title', () => {
+  it('opens with the report heading', () => {
+    expect(renderReport({ summary, exports: [], methodology: [], runs: [] })).toMatch(
+      /^# Stellar Harness report\n/,
     );
   });
 });

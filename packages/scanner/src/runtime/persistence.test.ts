@@ -9,7 +9,7 @@ const snapshot = {
   snapshotTime: '2026-10-02T00:00:00.000Z',
   ledgerCloseSeconds: 5,
   gitSha: 'abc',
-  network: 'testnet' as const,
+  network: 'mainnet' as const,
 };
 
 const collect = async (rows: AsyncIterable<unknown>) => {
