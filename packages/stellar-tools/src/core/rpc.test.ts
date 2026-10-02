@@ -1,4 +1,4 @@
-import { Keypair, xdr } from '@stellar/stellar-sdk';
+import { Keypair, StrKey, xdr } from '@stellar/stellar-sdk';
 import { describe, expect, it } from 'vitest';
 import fixtures from './__fixtures__/rpc.json';
 import { MemoryCache } from './cache';
@@ -18,10 +18,12 @@ const setup = (responses: Record<string, unknown>) => {
   return { ...mock, rpc: createRpcClient({ http: mock.http, url: RPC_URL }) };
 };
 
-const accountKey = (seed: number) =>
+const accountKey = (fill: number) =>
   xdr.LedgerKey.account(
     new xdr.LedgerKeyAccount({
-      accountId: Keypair.fromRawEd25519Seed(Buffer.alloc(32, seed)).xdrAccountId(),
+      accountId: Keypair.fromPublicKey(
+        StrKey.encodeEd25519PublicKey(new Uint8Array(32).fill(fill)),
+      ).xdrAccountId(),
     }),
   );
 
