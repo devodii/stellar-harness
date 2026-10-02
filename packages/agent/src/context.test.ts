@@ -1,3 +1,4 @@
+import { NETWORK_PROFILES } from '@harness/schema';
 import { loadNetworkConfig } from '@harness/stellar-tools';
 import { MemoryStorage } from '@harness/storage';
 import { describe, expect, it } from 'vitest';
@@ -117,6 +118,62 @@ describe('createAgentContext', () => {
         resultCodes: { tx: 'tx_failed', ops: ['op_no_trust'] },
         feeBump: null,
       },
+    });
+  });
+});
+
+describe('createAgentContext on testnet', () => {
+  const testnet = () => {
+    const calls: string[] = [];
+    const fetch: typeof globalThis.fetch = async (input, init) => {
+      const url = String(input);
+      const body = typeof init?.body === 'string' ? JSON.parse(init.body) : null;
+      calls.push(body ? `${url}#${body.method}` : url);
+      return new Response(
+        JSON.stringify({ jsonrpc: '2.0', id: 1, result: rpcResult(body?.method ?? '') }),
+        { status: 200, headers: { 'content-type': 'application/json' } },
+      );
+    };
+    const clients = createLiveClients(loadNetworkConfig({}, 'testnet'), { fetch, log: () => {} });
+    const ctx = createAgentContext({
+      clients,
+      storage: new MemoryStorage(),
+      policy: { spendCapXlm: 5 },
+    });
+    return { ctx, calls };
+  };
+
+  it('takes urls, passphrase and ecosystem availability from the testnet config', () => {
+    const { ctx } = testnet();
+    expect(ctx).toMatchObject({
+      network: 'testnet',
+      networkPassphrase: NETWORK_PROFILES.testnet.passphrase,
+      ecosystemDirectory: false,
+      rpcUrl: NETWORK_PROFILES.testnet.rpcUrl,
+      horizonUrl: NETWORK_PROFILES.testnet.horizonUrl,
+      stellarExpertUrl: NETWORK_PROFILES.testnet.stellarExpertUrl,
+    });
+  });
+
+  it('reads the latest ledger from testnet RPC', async () => {
+    const { ctx, calls } = testnet();
+    await ctx.latestLedger();
+    expect(calls).toEqual([`${NETWORK_PROFILES.testnet.rpcUrl}#getLatestLedger`]);
+  });
+
+  it('answers ecosystem search with a mainnet-only error and no request', async () => {
+    const { ctx, calls } = testnet();
+    const result = await createAgentTools(ctx).searchEcosystem.execute({ query: 'x' }, options);
+    expect(result).toMatchObject({ ok: false, error: { code: 'NOT_FOUND' } });
+    expect(calls).toEqual([]);
+  });
+
+  it('keeps mainnet settings for a mainnet config', () => {
+    const { ctx } = setup();
+    expect(ctx).toMatchObject({
+      network: 'mainnet',
+      networkPassphrase: NETWORK_PROFILES.mainnet.passphrase,
+      ecosystemDirectory: true,
     });
   });
 });
