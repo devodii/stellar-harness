@@ -1,7 +1,16 @@
 import { writeFile } from 'node:fs/promises';
 import type { z } from 'zod';
 import { renderReport } from '../../report/render';
-import { AnchorsSummary, ContractsSummary, emptySummary, FailuresSummary, FINDING_TYPES, GithubSummary, RentSummary, Summary } from '../../schema';
+import {
+  AnchorsSummary,
+  ContractsSummary,
+  emptySummary,
+  FailuresSummary,
+  FINDING_TYPES,
+  GithubSummary,
+  RentSummary,
+  Summary,
+} from '../../schema';
 import { type CensusRecord, readCensusRecords, readPreviews } from '../artifacts';
 import type { ScanContext } from '../context';
 import { backfillMeaningfulCounts } from './meaningful-backfill';
@@ -34,13 +43,11 @@ const summaryOf = <S extends z.ZodType>(
 export const buildSummary = async (ctx: ScanContext): Promise<Summary> => {
   const records = await readCensusRecords(ctx.persistence);
   const empty = emptySummary(ctx.snapshot);
-  const { rows } = await ctx.sink.storage.queryFindings({ limit: 1, offset: 0 });
+  const findings = await ctx.sink.storage.listFindings();
   const findingsCount: Summary['findingsCount'] = {};
-  if (rows.length > 0) {
-    for (const type of FINDING_TYPES) {
-      const { total } = await ctx.sink.storage.queryFindings({ type: [type], limit: 1 });
-      if (total > 0) findingsCount[type] = total;
-    }
+  for (const type of FINDING_TYPES) {
+    const total = findings.filter((finding) => finding.type === type).length;
+    if (total > 0) findingsCount[type] = total;
   }
   return Summary.parse({
     snapshot: ctx.snapshot,
