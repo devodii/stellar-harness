@@ -38,7 +38,7 @@ const FIELDS: FilterField<FindingsFilter>[] = [
     label: 'severity',
     options: SEVERITIES.map((severity) => ({ value: severity, label: severity })),
   },
-  { kind: 'text', name: 'tag', label: 'tag', placeholder: 'scf_funded' },
+  { kind: 'text', name: 'tag', label: 'tag', placeholder: 'e.g. scf_funded' },
 ];
 
 export function FindingsExplorer() {
