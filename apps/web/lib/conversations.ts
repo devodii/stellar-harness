@@ -68,3 +68,31 @@ export const withMessages = (
   title: conversation.title === UNTITLED ? conversationTitle(messages) : conversation.title,
   updatedAt: now.toISOString(),
 });
+
+export const STORAGE_BUDGET_BYTES = 3_500_000;
+
+const withoutImages = (message: HarnessUIMessage): HarnessUIMessage => ({
+  ...message,
+  parts: message.parts.filter((part) => part.type !== 'file'),
+});
+
+export const compactImages = (
+  list: Conversation[],
+  budget = STORAGE_BUDGET_BYTES,
+): Conversation[] => {
+  const size = (value: Conversation[]) => JSON.stringify(value).length;
+  if (size(list) <= budget) return list;
+  const compacted = list.map((conversation) => ({
+    ...conversation,
+    messages: [...conversation.messages],
+  }));
+  const oldestFirst = [...compacted].sort((a, b) => a.updatedAt.localeCompare(b.updatedAt));
+  for (const conversation of oldestFirst) {
+    for (const [index, message] of conversation.messages.entries()) {
+      if (!message.parts.some((part) => part.type === 'file')) continue;
+      conversation.messages[index] = withoutImages(message);
+      if (size(compacted) <= budget) return compacted;
+    }
+  }
+  return compacted;
+};

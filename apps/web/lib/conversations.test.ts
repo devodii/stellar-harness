@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { HarnessUIMessage } from './chat';
 import {
+  type Conversation,
+  compactImages,
   conversationTitle,
   MAX_CONVERSATIONS,
   newConversation,
@@ -57,5 +59,37 @@ describe('conversations', () => {
     const valid = newConversation('ok');
     expect(sanitizeConversations([valid, { id: 1 }, 'junk'])).toEqual([valid]);
     expect(sanitizeConversations('not an array')).toEqual([]);
+  });
+});
+
+describe('compactImages', () => {
+  const image = {
+    type: 'file' as const,
+    mediaType: 'image/jpeg',
+    url: `data:image/jpeg;base64,${'a'.repeat(5_000)}`,
+  };
+  const conversation = (id: string, updatedAt: string): Conversation => ({
+    id,
+    title: id,
+    createdAt: updatedAt,
+    updatedAt,
+    messages: [{ id: `${id}-m`, role: 'user', parts: [image, { type: 'text', text: 'look' }] }],
+  });
+
+  it('keeps everything under the budget', () => {
+    const list = [conversation('a', '2026-10-01T00:00:00.000Z')];
+    expect(compactImages(list, 1_000_000)).toBe(list);
+  });
+
+  it('drops images from the oldest conversations first and keeps text', () => {
+    const list = [
+      conversation('new', '2026-10-02T00:00:00.000Z'),
+      conversation('old', '2026-10-01T00:00:00.000Z'),
+    ];
+    const compacted = compactImages(list, JSON.stringify(list).length - 1_000);
+    expect(compacted.find((c) => c.id === 'old')?.messages[0]?.parts).toEqual([
+      { type: 'text', text: 'look' },
+    ]);
+    expect(compacted.find((c) => c.id === 'new')?.messages[0]?.parts).toHaveLength(2);
   });
 });
