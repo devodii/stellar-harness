@@ -6,10 +6,7 @@ export const DEFAULT_CHANNEL_MIN_ACCOUNTS = 5;
 const CONTRACT_CALLER_SHARE = 0.5;
 
 export type ClassificationTag =
-  | 'multisig'
-  | 'anchor_distribution'
-  | 'channel_pattern'
-  | 'contract_caller';
+  'multisig' | 'anchor_distribution' | 'channel_pattern' | 'contract_caller';
 
 export type AccountClassification = {
   account: string;
