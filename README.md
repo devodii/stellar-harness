@@ -68,6 +68,30 @@ docker compose run --rm scanner pnpm scan anchors --limit 20
 
 `REPORT.md` lists every endpoint, parameter, threshold, window and sampling decision, plus measured wall time and request counts per census. Scan output (`data/`, `REPORT.md`) is not committed.
 
+## Running the web demo
+
+```bash
+echo "ANTHROPIC_API_KEY=..." > apps/web/.env.local
+pnpm dev                      # http://localhost:3000
+pnpm --filter web storybook   # component catalogue
+```
+
+The landing page is the chat. It renders without a scan; scan-derived numbers show as `n/a` until `data/summary.json` exists. The agent reads mainnet live through the same tools the scanner uses and never signs or submits anything.
+
+### Two-minute path
+
+1. Read the live strip in the header: the ledger ticks from Horizon, the rest comes from the scan.
+2. Click "Why did tx … fail?": transaction, plain-language explanation, then a fix plan.
+3. Click "SCF contracts archived or expiring in 30d", ask to extend one, and approve the plan at the policy boundary (demo approval, nothing signed).
+4. Click "Is … conformant?" to watch the nine-stage anchor probe.
+5. Open `/findings`, filter, open a finding and send it to chat.
+
+`DEMO.md` has the full three-minute recording script with fixed subjects.
+
+## Deploying
+
+The Vercel project's root directory is `apps/web`. Run `pnpm refresh:public` to copy the latest summary and trimmed findings into `data/public/`, set `HARNESS_DATA_DIR=../../data/public` and `ANTHROPIC_API_KEY` on the project, then deploy with `vercel deploy` from the repository root. Scan data is never committed.
+
 ## Swapping storage
 
 The web app and the scanner read and write through the `Storage` interface in `packages/storage`. `createStorage({ dataDir })` picks `JsonFileStorage` when `data/summary.json` exists and `MemoryStorage` otherwise. `SqliteStorage` implements the same interface; moving to a database means returning it (or a new implementation) from that one factory.
