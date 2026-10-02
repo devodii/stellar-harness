@@ -1,6 +1,6 @@
 import type { Summary } from '@harness/schema';
 import { BracketTag } from '@/components/bracket-tag';
-import { ResultCard } from '@/components/result-card';
+import { ResultSection } from '@/components/result-section';
 import { Stat, StatLabel } from '@/components/stat';
 import { formatDateTime, formatInt, formatPercent, formatXlm } from '@/lib/format';
 import { hasScanData, summaryMetrics, topCodes } from '@/lib/summary';
@@ -11,7 +11,7 @@ export function SummaryView({ summary }: { summary: Summary }) {
   const codes = topCodes(summary.failures.preventable.byCode);
 
   return (
-    <ResultCard
+    <ResultSection
       title={`summary @ ledger ${formatInt(summary.snapshot.snapshotLedger)}`}
       aside={!scanned && <BracketTag label="no scan data" tone="warning" />}
       footer={`snapshot ${formatDateTime(summary.snapshot.snapshotTime)} · git ${summary.snapshot.gitSha.slice(0, 7)}`}
@@ -52,6 +52,6 @@ export function SummaryView({ summary }: { summary: Summary }) {
           </ul>
         </div>
       )}
-    </ResultCard>
+    </ResultSection>
   );
 }

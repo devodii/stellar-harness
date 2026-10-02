@@ -1,7 +1,7 @@
 import { Address } from '@/components/address';
 import { BracketTag } from '@/components/bracket-tag';
 import { KeyValueList } from '@/components/key-value-list';
-import { ResultCard } from '@/components/result-card';
+import { ResultSection } from '@/components/result-section';
 import { StatLabel } from '@/components/stat';
 import { useExplorer } from '@/hooks/use-explorer';
 import { formatDecimal } from '@/lib/format';
@@ -26,7 +26,7 @@ export function AccountView({ account }: { account: AccountViewData }) {
     .map(([flag]) => FLAG_LABELS[flag as keyof AccountViewData['flags']]);
 
   return (
-    <ResultCard
+    <ResultSection
       title={<Address value={account.address} href={explorerUrl('account', account.address)} />}
       aside={
         account.exists ? (
@@ -77,6 +77,6 @@ export function AccountView({ account }: { account: AccountViewData }) {
           </ul>
         </div>
       )}
-    </ResultCard>
+    </ResultSection>
   );
 }

@@ -1,12 +1,12 @@
 import { BracketTag } from '@/components/bracket-tag';
-import { ResultCard } from '@/components/result-card';
 import { ResultCodes } from '@/components/result-codes';
+import { ResultSection } from '@/components/result-section';
 import { StatLabel } from '@/components/stat';
 import type { FailureExplanationView as FailureExplanationData } from '@/lib/tool-views';
 
 export function FailureExplanationView({ explanation }: { explanation: FailureExplanationData }) {
   return (
-    <ResultCard
+    <ResultSection
       title="failure explanation"
       aside={
         explanation.preventable ? (
@@ -34,6 +34,6 @@ export function FailureExplanationView({ explanation }: { explanation: FailureEx
         <StatLabel>suggested action</StatLabel>
         <p className="text-sm text-foreground">{explanation.suggestedAction}</p>
       </div>
-    </ResultCard>
+    </ResultSection>
   );
 }

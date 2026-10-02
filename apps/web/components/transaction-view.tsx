@@ -1,8 +1,8 @@
 import { Address } from '@/components/address';
 import { BracketTag } from '@/components/bracket-tag';
 import { KeyValueList } from '@/components/key-value-list';
-import { ResultCard } from '@/components/result-card';
 import { ResultCodes } from '@/components/result-codes';
+import { ResultSection } from '@/components/result-section';
 import { StatLabel } from '@/components/stat';
 import { useExplorer } from '@/hooks/use-explorer';
 import { formatDateTime, formatInt } from '@/lib/format';
@@ -18,7 +18,7 @@ const timeboundsText = (timebounds: TransactionViewData['timebounds']): string =
 export function TransactionView({ transaction }: { transaction: TransactionViewData }) {
   const { explorerUrl } = useExplorer();
   return (
-    <ResultCard
+    <ResultSection
       title={
         <Address
           value={transaction.hash}
@@ -77,6 +77,6 @@ export function TransactionView({ transaction }: { transaction: TransactionViewD
           </ol>
         </div>
       )}
-    </ResultCard>
+    </ResultSection>
   );
 }

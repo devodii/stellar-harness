@@ -2,7 +2,7 @@ import { Address } from '@/components/address';
 import { BracketTag } from '@/components/bracket-tag';
 import { CopyButton } from '@/components/copy-button';
 import { KeyValueList } from '@/components/key-value-list';
-import { ResultCard } from '@/components/result-card';
+import { ResultSection } from '@/components/result-section';
 import { Stat, StatLabel } from '@/components/stat';
 import { useExplorer } from '@/hooks/use-explorer';
 import { formatInt, formatXlm } from '@/lib/format';
@@ -22,7 +22,7 @@ export function SimulationCostView({ simulation, xlmUsd }: SimulationCostViewPro
   const { explorerUrl } = useExplorer();
   const extend = isExtend(simulation);
   return (
-    <ResultCard
+    <ResultSection
       title={
         <span className="flex items-center gap-2">
           {extend ? 'extend ttl' : 'restore'}
@@ -70,6 +70,6 @@ export function SimulationCostView({ simulation, xlmUsd }: SimulationCostViewPro
           {simulation.unsignedXdr}
         </pre>
       </details>
-    </ResultCard>
+    </ResultSection>
   );
 }

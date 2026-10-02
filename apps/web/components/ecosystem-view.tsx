@@ -1,6 +1,6 @@
 import { Address } from '@/components/address';
 import { BracketTag } from '@/components/bracket-tag';
-import { ResultCard } from '@/components/result-card';
+import { ResultSection } from '@/components/result-section';
 import { StatLabel } from '@/components/stat';
 import { explorerUrl } from '@/lib/links';
 import type { EcosystemView as EcosystemData } from '@/lib/tool-views';
@@ -8,7 +8,7 @@ import type { EcosystemView as EcosystemData } from '@/lib/tool-views';
 export function EcosystemView({ ecosystem }: { ecosystem: EcosystemData }) {
   const empty = ecosystem.projects.length === 0 && ecosystem.repos.length === 0;
   return (
-    <ResultCard
+    <ResultSection
       title={`search "${ecosystem.query}"`}
       aside={
         <span className="font-mono text-xs text-muted-foreground">
@@ -85,6 +85,6 @@ export function EcosystemView({ ecosystem }: { ecosystem: EcosystemData }) {
           </ul>
         </div>
       )}
-    </ResultCard>
+    </ResultSection>
   );
 }

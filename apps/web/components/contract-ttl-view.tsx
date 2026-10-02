@@ -1,7 +1,7 @@
 import { Address } from '@/components/address';
 import { BracketTag } from '@/components/bracket-tag';
 import { KeyValueList } from '@/components/key-value-list';
-import { ResultCard } from '@/components/result-card';
+import { ResultSection } from '@/components/result-section';
 import { Stat } from '@/components/stat';
 import { useExplorer } from '@/hooks/use-explorer';
 import { formatDays, formatInt, formatSeconds } from '@/lib/format';
@@ -54,7 +54,7 @@ function TtlEntry({ label, entry }: { label: string; entry: TtlEntryView }) {
 export function ContractTtlView({ ttl }: { ttl: ContractTtlData }) {
   const { explorerUrl } = useExplorer();
   return (
-    <ResultCard
+    <ResultSection
       title={<Address value={ttl.contractId} href={explorerUrl('contract', ttl.contractId)} />}
       footer={`snapshot ledger ${formatInt(ttl.snapshotLedger)} · close ${formatSeconds(ttl.ledgerCloseSeconds)}`}
     >
@@ -74,6 +74,6 @@ export function ContractTtlView({ ttl }: { ttl: ContractTtlData }) {
           },
         ]}
       />
-    </ResultCard>
+    </ResultSection>
   );
 }
