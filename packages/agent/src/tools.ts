@@ -6,9 +6,11 @@ import {
   explainFailure,
   getAccount,
   getContractTtl,
+  getNetworkStatus,
   getSummary,
   getTransaction,
   invokeTool,
+  type NetworkStatusContext,
   type PolicyContext,
   type ProbeAnchorContext,
   planFix,
@@ -63,7 +65,8 @@ export type AgentToolContext = StorageContext &
   StellarlightContext &
   ContractToolContext &
   TransactionToolContext &
-  ProbeAnchorContext;
+  ProbeAnchorContext &
+  NetworkStatusContext;
 
 export const createAgentTools = <TContext extends AgentToolContext>(ctx: TContext) => ({
   getAccount: toAiTool(getAccount, ctx),
@@ -75,6 +78,7 @@ export const createAgentTools = <TContext extends AgentToolContext>(ctx: TContex
   getSummary: toAiTool(getSummary, ctx),
   explainFailure: toAiTool(explainFailure, ctx),
   searchEcosystem: toAiTool(searchEcosystem, ctx),
+  getNetworkStatus: toAiTool(getNetworkStatus, ctx),
   getContractTtl: toAiTool(getContractTtl, ctx),
   simulateExtendTtl: toAiTool(simulateExtendTtl, ctx),
   simulateRestore: toAiTool(simulateRestore, ctx),
