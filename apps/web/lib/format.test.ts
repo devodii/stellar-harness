@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { formatAgo, formatPercent, formatXlm, ratio, stroopsToXlm, truncateMiddle } from './format';
+import {
+  formatAgo,
+  formatPercent,
+  formatXlm,
+  ratio,
+  stroopsToXlm,
+  summarizeArgs,
+  truncateMiddle,
+} from './format';
 
 describe('format', () => {
   it('truncates long identifiers in the middle', () => {
@@ -20,6 +28,18 @@ describe('format', () => {
   it('formats ratios and guards empty denominators', () => {
     expect(formatPercent(0.4567)).toBe('45.7%');
     expect(ratio(1, 0)).toBeNull();
+  });
+
+  it('summarizes tool arguments compactly', () => {
+    expect(
+      summarizeArgs({
+        contractId: 'CDZYZVZNURK4DCD3ZJMBKLDYCB7FIYL3FRVSLRLGL2BEOIN53UP4YNQC',
+        days: 365,
+        skip: undefined,
+      }),
+    ).toBe('contractId=CDZY…YNQC, days=365');
+    expect(summarizeArgs({ severity: ['high', 'critical'] })).toBe('severity=[high,critical]');
+    expect(summarizeArgs(null)).toBe('');
   });
 
   it('formats relative time', () => {
