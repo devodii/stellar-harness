@@ -58,6 +58,16 @@ const parseStroops = (value: string | undefined): number | null => {
   return Number(value);
 };
 
+// The transaction fee field is a uint32, so a resource fee above ~429 XLM cannot be assembled into
+// one transaction; the simulated fee is still the right estimate, so keep the unsimulated draft.
+const assembledXdr = (draft: Transaction, assemble: () => Transaction): string => {
+  try {
+    return assemble().toXdr();
+  } catch {
+    return draft.toXdr();
+  }
+};
+
 export const simulateFootprint = async (
   rpc: RpcPort,
   source: SimulationSource,
@@ -77,11 +87,12 @@ export const simulateFootprint = async (
     );
   }
   const preambleFee = parseStroops(restorePreamble?.minResourceFee);
-  const unsigned = buildFootprintTransaction(source, keys, action, transactionData);
   return ok({
     minResourceFeeStroops,
     estimatedXlm: stroopsToXlm(minResourceFeeStroops + INCLUSION_FEE_STROOPS),
-    unsignedXdr: unsigned.toXdr(),
+    unsignedXdr: assembledXdr(draft, () =>
+      buildFootprintTransaction(source, keys, action, transactionData),
+    ),
     footprint: footprintFor(keys, action),
     restorePreamble: preambleFee === null ? null : { minResourceFeeStroops: preambleFee },
     latestLedger,
