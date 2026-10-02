@@ -230,12 +230,6 @@ importers:
 
   packages/scanner:
     dependencies:
-      '@harness/schema':
-        specifier: workspace:*
-        version: link:../schema
-      '@harness/stellar-tools':
-        specifier: workspace:*
-        version: link:../stellar-tools
       '@stellar/anchor-tests':
         specifier: 0.6.22
         version: 0.6.22
