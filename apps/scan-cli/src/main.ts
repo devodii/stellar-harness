@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { COMMANDS, createScanContext, dataDirFor, reportFileFor } from '@harness/scanner';
 import { commandSteps, parseScanArgs, USAGE } from './args';
 import { findWorkspaceRoot, resolveFrom } from './paths';
@@ -12,6 +14,8 @@ const main = async (): Promise<number> => {
   }
 
   const root = findWorkspaceRoot(process.env.INIT_CWD ?? process.cwd());
+  const envFile = join(root, '.env');
+  if (existsSync(envFile)) process.loadEnvFile(envFile);
   const dataDir = dataDirFor(
     resolveFrom(root, process.env.HARNESS_DATA_DIR ?? './data'),
     args.network,
@@ -20,6 +24,7 @@ const main = async (): Promise<number> => {
   const ctx = await createScanContext({
     dataDir,
     network: args.network,
+    databaseUrl: process.env.DATABASE_URL || undefined,
     noCache: args.noCache,
     newSnapshot: args.newSnapshot,
     limit: args.limit,
@@ -27,7 +32,9 @@ const main = async (): Promise<number> => {
     concurrency: args.concurrency,
     env: process.env,
   });
-  ctx.log(`[scan] ${args.network} data in ${dataDir}`);
+  ctx.log(
+    `[scan] ${args.network} data in ${ctx.persistence.kind === 'postgres' ? 'postgres' : dataDir}`,
+  );
   ctx.log(`[scan] snapshot ledger ${ctx.snapshot.snapshotLedger} at ${ctx.snapshot.snapshotTime}`);
 
   for (const step of commandSteps(args.command)) {
