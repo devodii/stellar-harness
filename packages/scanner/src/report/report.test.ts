@@ -1,6 +1,6 @@
 import { emptySummary } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
-import { formatPercent, renderReport, table } from './index';
+import { formatPercent, renderReport, reportTitle, table } from './index';
 
 const summary = emptySummary({
   snapshotLedger: 64722632,
@@ -88,5 +88,16 @@ describe('renderReport', () => {
   it('formats percentages safely', () => {
     expect(formatPercent(1, 0)).toBe('0%');
     expect(formatPercent(1, 8)).toBe('12.5%');
+  });
+});
+
+describe('reportTitle', () => {
+  it('names the network for testnet only', () => {
+    expect(reportTitle(summary)).toBe('Stellar Harness report');
+    const testnet = { ...summary, snapshot: { ...summary.snapshot, network: 'testnet' as const } };
+    expect(reportTitle(testnet)).toBe('Stellar Harness report (testnet)');
+    expect(renderReport({ summary: testnet, exports: [], methodology: [], runs: [] })).toMatch(
+      /^# Stellar Harness report \(testnet\)/,
+    );
   });
 });
