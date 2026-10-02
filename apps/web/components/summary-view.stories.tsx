@@ -14,7 +14,14 @@ const EMPTY = emptySummary(SNAPSHOT);
 
 const FILLED: Summary = {
   ...EMPTY,
-  contracts: { ...EMPTY.contracts, total: 5000, archivedInstances: 120, expiring30d: 44 },
+  contracts: {
+    ...EMPTY.contracts,
+    total: 5000,
+    archivedInstances: 120,
+    archivedMeaningful: 9,
+    expiring30d: 44,
+    expiring30dMeaningful: 3,
+  },
   failures: {
     ...EMPTY.failures,
     windowStart: '2026-01-01T00:00:00.000Z',
