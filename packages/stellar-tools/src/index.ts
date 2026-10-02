@@ -1,4 +1,5 @@
 export * from './adapters';
+export type { ContractToolContext } from './contracts/context';
 export * from './core/cache';
 export * from './core/clients';
 export * from './core/config';

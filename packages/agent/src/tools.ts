@@ -1,7 +1,9 @@
 import type { AppError, ToolMeta } from '@harness/schema';
 import {
+  type ContractToolContext,
   type DecodeContext,
   explainFailure,
+  getContractTtl,
   getSummary,
   invokeTool,
   type PolicyContext,
@@ -10,6 +12,8 @@ import {
   type StellarlightContext,
   type StorageContext,
   searchEcosystem,
+  simulateExtendTtl,
+  simulateRestore,
   type ToolDefinition,
 } from '@harness/stellar-tools';
 import {
@@ -47,7 +51,11 @@ export const toAiTool = <TInput extends z.ZodType, TOutput extends z.ZodType, TC
     },
   });
 
-export type AgentToolContext = StorageContext & PolicyContext & DecodeContext & StellarlightContext;
+export type AgentToolContext = StorageContext &
+  PolicyContext &
+  DecodeContext &
+  StellarlightContext &
+  ContractToolContext;
 
 export const createAgentTools = <TContext extends AgentToolContext>(ctx: TContext) => ({
   planFix: toAiTool(planFix, ctx),
@@ -55,6 +63,9 @@ export const createAgentTools = <TContext extends AgentToolContext>(ctx: TContex
   getSummary: toAiTool(getSummary, ctx),
   explainFailure: toAiTool(explainFailure, ctx),
   searchEcosystem: toAiTool(searchEcosystem, ctx),
+  getContractTtl: toAiTool(getContractTtl, ctx),
+  simulateExtendTtl: toAiTool(simulateExtendTtl, ctx),
+  simulateRestore: toAiTool(simulateRestore, ctx),
 });
 
 export type AgentTools = ReturnType<typeof createAgentTools>;
