@@ -36,7 +36,9 @@ function MessagePart({
       </Reasoning>
     );
   }
-  if (part.type === 'data-context') return <ContextChip context={part.data} />;
+  if (part.type === 'data-context') {
+    return <ContextChip context={part.data} className="bg-background" />;
+  }
   if (part.type === 'data-plan-approval') {
     return (
       <BracketTag
@@ -61,7 +63,7 @@ export function ChatMessage({ message, streaming = false, onReply }: ChatMessage
       className={message.role === 'assistant' ? 'max-w-full' : undefined}
     >
       <MessageContent
-        className={message.role === 'user' ? 'gap-3 border border-border' : 'w-full gap-3'}
+        className={message.role === 'user' ? 'gap-3 group-[.is-user]:bg-muted' : 'w-full gap-3'}
       >
         {parts.map(({ part, key }, position) => (
           <MessagePart
