@@ -98,6 +98,19 @@ const harness = () => {
   return { deps, derived, json, emitted, checkpoints, testRuns };
 };
 
+describe('makeAnchorProbe', () => {
+  it('probes against the selected network passphrase', async () => {
+    const fetch = fakeFetcher(routes);
+    const mainnet = await makeAnchorProbe({ fetch, horizon })('clpx.finance', {});
+    const testnet = await makeAnchorProbe({ fetch, horizon }, { network: 'testnet' })(
+      'clpx.finance',
+      {},
+    );
+    expect(mainnet.tags).toEqual([]);
+    expect(testnet.tags).toEqual(['mainnet_toml']);
+  });
+});
+
 describe('domainTags', () => {
   it('tags region, scf round and iso country', () => {
     expect(domainTags(domains[0] as AnchorDomain)).toEqual([
