@@ -13,7 +13,6 @@ import {
 } from '../../schema';
 import { type CensusRecord, readCensusRecords, readPreviews } from '../artifacts';
 import type { ScanContext } from '../context';
-import { backfillMeaningfulCounts } from './meaningful-backfill';
 
 const EXPORT_ORDER = [
   'failed_tx_by_code',
@@ -51,10 +50,7 @@ export const buildSummary = async (ctx: ScanContext): Promise<Summary> => {
   }
   return Summary.parse({
     snapshot: ctx.snapshot,
-    contracts: await backfillMeaningfulCounts(
-      ctx,
-      summaryOf(records, 'contracts', ContractsSummary, empty.contracts),
-    ),
+    contracts: summaryOf(records, 'contracts', ContractsSummary, empty.contracts),
     failures: summaryOf(records, 'failures', FailuresSummary, empty.failures),
     anchors: summaryOf(records, 'anchors', AnchorsSummary, empty.anchors),
     rent: summaryOf(records, 'rent', RentSummary, empty.rent),
