@@ -23,6 +23,7 @@ export const buildLive = (
       preventableShare: scanned ? metrics.preventableShare : null,
     },
     archivedContracts: fromScan(metrics.archivedContracts),
+    archivedMeaningful: fromScan(metrics.archivedMeaningful),
     anchorsFailing: fromScan(metrics.anchorsFailing),
     scanned,
     horizonOk: ledger?.source === 'horizon',

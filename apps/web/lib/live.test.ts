@@ -51,4 +51,20 @@ describe('buildLive', () => {
     expect(live.horizonOk).toBe(false);
     expect(live.ledgerSource).toBeNull();
   });
+
+  it('reports active archived contracts next to the raw total', () => {
+    const base = emptySummary(snapshot);
+    const summary = {
+      ...base,
+      contracts: {
+        ...base.contracts,
+        total: 70_000,
+        archivedInstances: 65_140,
+        archivedMeaningful: 240,
+      },
+    };
+    const live = buildLive('mainnet', ledger, { summary, scanned: true });
+    expect(LiveResponse.parse(live)).toEqual(live);
+    expect(live).toMatchObject({ archivedContracts: 65_140, archivedMeaningful: 240 });
+  });
 });
