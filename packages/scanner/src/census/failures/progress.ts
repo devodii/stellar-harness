@@ -47,12 +47,17 @@ export const remainingChunks = (chunks: LedgerChunk[], state: ResumeState): Ledg
 export class ContiguousProgress<T extends { chunk: LedgerChunk }> {
   private readonly order: LedgerChunk[];
   private readonly pending = new Map<number, T>();
+  private readonly alreadyDone: ReadonlySet<number>;
   private index = 0;
   private through: number;
 
-  constructor(chunks: LedgerChunk[], completedThrough: number) {
-    this.order = [...chunks].sort((a, b) => a.start - b.start);
+  constructor(chunks: LedgerChunk[], completedThrough: number, alreadyDone: number[] = []) {
+    this.order = chunks
+      .filter((chunk) => chunk.end > completedThrough)
+      .sort((a, b) => a.start - b.start);
     this.through = completedThrough;
+    this.alreadyDone = new Set(alreadyDone);
+    this.advance();
   }
 
   get completedThrough(): number {
@@ -65,13 +70,19 @@ export class ContiguousProgress<T extends { chunk: LedgerChunk }> {
 
   complete(result: T): T[] {
     this.pending.set(result.chunk.id, result);
+    return this.advance();
+  }
+
+  private advance(): T[] {
     const ready: T[] = [];
     while (this.index < this.order.length) {
       const next = this.order[this.index];
-      const done = next && this.pending.get(next.id);
-      if (!next || !done) break;
-      this.pending.delete(next.id);
-      ready.push(done);
+      if (!next) break;
+      const done = this.pending.get(next.id);
+      if (done) {
+        this.pending.delete(next.id);
+        ready.push(done);
+      } else if (!this.alreadyDone.has(next.id)) break;
       this.through = next.end;
       this.index += 1;
     }

@@ -32,6 +32,13 @@ describe('ContiguousProgress', () => {
     expect(progress.completedThrough).toBe(109);
   });
 
+  it('advances over chunks completed past a gap in an earlier run', () => {
+    const progress = new ContiguousProgress(chunks, 109, [2, 3]);
+    expect(progress.completedThrough).toBe(109);
+    expect(progress.complete(done(1)).map((r) => r.chunk.id)).toEqual([1]);
+    expect(progress.completedThrough).toBe(139);
+  });
+
   it('starts from a resumed position', () => {
     const rest = remainingChunks(chunks, { completedThrough: 119, completedChunkIds: [] });
     expect(rest.map((c) => c.id)).toEqual([2, 3]);
