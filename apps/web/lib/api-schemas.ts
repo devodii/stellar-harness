@@ -54,6 +54,9 @@ export const LiveResponse = z.object({
 });
 export type LiveResponse = z.infer<typeof LiveResponse>;
 
+export const NetworkBody = z.object({ network: Network });
+export type NetworkBody = z.infer<typeof NetworkBody>;
+
 export const ApiErrorBody = z.object({
   error: z.object({ code: z.string(), message: z.string() }),
 });
