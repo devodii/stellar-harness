@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import type * as React from 'react';
 import { AppSidebar } from '@/components/app-sidebar';
 import { LiveHeaderStrip } from '@/components/live-header-strip';
 import { NetworkTag } from '@/components/network-tag';
@@ -16,11 +16,7 @@ export interface AppShellProps {
 export function AppShell({ children, sidebar, strip }: AppShellProps) {
   return (
     <SidebarProvider className="h-svh">
-      {sidebar ?? (
-        <React.Suspense>
-          <AppSidebar />
-        </React.Suspense>
-      )}
+      {sidebar ?? <AppSidebar />}
       <SidebarInset className="min-h-0 min-w-0">
         <TopBar strip={strip ?? <LiveHeaderStrip />} badge={<NetworkTag />} />
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</div>
