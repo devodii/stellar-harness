@@ -9,10 +9,10 @@ import { probeInfo } from './info';
 import type { InfoEndpointOutcome } from './info-endpoint';
 import type { Fetcher, HorizonPort } from './ports';
 import type {
+  AnchorProbeResult,
   AnchorTestSep,
   AnchorTestsSummary,
   AnchorToml,
-  ProbeAnchorOutput,
   ProbeDetails,
   StageRecord,
 } from './schemas';
@@ -117,7 +117,7 @@ export const probeAnchor = async (
   domainInput: string,
   ports: AnchorProbePorts,
   opts: ProbeAnchorOptions = {},
-): Promise<ProbeAnchorOutput> => {
+): Promise<AnchorProbeResult> => {
   const domain = normalizeDomain(domainInput);
   if (!domain) return fail('INVALID_INPUT', `not a public hostname: ${domainInput}`);
 
@@ -130,7 +130,7 @@ export const probeAnchor = async (
   records.set('toml', tomlOutcome.record);
   const toml = tomlOutcome.toml;
 
-  const finish = (reason: SkipReason | null): ProbeAnchorOutput => {
+  const finish = (reason: SkipReason | null): AnchorProbeResult => {
     if (reason) {
       for (const stage of ANCHOR_STAGES) {
         if (!records.has(stage)) records.set(stage, skippedStage(stage, reason));
