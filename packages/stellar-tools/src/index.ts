@@ -15,6 +15,7 @@ export * from './core/snapshot';
 export * from './core/stats';
 export * from './core/stellarlight';
 export * from './decode/envelope';
+export * from './decode/port';
 export * from './decode/result-codes';
 export * from './explain/code-info';
 export * from './explain/codes';
