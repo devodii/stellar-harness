@@ -26,4 +26,13 @@ describe('getSummary tool', () => {
     expect(Summary.parse(result.data).failures.txFailed).toBe(0);
     expect(result.data.snapshot.gitSha).toBe('unknown');
   });
+
+  it('stamps the placeholder snapshot with the selected network', async () => {
+    const result = await invokeTool(
+      getSummary,
+      {},
+      { storage: new MemoryStorage(), network: 'testnet' as const },
+    );
+    expect(result.ok && result.data.snapshot.network).toBe('testnet');
+  });
 });
