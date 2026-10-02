@@ -16,6 +16,11 @@
         "feeCharged": "100"
       },
       "envelope": {
+        "operations": [
+          {
+            "type": "claim_claimable_balance"
+          }
+        ],
         "sourceAccount": "GASWSYFT5UDG7JTJQI2CGO6HF5KQIQAP5L6JCNM3ETMUFIARTQ73ATMB",
         "maxFee": "100",
         "operationCount": 1,
@@ -42,6 +47,11 @@
         "feeCharged": "100"
       },
       "envelope": {
+        "operations": [
+          {
+            "type": "claim_claimable_balance"
+          }
+        ],
         "sourceAccount": "GBQ2VS4KGUHPJR6O3QDLG6R6WEOROLEFYUPXPRMYYS3WHUNAFHJHVNTI",
         "maxFee": "100",
         "operationCount": 1,
@@ -68,6 +78,14 @@
         "feeCharged": "100"
       },
       "envelope": {
+        "operations": [
+          {
+            "type": "payment",
+            "destination": "GAR2CITLNZGVHSK6Z3FMO44HCGXGZNZATJEM3ZVV6X75FGF6IZ27JSIQ",
+            "asset": "XLM",
+            "amount": "334.7296509"
+          }
+        ],
         "sourceAccount": "GB7IYR44HFYQDZMCEJ2N6W64CJAIPJE4ZW5Z5JMFEFWUHSFEBRXB6KMQ",
         "maxFee": "100",
         "operationCount": 1,
@@ -94,6 +112,11 @@
         "feeCharged": "100"
       },
       "envelope": {
+        "operations": [
+          {
+            "type": "manage_buy_offer"
+          }
+        ],
         "sourceAccount": "GDAVYIICLHJIQACEC3FQFQAZDMIR4IRUJMURN446DD6SLILZS2FPUSDC",
         "maxFee": "6001",
         "operationCount": 1,
@@ -120,6 +143,17 @@
         "feeCharged": "200"
       },
       "envelope": {
+        "operations": [
+          {
+            "type": "payment",
+            "destination": "GDG7PTG6J62HPE74BVWNSQWTPSZKBXN6RRUKJRDEEXPSC2OTXXVLIANW",
+            "asset": "USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN",
+            "amount": "1.0000000"
+          },
+          {
+            "type": "manage_buy_offer"
+          }
+        ],
         "sourceAccount": "GCXSDGZIDUNDEBEPZXRIQEOUPS7SQU2L5KBMF5UE6LDJKTNNH4EVVNSS",
         "maxFee": "15000",
         "operationCount": 2,
@@ -146,6 +180,20 @@
         "feeCharged": "200"
       },
       "envelope": {
+        "operations": [
+          {
+            "type": "payment",
+            "destination": "GCW7NAQVS3S5MWJV4HUSLEOT3AJGGTXVGP4TXEYHSP4TXZDQHAQH6GYN",
+            "asset": "MBC:GBPE7L6AMFQL2IGCVD36VVWZR5DDLINLETF2QMBAJG7ZA65MK7WI4BPK",
+            "amount": "0.0036316"
+          },
+          {
+            "type": "payment",
+            "destination": "GD6V3BMID7YSAS73VU7N347KPOG3APV7F76JCQOEHZJY3JV2CECNM2MZ",
+            "asset": "MBC:GBPE7L6AMFQL2IGCVD36VVWZR5DDLINLETF2QMBAJG7ZA65MK7WI4BPK",
+            "amount": "0.0013684"
+          }
+        ],
         "sourceAccount": "GDTURFYJEYJLDOU72Q2TT3H3EQ2UNGWF7CDAXIPWO6HS3V6T34M6UBX6",
         "maxFee": "200",
         "operationCount": 2,
@@ -172,6 +220,15 @@
         "feeCharged": "100"
       },
       "envelope": {
+        "operations": [
+          {
+            "type": "path_payment_strict_receive",
+            "source": "GDP4BEOE7ET5SD7TM34PGOMUKYP46IEREFTGWXZWSVHSU4I4ZDYTTBXW",
+            "destination": "GDP4BEOE7ET5SD7TM34PGOMUKYP46IEREFTGWXZWSVHSU4I4ZDYTTBXW",
+            "asset": "AQUA:GBNZILSTVQZ4R7IKQDGHYGY2QXL5QOFJYQMXPKWRRM5PAV7Y4M67AQUA",
+            "amount": "1.1041172"
+          }
+        ],
         "sourceAccount": "GCI6CQNY5WPMBZFNEWIMRTAKILFFY4BZNS24OUIQA7WKOK3LK2FKEROH",
         "maxFee": "1000",
         "operationCount": 1,
@@ -198,6 +255,15 @@
         "feeCharged": "100"
       },
       "envelope": {
+        "operations": [
+          {
+            "type": "path_payment_strict_send",
+            "source": "GAMMQJQ6O6KQWPBATHLQWYEDCYKLNAV2D3XG5SQSVHJ6BTMQLSM5MSLE",
+            "destination": "GAMMQJQ6O6KQWPBATHLQWYEDCYKLNAV2D3XG5SQSVHJ6BTMQLSM5MSLE",
+            "asset": "yXLM:GARDNV3Q7YGT4AKSDF25LT32YSCCW4EV22Y2TV3I2PU2MMXJTEDL5T55",
+            "amount": "0.0009554"
+          }
+        ],
         "sourceAccount": "GB5IH7DSX2KG6WX53XLCECZMQRZNSED7RSFVTU3WS4UZSIE7JE5NQDM2",
         "maxFee": "4471",
         "operationCount": 1,
@@ -224,6 +290,15 @@
         "feeCharged": "100"
       },
       "envelope": {
+        "operations": [
+          {
+            "type": "path_payment_strict_send",
+            "source": "GBLVLKGRDU66WLWY4XRORJXCC4LDZ347AQTUYBEPBABIZTVITW2OAGIP",
+            "destination": "GBLVLKGRDU66WLWY4XRORJXCC4LDZ347AQTUYBEPBABIZTVITW2OAGIP",
+            "asset": "XLM",
+            "amount": "0.0000630"
+          }
+        ],
         "sourceAccount": "GAOOWDR27BRVYFVLS25B4ILT3DJZXOGNN6JXA5NLU6ELWJLFG37CYCU6",
         "maxFee": "510009",
         "operationCount": 1,
@@ -250,6 +325,15 @@
         "feeCharged": "200"
       },
       "envelope": {
+        "operations": [
+          {
+            "type": "path_payment_strict_send",
+            "source": "GD77RS525TLPXBSFTZSHDEVDSCDO3NQBTATLRJQVHBOTKUC2PMGPTQEF",
+            "destination": "GD77RS525TLPXBSFTZSHDEVDSCDO3NQBTATLRJQVHBOTKUC2PMGPTQEF",
+            "asset": "XLM",
+            "amount": "0.3172293"
+          }
+        ],
         "sourceAccount": "GDWX4MM6V3R5YSCX6KT7EGFITKMMKG2C4UJ6PEGVFYKMOCY26FJTFU7T",
         "maxFee": "690",
         "operationCount": 1,
@@ -276,6 +360,12 @@
         "feeCharged": "13856"
       },
       "envelope": {
+        "operations": [
+          {
+            "type": "invoke_host_function",
+            "source": "GCJVBJRRJIJ5TGJ4ZQE3YV33N5WKE6VVDMZPL2KYRR4HHPJ2XFIOW6TY"
+          }
+        ],
         "sourceAccount": "GCJVBJRRJIJ5TGJ4ZQE3YV33N5WKE6VVDMZPL2KYRR4HHPJ2XFIOW6TY",
         "maxFee": "232401",
         "operationCount": 1,
@@ -302,6 +392,11 @@
         "feeCharged": "31291"
       },
       "envelope": {
+        "operations": [
+          {
+            "type": "invoke_host_function"
+          }
+        ],
         "sourceAccount": "GCMHW7SRDBO72CTSPYQ5IRY4PHIDY5CCHPK6WPLRXSDAG7DQ6SU63DYA",
         "maxFee": "247866",
         "operationCount": 1,
