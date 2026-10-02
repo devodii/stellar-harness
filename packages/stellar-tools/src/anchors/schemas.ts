@@ -49,6 +49,7 @@ export const AnchorSepResult = z.object({
   passed: z.number().int().nonnegative(),
   failed: z.number().int().nonnegative(),
   skipped: z.number().int().nonnegative(),
+  blocked: z.number().int().nonnegative().default(0),
   names: z.array(z.string()),
 });
 export type AnchorSepResult = z.infer<typeof AnchorSepResult>;

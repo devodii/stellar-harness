@@ -62,7 +62,7 @@ describe('probeAnchor tool', () => {
           domain,
           requestedSeps: seps,
           ranSeps: [1],
-          perSep: { '1': { passed: 5, failed: 0, skipped: 0, names: [] } },
+          perSep: { '1': { passed: 5, failed: 0, skipped: 0, blocked: 0, names: [] } },
           excludedSeps: [{ sep: 31, reason: 'requires a configured secret key' }],
           excludedTests: [],
           error: null,
