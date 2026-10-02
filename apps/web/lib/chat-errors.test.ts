@@ -4,10 +4,10 @@ import { chatErrorMessage } from './chat-errors';
 describe('chatErrorMessage', () => {
   it('unwraps an api error body', () => {
     const body = JSON.stringify({
-      error: { code: 'INTERNAL', message: 'ANTHROPIC_API_KEY is required for /api/chat' },
+      error: { code: 'INTERNAL', message: 'OPENAI_API_KEY is required for /api/chat' },
     });
     expect(chatErrorMessage(new Error(body))).toBe(
-      'INTERNAL: ANTHROPIC_API_KEY is required for /api/chat',
+      'INTERNAL: OPENAI_API_KEY is required for /api/chat',
     );
   });
 
