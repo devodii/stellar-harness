@@ -63,9 +63,25 @@ export const FindingQuery = z.object({
   subject: z.string().optional(),
   tags: z.array(z.string()).optional(),
   severity: z.array(Severity).optional(),
+  meaningful: z.boolean().optional(),
   limit: z.number().int().positive().max(1000).optional(),
   offset: z.number().int().nonnegative().optional(),
 });
 export type FindingQuery = z.infer<typeof FindingQuery>;
 
 export const severityRank = (severity: Severity): number => SEVERITIES.indexOf(severity);
+
+export const MEANINGFUL_INVOCATIONS = 100;
+
+export const isMeaningfulFinding = (finding: Pick<Finding, 'tags' | 'evidence' | 'subjectKind'>) =>
+  finding.subjectKind === 'anchor_domain' ||
+  finding.tags.includes('scf_funded') ||
+  (typeof finding.evidence.invocations === 'number' &&
+    finding.evidence.invocations >= MEANINGFUL_INVOCATIONS);
+
+export const WaitlistEntry = z.object({
+  email: z.email(),
+  createdAt: z.iso.datetime(),
+  userAgent: z.string().max(512),
+});
+export type WaitlistEntry = z.infer<typeof WaitlistEntry>;
