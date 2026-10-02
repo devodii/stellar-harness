@@ -2,6 +2,22 @@ import { describe, expect, it } from 'vitest';
 import { hostLimitsFromConfig, loadNetworkConfig } from './config';
 
 describe('loadNetworkConfig', () => {
+  it('resolves testnet endpoints and passphrase', () => {
+    const config = loadNetworkConfig({ HORIZON_URL: 'https://mainnet.example' }, 'testnet');
+    expect(config).toMatchObject({
+      NETWORK: 'testnet',
+      HORIZON_URL: 'https://horizon-testnet.stellar.org',
+      RPC_URL: 'https://soroban-testnet.stellar.org',
+      NETWORK_PASSPHRASE: 'Test SDF Network ; September 2015',
+      ECOSYSTEM_DIRECTORY: false,
+    });
+  });
+
+  it('lets testnet urls be overridden separately', () => {
+    const config = loadNetworkConfig({ TESTNET_RPC_URL: 'https://rpc.example' }, 'testnet');
+    expect(config.RPC_URL).toBe('https://rpc.example');
+  });
+
   it('falls back to brief defaults without any env', () => {
     const config = loadNetworkConfig({});
     expect(config.HORIZON_URL).toBe('https://horizon.stellar.org');
