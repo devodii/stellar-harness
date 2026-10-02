@@ -1,6 +1,7 @@
 import type { Org } from '@harness/schema';
 import { Hint } from '@/components/hint';
 import { PilotSheet } from '@/components/pilot-sheet';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Wordmark } from '@/components/wordmark';
 
 export const policyLine = ({ policy }: Org): string =>
@@ -23,6 +24,7 @@ export function Header({ org }: { org: Org }) {
           </button>
         </Hint>
         <PilotSheet />
+        <ThemeToggle />
       </div>
     </header>
   );
