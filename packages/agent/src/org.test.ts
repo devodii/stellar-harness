@@ -45,9 +45,23 @@ describe('proposeAction', () => {
     expect(await storage.listActions()).toEqual([action]);
   });
 
+  it('replaces an earlier proposal for the same subject and operation', async () => {
+    const storage = new MemoryStorage(org);
+    await proposeAction(storage, extend);
+    const latest = await proposeAction(storage, { ...extend, estimatedCostXlm: 5 });
+    expect(await storage.listActions()).toEqual([latest]);
+  });
+
   it('resolves a label to the subject id', async () => {
     const action = await proposeAction(new MemoryStorage(org), { ...extend, subject: 'escrow' });
     expect(action.subject).toBe(ESCROW);
+  });
+
+  it('replaces an earlier proposal for the same subject and operation', async () => {
+    const storage = new MemoryStorage(org);
+    await proposeAction(storage, extend);
+    const latest = await proposeAction(storage, { ...extend, estimatedCostXlm: 5 });
+    expect(await storage.listActions()).toEqual([latest]);
   });
 
   it('resolves a label to the subject id', async () => {

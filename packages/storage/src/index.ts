@@ -21,6 +21,11 @@ export class MemoryStorage implements Storage {
   }
 
   async putAction(action: Action): Promise<void> {
+    for (const [id, existing] of this.#actions) {
+      if (existing.subject === action.subject && existing.operation === action.operation) {
+        this.#actions.delete(id);
+      }
+    }
     this.#actions.set(action.id, action);
   }
 }
