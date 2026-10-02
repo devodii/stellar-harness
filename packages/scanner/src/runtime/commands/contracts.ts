@@ -25,6 +25,7 @@ export const contractsCommand = async (ctx: ScanContext) => {
         snapshot,
         stellarExpertUrl: config.STELLAR_EXPERT_URL,
         stellarlightUrl: config.STELLARLIGHT_URL,
+        ecosystemDirectory: config.ECOSYSTEM_DIRECTORY,
         rpcConcurrency: config.CONCURRENCY_RPC,
         expertConcurrency: config.CONCURRENCY_EXPERT,
       },
@@ -64,10 +65,15 @@ export const contractsCommand = async (ctx: ScanContext) => {
         `GET ${config.STELLAR_EXPERT_URL}/contract?limit=200&order=desc (paged via _links.next)`,
         `GET ${config.STELLAR_EXPERT_URL}/contract/{id} (invocations > 100 only)`,
         `POST ${config.RPC_URL} getLedgerEntries (200 keys per call)`,
-        `GET ${config.STELLARLIGHT_URL}/api/projects/search?scfAwarded=1`,
-        `GET ${config.STELLARLIGHT_URL}/api/repos/search?minScore=0`,
+        ...(config.ECOSYSTEM_DIRECTORY
+          ? [
+              `GET ${config.STELLARLIGHT_URL}/api/projects/search?scfAwarded=1`,
+              `GET ${config.STELLARLIGHT_URL}/api/repos/search?minScore=0`,
+            ]
+          : []),
       ],
       parameters: {
+        network: config.NETWORK,
         'snapshot ledger': snapshot.snapshotLedger,
         'ledger close seconds': snapshot.ledgerCloseSeconds,
         'expiring window 1 (days)': 30,
@@ -77,6 +83,7 @@ export const contractsCommand = async (ctx: ScanContext) => {
         'contract limit': options.limit ?? 'none',
       },
       notes: [
+        ...result.notes,
         'An instance is archived when RPC does not return it or its liveUntilLedgerSeq is below the snapshot ledger.',
         'Hot-archived entries are returned with liveUntilLedgerSeq 0 and count as archived.',
         `Enumeration complete: ${result.stats.enumerationComplete}.`,
