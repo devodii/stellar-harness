@@ -1,24 +1,9 @@
-import { readdir, readFile } from 'node:fs/promises';
-import { basename, join } from 'node:path';
+import { basename } from 'node:path';
 import { type CsvColumn, exportPath, writeCsv } from '../core/derived';
-import { writeJsonAtomic } from '../core/state';
 import type { CensusRun, ExportPreview, MethodEntry } from '../report/inputs';
+import type { ScanPersistence } from './persistence';
 
 export const PREVIEW_LIMIT = 20;
-
-const artifactsDir = (dataDir: string, kind: string) => join(dataDir, 'derived', kind);
-
-const readJsonDir = async <T>(dir: string): Promise<T[]> => {
-  try {
-    const files = (await readdir(dir)).filter((file) => file.endsWith('.json')).sort();
-    return Promise.all(
-      files.map(async (file) => JSON.parse(await readFile(join(dir, file), 'utf8')) as T),
-    );
-  } catch (error) {
-    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') return [];
-    throw error;
-  }
-};
 
 const csvHeader = <T>(column: CsvColumn<T>): string =>
   typeof column === 'string' ? column : column.header;
@@ -30,11 +15,12 @@ const csvValue = <T>(row: T, column: CsvColumn<T>): string | number | null => {
 };
 
 export const writeExport = async <T>(
-  dataDir: string,
+  persistence: ScanPersistence,
   name: string,
   rows: readonly T[],
   columns: ReadonlyArray<CsvColumn<T>>,
 ): Promise<ExportPreview> => {
+  const { dataDir } = persistence;
   const path = exportPath(dataDir, name);
   await writeCsv(path, rows, columns);
   const preview: ExportPreview = {
@@ -48,12 +34,12 @@ export const writeExport = async <T>(
         Object.fromEntries(columns.map((column) => [csvHeader(column), csvValue(row, column)])),
       ),
   };
-  await writeJsonAtomic(join(artifactsDir(dataDir, 'previews'), `${name}.json`), preview);
+  await persistence.putArtifact('previews', name, preview);
   return preview;
 };
 
-export const readPreviews = (dataDir: string): Promise<ExportPreview[]> =>
-  readJsonDir(artifactsDir(dataDir, 'previews'));
+export const readPreviews = async (persistence: ScanPersistence): Promise<ExportPreview[]> =>
+  (await persistence.listArtifacts('previews')) as ExportPreview[];
 
 export type CensusRecord<TSummary> = {
   run: CensusRun;
@@ -63,10 +49,11 @@ export type CensusRecord<TSummary> = {
 };
 
 export const writeCensusRecord = <TSummary>(
-  dataDir: string,
+  persistence: ScanPersistence,
   record: CensusRecord<TSummary>,
-): Promise<void> =>
-  writeJsonAtomic(join(artifactsDir(dataDir, 'runs'), `${record.run.census}.json`), record);
+): Promise<void> => persistence.putArtifact('runs', record.run.census, record);
 
-export const readCensusRecords = (dataDir: string): Promise<CensusRecord<unknown>[]> =>
-  readJsonDir(artifactsDir(dataDir, 'runs'));
+export const readCensusRecords = async (
+  persistence: ScanPersistence,
+): Promise<CensusRecord<unknown>[]> =>
+  (await persistence.listArtifacts('runs')) as CensusRecord<unknown>[];
