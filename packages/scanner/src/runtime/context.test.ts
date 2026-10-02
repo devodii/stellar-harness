@@ -1,12 +1,6 @@
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import {
-  type Cache,
-  createClients,
-  DiskCache,
-  loadNetworkConfig,
-  NoCache,
-} from '../stellar';
+import { type Cache, createClients, DiskCache, loadNetworkConfig, NoCache } from '../stellar';
 import { scanPorts, selectCache } from './context';
 
 const memoryCache = (): Cache => {

@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type {
-  AnchorTestsReport,
-  FindingDraft,
-  HorizonAccount,
-} from '../../stellar/anchors';
+import type { AnchorTestsReport, FindingDraft, HorizonAccount } from '../../stellar/anchors';
 import {
   readFixture as toolsFixture,
   readJsonFixture as toolsJson,
