@@ -1,4 +1,4 @@
-import { Finding, FindingType, Network, Severity, Summary } from '@harness/schema';
+import { Finding, FindingType, Network, Severity, Summary, WaitlistEntry } from '@harness/schema';
 import { z } from 'zod';
 import { LEDGER_SOURCES } from './latest-ledger';
 
@@ -56,6 +56,12 @@ export type LiveResponse = z.infer<typeof LiveResponse>;
 
 export const NetworkBody = z.object({ network: Network });
 export type NetworkBody = z.infer<typeof NetworkBody>;
+
+export const WaitlistBody = WaitlistEntry.pick({ email: true });
+export type WaitlistBody = z.infer<typeof WaitlistBody>;
+
+export const WaitlistResponse = z.object({ count: z.number().int().nonnegative() });
+export type WaitlistResponse = z.infer<typeof WaitlistResponse>;
 
 export const ApiErrorBody = z.object({
   error: z.object({ code: z.string(), message: z.string() }),
