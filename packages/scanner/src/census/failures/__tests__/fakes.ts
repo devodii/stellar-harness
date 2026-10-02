@@ -1,5 +1,5 @@
 import { appError, err, ok } from '@harness/schema';
-import type { DecodedResultCodes, EnvelopeSummary } from '@harness/stellar-tools';
+import type { DecodedResultCodes, EnvelopeSummary } from '@harness/stellar-tools/ports';
 import type { Decoders } from '../extract';
 import type { HorizonAccount, HorizonPort, RpcPort, RpcTransaction, Runner } from '../ports';
 

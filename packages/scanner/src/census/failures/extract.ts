@@ -1,6 +1,6 @@
 import { appError, err, ok, type Result } from '@harness/schema';
-import type { DecodedResultCodes, EnvelopeSummary } from '@harness/stellar-tools';
 import { readFeeCharged } from '@harness/stellar-tools';
+import type { DecodedResultCodes, EnvelopeSummary } from '@harness/stellar-tools/ports';
 import type { DecodeEnvelopeSummary, DecodeResultCodes, RpcTransaction } from './ports';
 import type { FailedPayment, FailedTx } from './rows';
 
