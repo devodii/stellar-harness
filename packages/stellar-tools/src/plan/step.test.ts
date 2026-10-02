@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { makeFinding } from '../__fixtures__/findings';
 import { contractRef, evidenceNumber, evidenceString, sampleTxHash } from './evidence';
-import { build, linkSteps, read, simulate, submit } from './step';
+import { build, linkSteps, read, simulate, submit, withNetwork } from './step';
 
 describe('linkSteps', () => {
   it('links builds to the last simulation and submits to the last build', () => {
@@ -12,13 +12,21 @@ describe('linkSteps', () => {
       submit('x'),
     ]);
     expect(steps[2]?.args).toEqual({ fromStep: 's2' });
-    expect(steps[3]?.args).toEqual({ fromStep: 's3', network: 'mainnet' });
+    expect(steps[3]?.args).toEqual({ fromStep: 's3' });
   });
 
   it('leaves explicit links and unlinked builds alone', () => {
     const steps = linkSteps([build('b', { fromStep: 's9' }), build('c', {})]);
     expect(steps[0]?.args).toEqual({ fromStep: 's9' });
     expect(steps[1]?.args).toEqual({});
+  });
+});
+
+describe('withNetwork', () => {
+  it('names the network on submit steps only', () => {
+    const steps = withNetwork([build('b', {}), submit('x')], 'testnet');
+    expect(steps[0]?.args).toEqual({});
+    expect(steps[1]?.args).toEqual({ network: 'testnet' });
   });
 });
 

@@ -1,4 +1,4 @@
-import type { Finding, PlanStepKind } from '@harness/schema';
+import type { Finding, Network, PlanStepKind } from '@harness/schema';
 import type { ToolName } from '../tools/names';
 
 export const PLAN_ACTIONS = ['buildTransaction', 'submitTransaction', 'draftNotice'] as const;
@@ -52,8 +52,13 @@ export const submit = (description: string): StepDraft => ({
   kind: 'submit',
   tool: 'submitTransaction',
   description,
-  args: { network: 'mainnet' },
+  args: {},
 });
+
+export const withNetwork = (steps: StepDraft[], network: Network): StepDraft[] =>
+  steps.map((step) =>
+    step.kind === 'submit' ? { ...step, args: { ...step.args, network } } : step,
+  );
 
 const linkSource = (step: StepDraft): PlanStepKind | null => {
   if (step.kind === 'submit') return 'build';
