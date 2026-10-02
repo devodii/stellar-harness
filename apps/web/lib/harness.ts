@@ -18,7 +18,8 @@ const rootEnv = resolve(process.cwd(), '../../.env');
 if (existsSync(rootEnv)) process.loadEnvFile(rootEnv);
 
 const globals = globalThis as typeof globalThis & { harnessStorage?: MemoryStorage };
-export const storage = (globals.harnessStorage ??= new MemoryStorage(DEMO_ORG));
+globals.harnessStorage ??= new MemoryStorage(DEMO_ORG);
+export const storage = globals.harnessStorage;
 export const clients = createClients(DEMO_ORG.network);
 export const tools = createAgentTools(storage, clients);
 
