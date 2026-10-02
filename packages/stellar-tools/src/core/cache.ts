@@ -71,6 +71,8 @@ export class NoCache implements Cache {
 const isMissing = (error: unknown): boolean =>
   error instanceof Error && 'code' in error && error.code === 'ENOENT';
 
+let tempCounter = 0;
+
 export class DiskCache implements Cache {
   readonly root: string;
 
@@ -95,7 +97,8 @@ export class DiskCache implements Cache {
   async set(key: string, entry: CacheEntry): Promise<void> {
     const path = this.pathFor(key);
     await mkdir(dirname(path), { recursive: true });
-    const temp = `${path}.${process.pid}.${Date.now()}.tmp`;
+    tempCounter += 1;
+    const temp = `${path}.${process.pid}.${Date.now()}.${tempCounter}.tmp`;
     await writeFile(temp, JSON.stringify(entry));
     await rename(temp, path);
   }
