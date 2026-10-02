@@ -8,11 +8,24 @@ describe('systemPrompt', () => {
     for (const name of TOOL_NAMES) expect(systemPrompt).toContain(name);
   });
 
-  it('carries the safety and approval rules', () => {
+  it('carries the observe and simulate rules', () => {
     expect(systemPrompt).toContain('Call a tool before stating any network fact');
-    expect(systemPrompt).toContain('Never say or imply that a transaction was submitted');
-    expect(systemPrompt).toContain('requiresApproval true, stop');
-    expect(systemPrompt).toContain('"type":"plan-approval"');
+    expect(systemPrompt).toContain(
+      'You observe and simulate. You do not execute. When a fix requires authority over the subject, say exactly who holds that authority and what it would cost, then stop.',
+    );
+    expect(systemPrompt).toContain(
+      'Never describe the demo as executing, signing, or approving anything.',
+    );
+  });
+
+  it('says nothing about approvals, policy boundaries or submission', () => {
+    for (const network of ['mainnet', 'testnet'] as const) {
+      expect(systemPromptFor(network)).not.toMatch(/approval|approve |boundary|policy|submit/i);
+    }
+  });
+
+  it('keeps the live network guidance', () => {
+    expect(systemPrompt).toContain('call getNetworkStatus');
   });
 
   it('contains no em dashes', () => {
