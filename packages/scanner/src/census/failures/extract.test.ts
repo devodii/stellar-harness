@@ -1,3 +1,4 @@
+import { decodeResultCodes, portDecoders } from '@harness/stellar-tools';
 import type { EnvelopeOperation } from '@harness/stellar-tools/ports';
 import { describe, expect, it } from 'vitest';
 import samples from './__fixtures__/rpc-failed-transactions.json';
@@ -96,4 +97,26 @@ describe('extractFailed', () => {
   });
 });
 
-it.todo('decodes the recorded live samples with the real stellar-tools decoder after core merge');
+describe('real stellar-tools decoders', () => {
+  it.each(samples.map((sample) => [sample.txHash.slice(0, 12), sample] as const))(
+    'decode %s to the recorded result codes',
+    (_hash, sample) => {
+      const { tx, ops, feeBump, feeCharged } = decodeResultCodes(sample.resultXdr);
+      expect({ tx, ops, feeBump, feeCharged }).toEqual(sample.expected.result);
+    },
+  );
+
+  it.each(samples.map((sample) => [sample.txHash.slice(0, 12), sample] as const))(
+    'decode %s to the recorded envelope summary',
+    (_hash, sample) => {
+      const envelope = portDecoders.decodeEnvelopeSummary(sample.envelopeXdr);
+      expect(envelope).toMatchObject(sample.expected.envelope);
+      expect(envelope.operations).toEqual(sample.expected.envelope.operations);
+    },
+  );
+
+  it('builds the same rows as the recorded decodings', () => {
+    const live = samples.map(asRpcTransaction);
+    expect(extractFailed(live, portDecoders)).toEqual(extractFailed(live, decoders));
+  });
+});
