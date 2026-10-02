@@ -53,3 +53,4 @@ export * from './tools/schemas';
 export * from './tools/search-ecosystem';
 export * from './tools/simulate-extend-ttl';
 export * from './tools/simulate-restore';
+export { type ProbeAnchorContext, probeAnchorTool } from './tools/probe-anchor';
