@@ -12,27 +12,27 @@ A three-minute screen recording. Run a scan first (`pnpm scan all --window 1d`) 
 
 ## 0:00 Header (15 s)
 
-Open `/`. Point at the live strip: the latest ledger ticks every few seconds from Horizon; the other numbers (failed transactions in the window, preventable share, archived contracts, failing anchors) come from the scan. Hover a number to show its label.
+Open `/`. Point at the live strip: the latest ledger ticks every few seconds from Horizon; the other numbers (failed transactions in the window, preventable share, archived contracts, failing anchors) come from the scan. Hover `ARCHIVED (active)` to show the raw archived total behind the meaningful count.
 
-## 0:15 A failed transaction, explained and planned (45 s)
+## 0:15 Chip 1: a failed transaction (40 s)
 
-Click "Why did tx e2173f…5662 fail?". The agent calls `getTransaction`, then `explainFailure`, then `planFix`. Show:
+Click "Why did tx e2173f…5662 fail?". The agent calls `getTransaction`, then `explainFailure`, then `planFix`. Show the transaction with `tx_failed` and the failing operation's `op_no_trust`, the plain-language explanation and that it is preventable, and the plan timeline: `[read]` and `[simulate]` steps, then the `[handoff]` block naming who can act (the account signer) and the roadmap note.
 
-- the transaction card with `tx_failed` and the failing operation's `op_no_trust`,
-- the plain-language explanation and that it is in the preventable set,
-- the plan: `[read]` steps marked done, then the trustline pre-flight and sponsorship steps.
+## 0:55 Chip 2: SCF-funded contracts (50 s)
 
-## 1:00 SCF-funded contracts and an approval boundary (60 s)
+Click "Which SCF-funded contracts are archived or expiring within 30 days, and what would restoring them cost?". The agent queries findings tagged `scf_funded`, simulates the restore or extension for one of them and ends at the handoff: anyone can pay for a restore or TTL extension, and the block shows the simulated XLM cost. Hover `[simulate]` to show that the cost comes from RPC `simulateTransaction` and nothing is signed or submitted.
 
-Click "SCF contracts archived or expiring in 30d". The agent queries findings tagged `scf_funded` and renders the table. Ask it to extend the first live one. It runs `simulateExtendTtl` (365 days) and proposes a plan whose `submit` step crosses the policy boundary. Show the boundary block (rule, requested amount, threshold), click **Approve (demo)**, and show the agent running only the read and simulate steps. Read the footnote aloud: nothing is signed or broadcast.
+## 1:45 Chip 3: anchor conformance (30 s)
 
-## 2:00 Anchor conformance (30 s)
+Click "Is mykobo.co conformant?". `probeAnchor` runs the nine stages live; the timeline shows `stellar.toml` passing and `/info` failing because the transfer server host does not resolve. The plan hands off to the anchor operator.
 
-Click "Is mykobo.co conformant?". `probeAnchor` runs the nine stages live; the stage table shows `stellar.toml` passing and `/info` failing because the transfer server host does not resolve. The agent turns the finding into a plan.
+## 2:15 Findings explorer (25 s)
 
-## 2:30 Findings explorer (30 s)
+Open `/findings`. It lists the meaningful findings by default (SCF-funded, 100+ invocations, or anchor domains); toggle `show all` to see everything. Open a row in the drawer, then **Open in chat** to attach it to a new conversation.
 
-Open `/findings`. Filter severity to `critical`, then type `ANCHOR_TOML_UNREACHABLE` or `CONTRACT_INSTANCE_ARCHIVED`. Click a row to open the drawer with the evidence JSON, then **Open in chat** to start a conversation that runs `planFix` on it.
+## 2:40 Connect organisation (20 s)
+
+Click `connect organisation` in the top bar. The sheet explains continuous monitoring and that execution under a smart-account policy is the next phase; leave an email and submit to show `request received · N organisations waiting`.
 
 ## Optional extras
 
