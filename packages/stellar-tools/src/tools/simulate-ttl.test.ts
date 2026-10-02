@@ -1,4 +1,4 @@
-import { ok } from '@harness/schema';
+import { appError, err, ok } from '@harness/schema';
 import { Networks, type Transaction, TransactionBuilder } from '@stellar/stellar-sdk';
 import { describe, expect, it } from 'vitest';
 import account from '../contracts/__fixtures__/horizon-account-circle.json';
@@ -8,10 +8,11 @@ import extend365 from '../contracts/__fixtures__/rpc-simulate-extend-365d.json';
 import extendArchived from '../contracts/__fixtures__/rpc-simulate-extend-archived.json';
 import restore from '../contracts/__fixtures__/rpc-simulate-restore.json';
 import type { ContractToolContext } from '../contracts/context';
-import { DEFAULT_SIMULATION_SOURCE } from '../contracts/defaults';
+import { DEFAULT_SIMULATION_SOURCE, SIMULATION_SOURCES } from '../contracts/defaults';
 import { type FakeRpc, fakeFetcher, fakeHorizon, fakeRpc } from '../contracts/fakes';
 import { codeKeyXdr, instanceKeyXdr } from '../contracts/keys';
 import type { HorizonAccount, LedgerEntryResult } from '../contracts/ports';
+import circle from '../core/__fixtures__/rpc-account-circle-testnet.json';
 import { invokeTool } from '../tool';
 import { simulateExtendTtl } from './simulate-extend-ttl';
 import { simulateRestore } from './simulate-restore';
@@ -91,6 +92,21 @@ describe('simulateExtendTtl', () => {
     const ctx = { ...context(router.result.entries, extend365), horizon: fakeHorizon() };
     const result = await invokeTool(simulateExtendTtl, { contractId: ROUTER }, ctx);
     expect(result).toMatchObject({ ok: false, error: { code: 'NOT_FOUND' } });
+  });
+
+  it('simulates from the testnet source read over RPC when testnet Horizon is down', async () => {
+    const base = context(
+      [...router.result.entries, { key: circle.key, xdr: circle.xdr }],
+      extend365,
+    );
+    const ctx = {
+      ...base,
+      network: 'testnet' as const,
+      horizon: { ...fakeHorizon(), account: async () => err(appError('UPSTREAM_FAILED', 'down')) },
+    };
+    const result = await invokeTool(simulateExtendTtl, { contractId: ROUTER }, ctx);
+    expect(result.ok).toBe(true);
+    expect(submitted(ctx).source).toBe(SIMULATION_SOURCES.testnet);
   });
 });
 
