@@ -96,4 +96,14 @@ export const TX_CODES = {
     'Invalid Soroban transaction',
     'The Soroban resource declaration or footprint is invalid for this transaction. Simulate again and use the returned resources.',
   ),
+  tx_bad_minseq_age_or_gap: entry(
+    'sequence',
+    'Minimum sequence conditions not met',
+    'The transaction sets a minimum sequence age or ledger gap precondition that the source account has not reached yet.',
+  ),
+  tx_frozen_key_accessed: entry(
+    'auth',
+    'Frozen ledger key accessed',
+    'The transaction touches a ledger entry that the network has frozen. It cannot succeed until the entry is unfrozen.',
+  ),
 } satisfies Record<string, CodeEntry>;

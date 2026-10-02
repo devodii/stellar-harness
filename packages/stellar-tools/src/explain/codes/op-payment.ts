@@ -31,6 +31,11 @@ export const OP_PAYMENT_CODES = {
     'Not authorized',
     'The issuer requires authorization and has not authorized the account for this asset.',
   ),
+  op_trustline_frozen: entry(
+    'trust',
+    'Trustline frozen',
+    'The trustline used by this operation is frozen by the network, so it cannot send or receive the asset.',
+  ),
   op_line_full: entry(
     'limit',
     'Trustline full',
