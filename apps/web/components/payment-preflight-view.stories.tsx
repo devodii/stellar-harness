@@ -1,6 +1,8 @@
+import { ok, ROADMAP_NOTE } from '@harness/schema';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { fn } from 'storybook/test';
 import type { PaymentPreflightView as PaymentPreflightData } from '@/lib/tool-views';
+import { ConnectSheetProvider } from './connect-sheet';
 import { PaymentPreflightView } from './payment-preflight-view';
 
 const FROM = 'GFAKESENDERFORSTORYBOOK0000000000000000000000000000SEND';
@@ -24,39 +26,47 @@ const BLOCKED: PaymentPreflightData = {
   ],
   alternative: {
     planId: 'plan-preflight-story',
-    title: 'Sponsor destination trustline, then pay',
+    title: 'Sponsor the destination trustline, then pay',
     subject: TO,
-    requiresApproval: true,
-    estimatedCostXlm: 0.5,
-    boundary: {
-      rule: 'step.kind == submit',
-      reason: 'Submitting requires approval in the demo.',
-    },
     steps: [
       {
         id: 's1',
-        kind: 'build',
-        description: 'Build begin_sponsoring, change_trust, end_sponsoring',
+        kind: 'read',
+        description: 'Read both accounts, trustlines and reserves',
         tool: 'buildPaymentPreflight',
-        args: { from: FROM, to: TO, asset: 'USDX', amount: '25' },
-        status: 'pending',
+        args: { from: FROM, to: TO },
+        status: 'done',
       },
       {
         id: 's2',
-        kind: 'submit',
-        description: 'Submit after approval',
-        tool: 'submit',
+        kind: 'handoff',
+        description: 'Hand the sponsored trustline to the destination signer',
+        tool: 'handoff',
         args: {},
-        status: 'blocked',
+        status: 'pending',
       },
     ],
+    handoff: {
+      summary:
+        'The destination signer co-signs a sponsored USDX trustline (CAP-33), then the payment can land.',
+      requiredAuthority: 'account_signer',
+      estimatedCostXlm: 0.5,
+      roadmapNote: ROADMAP_NOTE,
+    },
   },
 };
 
 const meta: Meta<typeof PaymentPreflightView> = {
   component: PaymentPreflightView,
   title: 'renderers/PaymentPreflightView',
-  args: { preflight: BLOCKED, onDecide: fn() },
+  args: { preflight: BLOCKED },
+  decorators: [
+    (Story) => (
+      <ConnectSheetProvider requestPilot={fn(async () => ok({ count: 2 }))}>
+        <Story />
+      </ConnectSheetProvider>
+    ),
+  ],
 };
 export default meta;
 

@@ -74,22 +74,10 @@ export const TOOL_RENDERERS = {
   simulateRestore: defineRenderer(S.simulateRestore, ({ data }) => (
     <SimulationCostView simulation={data} />
   )),
-  buildPaymentPreflight: defineRenderer(S.buildPaymentPreflight, ({ data, ctx }) => (
-    <PaymentPreflightView
-      preflight={data}
-      decision={data.alternative ? ctx.decisions[data.alternative.planId] : undefined}
-      onDecide={ctx.onDecide}
-      disabled={ctx.busy}
-    />
+  buildPaymentPreflight: defineRenderer(S.buildPaymentPreflight, ({ data }) => (
+    <PaymentPreflightView preflight={data} />
   )),
-  planFix: defineRenderer(S.planFix, ({ data, ctx }) => (
-    <PlanView
-      plan={data}
-      decision={ctx.decisions[data.planId]}
-      onDecide={ctx.onDecide}
-      disabled={ctx.busy}
-    />
-  )),
+  planFix: defineRenderer(S.planFix, ({ data }) => <PlanView plan={data} />),
 } satisfies Record<ToolViewName, ToolRenderer>;
 
 const isRegistered = (name: string): name is ToolViewName => Object.hasOwn(TOOL_RENDERERS, name);
