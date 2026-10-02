@@ -17,12 +17,14 @@ export function ResultCodes({ codes, className }: ResultCodesProps) {
         tone={isSuccess(codes.tx) ? 'success' : 'destructive'}
         emphasis
       />
-      {codes.ops.map((code, index) => (
-        <span key={`${index}-${code}`} className="inline-flex items-baseline gap-1">
-          <span className="font-mono text-[10px] text-muted-foreground">op{index + 1}</span>
-          <BracketTag label={code} tone={isSuccess(code) ? 'muted' : 'destructive'} />
-        </span>
-      ))}
+      {codes.ops
+        .map((code, index) => ({ code, label: `op${index + 1}` }))
+        .map((op) => (
+          <span key={op.label} className="inline-flex items-baseline gap-1">
+            <span className="font-mono text-[10px] text-muted-foreground">{op.label}</span>
+            <BracketTag label={op.code} tone={isSuccess(op.code) ? 'muted' : 'destructive'} />
+          </span>
+        ))}
     </div>
   );
 }
