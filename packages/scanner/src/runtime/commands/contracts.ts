@@ -83,6 +83,7 @@ export const contractsCommand = async (ctx: ScanContext) => {
         'contract limit': options.limit ?? 'none',
       },
       notes: [
+        ...ctx.notes,
         ...result.notes,
         'An instance is archived when RPC does not return it or its liveUntilLedgerSeq is below the snapshot ledger.',
         'Hot-archived entries are returned with liveUntilLedgerSeq 0 and count as archived.',
