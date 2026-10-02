@@ -10,6 +10,7 @@ import {
   PromptInputTextarea,
   PromptInputTools,
 } from '@/components/ai-elements/prompt-input';
+import { NetworkSwitch } from '@/components/network-switch';
 
 export interface ChatComposerProps {
   onSubmit: (text: string) => void;
@@ -41,8 +42,9 @@ export function ChatComposer({
       </PromptInputBody>
       <PromptInputFooter>
         <PromptInputTools>
-          <span className="px-1 font-mono text-[11px] text-muted-foreground">
-            mainnet · read-only · nothing is signed
+          <NetworkSwitch />
+          <span className="font-mono text-[11px] text-muted-foreground">
+            · read-only · nothing is signed
           </span>
         </PromptInputTools>
         <PromptInputSubmit status={status} onStop={onStop} disabled={disabled} />
