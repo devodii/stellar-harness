@@ -1,60 +1,59 @@
-import { mkdtemp } from 'node:fs/promises';
+import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { emptySummary, type Finding, SUGGESTED_ACTION } from '@harness/schema';
+import { emptySummary } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
-import { createStorage, JsonFileStorage, MemoryStorage, type Storage } from './index';
+import {
+  createCache,
+  createScanStore,
+  createStorage,
+  JsonFileStorage,
+  MemoryStorage,
+  PgCache,
+  PostgresStorage,
+} from './index';
+import { snapshot, storageContract } from './testing';
 
-const snapshot = {
-  snapshotLedger: 100,
-  snapshotTime: '2026-10-02T00:00:00.000Z',
-  ledgerCloseSeconds: 5.8,
-  gitSha: 'abc',
-  network: 'mainnet' as const,
-};
-
-const finding = (n: number, overrides: Partial<Finding> = {}): Finding => ({
-  findingId: n.toString(16).padStart(64, '0'),
-  type: 'OP_NO_TRUST_CLUSTER',
-  subjectKind: 'account',
-  subject: `G${n}`,
-  severity: 'high',
-  evidence: { count: n },
-  suggestedAction: SUGGESTED_ACTION.OP_NO_TRUST_CLUSTER,
-  snapshotLedger: 100,
-  observedAt: snapshot.snapshotTime,
-  tags: [],
-  ...overrides,
-});
-
-const contract = (name: string, make: () => Promise<Storage>) =>
-  describe(name, () => {
-    it('stores, dedupes and filters findings', async () => {
-      const storage = await make();
-      await storage.putFindings([finding(1), finding(2, { severity: 'low', tags: ['anchor'] })]);
-      await storage.putFindings([finding(1)]);
-      expect((await storage.queryFindings({})).total).toBe(2);
-      expect((await storage.queryFindings({ tags: ['anchor'] })).rows[0]?.subject).toBe('G2');
-      expect((await storage.queryFindings({ severity: ['high'] })).total).toBe(1);
-      expect(await storage.getFinding(finding(2).findingId)).toMatchObject({ subject: 'G2' });
-    });
-
-    it('round trips the summary and snapshot', async () => {
-      const storage = await make();
-      expect(await storage.getSummary()).toBeNull();
-      await storage.putSummary(emptySummary(snapshot));
-      expect((await storage.getSnapshot())?.snapshotLedger).toBe(100);
-    });
-  });
-
-contract('MemoryStorage', async () => new MemoryStorage());
-contract(
+storageContract('MemoryStorage', async () => new MemoryStorage());
+storageContract(
   'JsonFileStorage',
   async () => new JsonFileStorage(await mkdtemp(join(tmpdir(), 'harness-'))),
 );
 
+const DATABASE_URL = 'postgres://user:pass@127.0.0.1:1/none';
+
 describe('createStorage', () => {
   it('falls back to memory without a data dir', () => {
     expect(createStorage()).toBeInstanceOf(MemoryStorage);
+  });
+
+  it('reads files from the network data dir', async () => {
+    const base = join(await mkdtemp(join(tmpdir(), 'harness-')), 'data');
+    await mkdir(`${base}-testnet`, { recursive: true });
+    await writeFile(
+      join(`${base}-testnet`, 'summary.json'),
+      JSON.stringify(emptySummary({ ...snapshot, network: 'testnet' })),
+    );
+    expect(createStorage({ dataDir: base, network: 'testnet' })).toBeInstanceOf(JsonFileStorage);
+    expect(createStorage({ dataDir: base, network: 'mainnet' })).toBeInstanceOf(MemoryStorage);
+  });
+
+  it('uses postgres when a database url is set', () => {
+    const storage = createStorage({ dataDir: '/x', network: 'testnet', databaseUrl: DATABASE_URL });
+    expect(storage).toBeInstanceOf(PostgresStorage);
+    expect((storage as PostgresStorage).network).toBe('testnet');
+  });
+});
+
+describe('createCache', () => {
+  it('returns null without a database url so callers keep the disk cache', () => {
+    expect(createCache({ dataDir: '/x', network: 'mainnet' })).toBeNull();
+    expect(createScanStore({ network: 'mainnet' })).toBeNull();
+  });
+
+  it('returns a postgres cache keyed by network', () => {
+    const cache = createCache({ dataDir: '/x', network: 'testnet', databaseUrl: DATABASE_URL });
+    expect(cache).toBeInstanceOf(PgCache);
+    expect((cache as PgCache).network).toBe('testnet');
   });
 });
