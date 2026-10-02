@@ -16,3 +16,5 @@ data/*
 REPORT.md
 data-*/
 REPORT.*.md
+data-testnet/
+REPORT.testnet.md
