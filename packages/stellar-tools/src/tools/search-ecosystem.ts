@@ -1,10 +1,21 @@
 import { z } from 'zod';
+import { type NetworkSelection, resolveNetwork } from '../core/network';
 import { fail } from '../tool';
 import { defineNamedTool } from './define';
 import type { EcosystemProject, EcosystemRepo } from './schemas';
 
-export type StellarlightContext = {
+export type StellarlightContext = NetworkSelection & {
   stellarlight: { get: (path: string) => Promise<unknown> };
+  ecosystemDirectory?: boolean;
+};
+
+export const ecosystemUnavailable = (ctx: StellarlightContext): never => {
+  const { network } = resolveNetwork(ctx);
+  return fail(
+    'NOT_FOUND',
+    `The Stellar ecosystem directory (stellarlight.xyz) lists mainnet projects only; there is no ${network} directory to search.`,
+    { network },
+  );
 };
 
 const CONTRACT_ID = /^C[A-Z2-7]{55}$/;
@@ -78,6 +89,7 @@ const getPage = async <T extends z.ZodType>(
 export const searchEcosystem = defineNamedTool(
   'searchEcosystem',
   async ({ query, limit }, ctx: StellarlightContext) => {
+    if (ctx.ecosystemDirectory === false) return ecosystemUnavailable(ctx);
     const q = encodeURIComponent(query);
     const [projects, repos] = await Promise.all([
       getPage(ctx, `/api/projects/search?q=${q}&limit=${limit}`, ProjectPage),
