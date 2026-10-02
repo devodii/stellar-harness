@@ -1,6 +1,6 @@
 import { type ContractToolContext, orFail, resolveSimulationSource } from '../contracts/context';
 import { type ContractLookup, footprintKeys, lookupContract } from '../contracts/lookup';
-import { simulateFootprint } from '../contracts/rent';
+import { describeFootprintOperation, simulateFootprint } from '../contracts/rent';
 import type { RestoreEntries } from '../contracts/schemas';
 import { fail } from '../tool';
 import { defineNamedTool } from './define';
@@ -21,6 +21,7 @@ export const simulateRestore = defineNamedTool(
     const estimate = orFail(
       await simulateFootprint(ctx.rpc, source, restoreKeys(lookup, entries), { kind: 'restore' }),
     );
-    return { ...estimate, contractId, entries };
+    const operation = describeFootprintOperation({ kind: 'restore' }, entries);
+    return { ...estimate, operation, contractId, entries };
   },
 );

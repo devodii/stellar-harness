@@ -1,10 +1,5 @@
 import { appError, err, ok } from '@harness/schema';
-import {
-  Networks,
-  SorobanDataBuilder,
-  type Transaction,
-  TransactionBuilder,
-} from '@stellar/stellar-sdk';
+import { Networks, SorobanDataBuilder } from '@stellar/stellar-sdk';
 import { describe, expect, it } from 'vitest';
 import circle from '../core/__fixtures__/rpc-account-circle-testnet.json';
 import account from './__fixtures__/horizon-account-circle.json';
@@ -14,7 +9,12 @@ import restore from './__fixtures__/rpc-simulate-restore.json';
 import { fakeHorizon, fakeRpc } from './fakes';
 import { codeKeyXdr, contractCodeKey, contractInstanceKey, instanceKeyXdr } from './keys';
 import type { HorizonAccount } from './ports';
-import { buildFootprintTransaction, fetchSimulationSource, simulateFootprint } from './rent';
+import {
+  buildFootprintTransaction,
+  describeFootprintOperation,
+  fetchSimulationSource,
+  simulateFootprint,
+} from './rent';
 
 const ROUTER = 'CAG5LRYQ5JVEUI5TEID72EYOVX44TTUJT5BQR2J6J77FH65PCCFAJDDH';
 const ROUTER_WASM = '4c3db3ebd2d6a2ab23de1f622eaabb39501539b4611b68622ec4e47f76c4ba07';
@@ -26,8 +26,6 @@ const source = {
   sequence: '144373126631784461',
   networkPassphrase: Networks.PUBLIC,
 };
-
-const decode = (txXdr: string) => TransactionBuilder.fromXdr(txXdr, Networks.PUBLIC) as Transaction;
 
 const replay =
   (fixture: { request: { transaction: string }; result: unknown }) => (txXdr: string) => {
@@ -63,6 +61,17 @@ describe('buildFootprintTransaction', () => {
   });
 });
 
+describe('describeFootprintOperation', () => {
+  it('describes extensions and restores in plain language', () => {
+    expect(describeFootprintOperation({ kind: 'extend', days: 365 }, 'both')).toBe(
+      'Extend the TTL of the contract instance and its wasm code to 365 days (ExtendFootprintTTL)',
+    );
+    expect(describeFootprintOperation({ kind: 'restore' }, 'code')).toBe(
+      'Restore the contract wasm code from the archive (RestoreFootprint)',
+    );
+  });
+});
+
 describe('simulateFootprint', () => {
   it('returns the fee, xlm estimate and read only footprint for an extension', async () => {
     const rpc = fakeRpc({ simulate: replay(extend365) });
@@ -81,9 +90,7 @@ describe('simulateFootprint', () => {
       restorePreamble: null,
       latestLedger: 64_722_853,
     });
-    const unsigned = decode(result.value.unsignedXdr);
-    expect(unsigned.fee).toBe(String(491_604_076 + 100));
-    expect(unsigned.signatures).toHaveLength(0);
+    expect(result.value).not.toHaveProperty('unsignedXdr');
     expect(rpc.calls.simulate).toHaveLength(1);
   });
 
@@ -107,7 +114,7 @@ describe('simulateFootprint', () => {
       { kind: 'extend', extendToLedgers: RECORDED_EXTEND_TO },
     );
     expect(result.ok && result.value.minResourceFeeStroops).toBe(overflow);
-    expect(result.ok && decode(result.value.unsignedXdr).fee).toBe('100');
+    expect(result.ok && result.value.estimatedXlm).toBe((overflow + 100) / 10_000_000);
   });
 
   it('builds a read write footprint for a restore', async () => {
