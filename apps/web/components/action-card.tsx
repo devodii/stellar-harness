@@ -7,10 +7,10 @@ import { formatXlm } from '@/lib/format';
 const COMING_SOON =
   "coming soon · execution runs under the organisation's smart-account policy via Stellar Wallets Kit agent mode";
 
-export const policyTag = (action: Action): string =>
+const policyTag = (action: Action): string =>
   action.withinPolicy ? 'within policy' : 'needs approval';
 
-export function ActionButtons() {
+function ActionButtons() {
   return (
     <Tooltip>
       <TooltipTrigger asChild>

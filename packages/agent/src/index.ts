@@ -13,7 +13,6 @@ import { type InferUITools, tool, type UIMessage } from 'ai';
 import { z } from 'zod';
 import { ProposeActionInput, proposeAction, resolveSubject } from './org';
 
-export { isWithinPolicy, orgSubjects, proposeAction, resolveSubject } from './org';
 
 export const SYSTEM_PROMPT = [
   "You are Stellar Harness, the operator agent for one organisation. You only talk about this organisation's accounts, contracts and anchor domain, which you get from getOrg. Use tools before stating any fact. When you notice something that needs fixing, call simulate tools to get the cost, then call proposeAction. Say in one or two plain sentences what you found, what you propose, what it costs, and whether it is within the organisation's policy. You cannot execute anything in this demo; never say you did. Be terse. No marketing language.",

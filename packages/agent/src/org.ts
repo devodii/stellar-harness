@@ -10,7 +10,7 @@ export const isWithinPolicy = (policy: Policy, input: ProposeActionInput): boole
   input.estimatedCostXlm !== undefined &&
   input.estimatedCostXlm <= policy.approvalAboveXlm;
 
-export const orgSubjects = (org: Org): string[] => [
+const orgSubjects = (org: Org): string[] => [
   ...org.accounts.map((account) => account.address),
   ...org.contracts.map((contract) => contract.id),
   ...(org.anchorDomain ? [org.anchorDomain] : []),
