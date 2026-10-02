@@ -1,5 +1,6 @@
 import { appError, err, ok, type Result } from '@harness/schema';
 import type { xdr } from '@stellar/stellar-sdk';
+import { type NetworkSelection, resolveNetwork } from '../core/network';
 import { fetchExpertContract } from './expert';
 import {
   contractCodeKey,
@@ -10,7 +11,11 @@ import {
 import type { Fetcher, LedgerEntryResult, RpcPort } from './ports';
 import type { ContractExecutableKind, ExpertContract } from './schemas';
 
-export type ContractLookupDeps = { rpc: RpcPort; fetch: Fetcher; stellarExpertUrl: string };
+export type ContractLookupDeps = NetworkSelection & {
+  rpc: RpcPort;
+  fetch: Fetcher;
+  stellarExpertUrl: string;
+};
 
 export type ContractLookup = {
   contractId: string;
@@ -51,7 +56,8 @@ export const lookupContract = async (
     expert = fetched.ok ? fetched.value : null;
   }
   if (!instance.value.entry && !expert) {
-    return err(appError('NOT_FOUND', `Contract ${contractId} was not found on mainnet`));
+    const { network } = resolveNetwork(deps);
+    return err(appError('NOT_FOUND', `Contract ${contractId} was not found on ${network}`));
   }
 
   const wasmHash = parsed?.kind === 'wasm' ? parsed.wasmHash : (expert?.wasm ?? null);
