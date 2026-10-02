@@ -18,6 +18,7 @@
     "@ai-sdk/react": "^4.0.130",
     "@harness/agent": "workspace:*",
     "@harness/schema": "workspace:*",
+    "@harness/stellar-tools": "workspace:*",
     "@harness/storage": "workspace:*",
     "@hookform/resolvers": "^5.9.1",
     "@phosphor-icons/react": "^2.1.10",
