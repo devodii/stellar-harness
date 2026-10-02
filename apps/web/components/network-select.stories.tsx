@@ -1,7 +1,7 @@
 import type { Network } from '@harness/schema';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import * as React from 'react';
-import { expect, fn, userEvent, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { NetworkSelect, type NetworkSelectProps } from './network-select';
 
 function Controlled(args: NetworkSelectProps) {
@@ -39,10 +39,11 @@ export const Disabled: Story = { args: { disabled: true } };
 export const SwitchToTestnet: Story = {
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole('combobox', { name: 'Network' }));
+    const trigger = canvas.getByRole('combobox', { name: 'Network' });
+    await userEvent.click(trigger);
     const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(await body.findByRole('option', { name: 'testnet' }));
     await expect(args.onValueChange).toHaveBeenCalledWith('testnet');
-    await expect(canvas.getByRole('combobox', { name: 'Network' })).toHaveTextContent('testnet');
+    await waitFor(() => expect(trigger).toHaveTextContent('testnet'));
   },
 };
