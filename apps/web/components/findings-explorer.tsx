@@ -11,7 +11,7 @@ import { FindingsTable } from '@/components/findings-table';
 import { InlineAlert } from '@/components/inline-alert';
 import { ResponsiveSheet } from '@/components/responsive-sheet';
 import { Button } from '@/components/ui/button';
-import { type FindingsFilter, useFindings } from '@/hooks/use-findings';
+import { type FindingsFilter, type FindingsScope, useFindings } from '@/hooks/use-findings';
 import { FINDINGS_PAGE_SIZE } from '@/lib/api-schemas';
 import { findingChatHref } from '@/lib/routes';
 
@@ -20,6 +20,9 @@ const FilterSchema = z.object({
   severity: z.array(z.string()),
   tag: z.string(),
 });
+
+const MEANINGFUL_NOTE =
+  'showing findings that matter: anchors, SCF-funded, or 100+ contract invocations';
 
 const EMPTY_FILTER: FindingsFilter = { type: [], severity: [], tag: '' };
 
@@ -43,9 +46,16 @@ const FIELDS: FilterField<FindingsFilter>[] = [
 export function FindingsExplorer() {
   const router = useRouter();
   const [filter, setFilter] = React.useState<FindingsFilter>(EMPTY_FILTER);
+  const [scope, setScope] = React.useState<FindingsScope>('meaningful');
   const [pageIndex, setPageIndex] = React.useState(0);
   const [selected, setSelected] = React.useState<Finding | null>(null);
-  const { data, isPending, error } = useFindings(filter, pageIndex, FINDINGS_PAGE_SIZE);
+  const { data, isPending, error } = useFindings(filter, pageIndex, FINDINGS_PAGE_SIZE, scope);
+  const showingAll = scope === 'all';
+
+  const toggleScope = () => {
+    setScope(showingAll ? 'meaningful' : 'all');
+    setPageIndex(0);
+  };
 
   const applyFilter = React.useCallback((next: FindingsFilter) => {
     setFilter(next);
@@ -61,6 +71,19 @@ export function FindingsExplorer() {
         fields={FIELDS}
         onChange={applyFilter}
       />
+      <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-muted-foreground">
+        <span>{showingAll ? 'showing every finding' : MEANINGFUL_NOTE}</span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="xs"
+          aria-pressed={showingAll}
+          onClick={toggleScope}
+          className="font-mono"
+        >
+          {showingAll ? 'show active only' : 'show all'}
+        </Button>
+      </div>
       {error && (
         <InlineAlert tone="destructive" title="Could not load findings">
           {error.message}

@@ -1,5 +1,6 @@
 import { type Finding, SUGGESTED_ACTION } from '@harness/schema';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { expect, userEvent, within } from 'storybook/test';
 import { findingsQueryKey } from '@/hooks/use-findings';
 import { FINDINGS_PAGE_SIZE, type FindingsResponse } from '@/lib/api-schemas';
 import { FindingsExplorer } from './findings-explorer';
@@ -21,7 +22,12 @@ const finding = (n: number, overrides: Partial<Finding> = {}): Finding => ({
 
 const PAGE: FindingsResponse = {
   rows: [
-    finding(1, { severity: 'critical', type: 'CONTRACT_CODE_ARCHIVED', subjectKind: 'contract' }),
+    finding(1, {
+      severity: 'critical',
+      type: 'CONTRACT_CODE_ARCHIVED',
+      subjectKind: 'contract',
+      tags: ['scf_funded'],
+    }),
     finding(2),
     finding(3, { severity: 'medium', type: 'TX_TOO_LATE_CLUSTER' }),
   ],
@@ -30,21 +36,52 @@ const PAGE: FindingsResponse = {
   offset: 0,
 };
 
-const KEY = findingsQueryKey('mainnet', { type: [], severity: [], tag: '' }, 0, FINDINGS_PAGE_SIZE);
+const MEANINGFUL: FindingsResponse = { ...PAGE, rows: PAGE.rows.slice(0, 1), total: 1 };
 
-const meta: Meta<{ page: FindingsResponse }> = {
+const NO_FILTER = { type: [], severity: [], tag: '' };
+const keyFor = (scope: 'meaningful' | 'all') =>
+  findingsQueryKey('mainnet', NO_FILTER, 0, FINDINGS_PAGE_SIZE, scope);
+
+type Args = { meaningful: FindingsResponse; all: FindingsResponse };
+
+const meta: Meta<Args> = {
   title: 'pages/FindingsExplorer',
-  args: { page: PAGE },
-  render: ({ page }) => (
-    <QueryStory seed={[[KEY, page]]}>
+  args: { meaningful: MEANINGFUL, all: PAGE },
+  render: ({ meaningful, all }) => (
+    <QueryStory
+      seed={[
+        [keyFor('meaningful'), meaningful],
+        [keyFor('all'), all],
+      ]}
+    >
       <FindingsExplorer />
     </QueryStory>
   ),
 };
 export default meta;
 
-type Story = StoryObj<{ page: FindingsResponse }>;
+type Story = StoryObj<Args>;
 
 export const WithFindings: Story = {};
 
-export const NoScanYet: Story = { args: { page: { ...PAGE, rows: [], total: 0 } } };
+export const ShowAllToggle: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText(/findings that matter/)).toBeVisible();
+    await expect(canvas.queryByText('tx_too_late_cluster')).toBeNull();
+    await userEvent.click(canvas.getByRole('button', { name: 'show all' }));
+    await expect(await canvas.findByText('showing every finding')).toBeVisible();
+    await expect(await canvas.findByText('tx_too_late_cluster')).toBeVisible();
+    await expect(canvas.getByRole('button', { name: 'show active only' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  },
+};
+
+export const NoScanYet: Story = {
+  args: {
+    meaningful: { ...PAGE, rows: [], total: 0 },
+    all: { ...PAGE, rows: [], total: 0 },
+  },
+};
