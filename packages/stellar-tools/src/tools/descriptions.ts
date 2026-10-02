@@ -2,9 +2,9 @@ import type { ToolName } from './names';
 
 export const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   getAccount:
-    'Read a mainnet account from Horizon: sequence, balances, thresholds, signers, flags, home domain and sponsorship counts.',
+    'Read an account on the selected network from Horizon (RPC ledger entry when Horizon is down): sequence, balances, thresholds, signers, flags, home domain and sponsorship counts.',
   getTransaction:
-    'Read a mainnet transaction by hash: ledger, source, fee, operations, timebounds and decoded result codes.',
+    'Read a transaction on the selected network by hash: ledger, source, fee, operations, timebounds and decoded result codes.',
   explainFailure:
     'Explain why a transaction failed in plain language from its hash, result XDR or result codes, with whether it was preventable and the suggested action.',
   getContractTtl:
@@ -16,7 +16,7 @@ export const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   getSummary:
     'Read the latest scan summary: contracts, failures, anchors, rent and GitHub numbers with the snapshot they were measured at.',
   searchEcosystem:
-    'Search Stellar ecosystem projects and repositories (stellarlight.xyz). In the product, Raven (the SDF MCP server) is the fuller knowledge gateway and would be wired here.',
+    'Search Stellar ecosystem projects and repositories (stellarlight.xyz, mainnet only). In the product, Raven (the SDF MCP server) is the fuller knowledge gateway and would be wired here.',
   simulateExtendTtl:
     'Simulate extending a contract instance and code TTL by N days. Returns the resource fee, estimated XLM and unsigned XDR for display. Nothing is submitted.',
   simulateRestore:
