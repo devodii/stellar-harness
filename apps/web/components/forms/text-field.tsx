@@ -5,8 +5,10 @@ import { Input } from '@/components/ui/input';
 import { FieldLayout } from './field-layout';
 import type { FieldProps } from './types';
 
-export interface TextFieldProps<TValues extends RHF.FieldValues, TName extends RHF.Path<TValues>>
-  extends FieldProps<TValues, TName> {
+export interface TextFieldProps<
+  TValues extends RHF.FieldValues,
+  TName extends RHF.Path<TValues>,
+> extends FieldProps<TValues, TName> {
   placeholder?: string;
   disabled?: boolean;
   autoFocus?: boolean;

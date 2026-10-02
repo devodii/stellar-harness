@@ -13,8 +13,10 @@ import type { FieldOption, FieldProps } from './types';
 
 const ANY = '__any__';
 
-export interface SelectFieldProps<TValues extends RHF.FieldValues, TName extends RHF.Path<TValues>>
-  extends FieldProps<TValues, TName> {
+export interface SelectFieldProps<
+  TValues extends RHF.FieldValues,
+  TName extends RHF.Path<TValues>,
+> extends FieldProps<TValues, TName> {
   options: FieldOption[];
   placeholder?: string;
   anyLabel?: string;
