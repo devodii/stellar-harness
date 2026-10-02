@@ -4,56 +4,67 @@ Resume here: read this file and `DECISIONS.md` first.
 
 ## Status
 
-| Milestone                            | State                                                                                                                                                           |
-| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| M0 workspace, schema, storage        | Done. `pnpm install && pnpm build && pnpm lint && pnpm test` pass; `docker compose build` passes for both images.                                               |
-| M1 network core, Census 2            | Done. Decoder checked against all 208 of Horizon's result code mappings.                                                                                        |
-| M2 Census 3 anchors                  | Done. Full domain list probed.                                                                                                                                  |
-| M3 Census 1 contracts, Census 4 rent | Done. Full enumeration and TTL reads.                                                                                                                           |
-| M4 GitHub, report, CLI               | Done. GitHub census is implemented and skipped until `GITHUB_TOKEN` is set.                                                                                     |
-| M5 tools and agent                   | Done. All 12 tools exposed to the agent; `planFix` produces a valid plan for every finding type.                                                                |
-| M6 web app                           | Done. Builds clean; renders without scan data; chat needs `OPENAI_API_KEY`. The approve and decline round trip has not been exercised against a real model yet. |
-| M7 polish                            | Done: README, DEMO.md, Vercel config, `pnpm refresh:public`.                                                                                                    |
+| Milestone              | State                                                                                                                        |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| M0 to M7 scanner       | Done. Five censuses, `REPORT.md`, 843 tests. Kept as-is for the public report; now self-contained in `packages/scanner`.     |
+| M9 delete              | Done. See below.                                                                                                             |
+| M10 organisation model | Done. `Org`, `Action`, in-memory storage, eight agent tools, demo organisation on testnet.                                   |
+| M11 one screen         | Done. Header, watched panel with live numbers, chat with four suggestions and four result renderers, action cards, pilot.    |
+| M12 wire and document  | Done. Three chips end in action cards against the live organisation; the anchor chip reports a passing anchor (see DEMO.md). |
 
-## Next steps
+`pnpm build`, `pnpm lint`, `pnpm test`, `pnpm knip` and `pnpm depcheck` pass.
 
-1. Set `OPENAI_API_KEY` in the root `.env`, run `pnpm dev`, and click through the six suggestions; adjust the system prompt if any workflow stops early.
-2. Set `GITHUB_TOKEN` and run `pnpm scan github && pnpm scan report` to fill Census 5.
-3. Optionally run `pnpm scan failures --window 7d` (about 120,000 RPC calls, five to six hours on the public endpoint) for the full window.
+## Deleted in patch 02
 
-## Measured: full run
+- Web: the findings explorer and drawer, `/about`, the live strip, the chat list and local storage history, plans and handoffs, the connect sheet and waitlist, the theme toggle and dark theme, the network picker, image attachments, every result renderer except four, Storybook and every story, the web unit tests, 24 shadcn components and 11 AI Elements components.
+- API routes: `findings`, `summary`, `live`, `network`, `waitlist`.
+- Tools: `getTransaction`, `explainFailure`, `queryFindings`, `getSummary`, `searchEcosystem`, `planFix`, `getNetworkStatus`, and the old `stellar-tools` internals (now owned by the scanner).
+- Agent: the provider switch, the old system prompt and the tool envelope adapters.
+- Schema and storage: findings, summaries, snapshots, plans, the waitlist, JSON file, SQLite and Postgres storage, migrations.
+- Repo: `scripts/` (public data refresh, Postgres import, migrate, action refresh), Docker and compose files, Vercel config, the root tsconfig, the testnet scan path.
 
-Snapshot ledger 64,723,488 at 2026-10-02T01:07:02Z, measured ledger close 5.0 s.
+## What remains
 
-| Census           | Wall time (s) | Requests | Network calls | Cache hits | Gaps |
-| ---------------- | ------------: | -------: | ------------: | ---------: | ---: |
-| anchors (rerun)  |         640.3 |    1,067 |           140 |        959 |    6 |
-| contracts        |       1,150.0 |    2,302 |         1,915 |        518 |    0 |
-| rent             |         220.8 |    2,002 |         2,145 |          2 |    0 |
-| failures (1 day) |       5,446.2 |   24,780 |        24,848 |          8 |    0 |
-| github           |       skipped |          |               |            |      |
+```
+apps/web/demo-org.ts                          the demo organisation: accounts, contracts, anchor, policy
+apps/web/app/layout.tsx                       fonts and the tooltip provider
+apps/web/app/page.tsx                         the one screen: header, watched panel, chat
+apps/web/app/globals.css                      design tokens, light only
+apps/web/app/api/chat/route.ts                streams the model with the eight tools
+apps/web/app/api/pilot/route.ts               appends a pilot request to data/pilot.jsonl and returns the count
+apps/web/lib/harness.ts                       server singletons and cached live reads for the watched panel
+apps/web/lib/format.ts                        truncateId and formatXlm
+apps/web/components/header.tsx                name, organisation and network, policy chip, pilot link
+apps/web/components/watch-panel.tsx           accounts, contracts, anchor and proposed actions
+apps/web/components/action-card.tsx           a proposed action with disabled execute and approve
+apps/web/components/chat.tsx                  suggestions, messages and the composer
+apps/web/components/tool-results.tsx          tool call header and the account, ttl, preflight and anchor renderers
+apps/web/components/pilot-sheet.tsx           the request a pilot sheet and form
+apps/web/components/copy-id.tsx               truncated id with copy
+apps/web/components/ai-elements/conversation.tsx  scrolling message log
+apps/web/components/ai-elements/message.tsx   message layout and markdown response
+apps/web/components/ai-elements/tool.tsx      collapsible tool call
+apps/web/components/ui/button.tsx             button
+apps/web/components/ui/input.tsx              input
+apps/web/components/ui/sheet.tsx              side sheet
+apps/web/components/ui/tooltip.tsx            tooltip
+packages/agent/src/index.ts                   the eight AI SDK tools and the system prompt
+packages/agent/src/org.ts                     label resolution, policy check and proposeAction
+packages/agent/src/org.test.ts                proposeAction and policy tests
+packages/stellar-tools/src/clients.ts         Horizon, RPC and fetch clients per network
+packages/stellar-tools/src/account.ts         getAccount
+packages/stellar-tools/src/contract-ttl.ts    getContractTtl
+packages/stellar-tools/src/simulate.ts        simulateExtendTtl and simulateRestore
+packages/stellar-tools/src/anchor.ts          probeAnchor
+packages/stellar-tools/src/preflight.ts       buildPaymentPreflight and the result code table
+packages/stellar-tools/src/index.ts           exports
+packages/stellar-tools/src/tools.test.ts      tests for the six tools
+packages/storage/src/index.ts                 Storage and MemoryStorage
+packages/schema/src/index.ts                  Org and Action
+```
 
-- Network calls can exceed requests because retries count as network calls.
-- Failures throughput: 3.19 ledgers/s and 874 transactions/s at RPC concurrency 8. The brief's 10 minute target for one day is not reachable on the public RPC (one `getTransactions` call covers about 1.08 ledgers).
-- Warm cache reruns of contracts and rent made zero network calls.
-- Cache size after the run: 9.0 GB in `data/cache`, 644 MB in `data/derived`. `data/public` is 5.2 MB.
+35 source files, plus each package's `package.json` and `tsconfig.json`.
 
-## Headline figures (from REPORT.md)
+## Next step
 
-| Metric                                                  |                                                                                                                   Value |
-| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------: |
-| Contracts enumerated                                    |                                                                                                                 154,434 |
-| Wasm families                                           |                                                                                                                   3,779 |
-| Contract instances archived                             |                                                                                                                  65,140 |
-| Expiring within 30 days                                 |                                                           45,050 (41,147 from one mass-deployed wasm family of 124,585) |
-| Expiring within 31 to 90 days                           |                                                                                                                  29,523 |
-| SCF-funded contracts archived / expiring within 30 days |                                                                                                                 13 / 24 |
-| Transactions scanned (1 day)                            |                                                                                                               4,729,762 |
-| Failed                                                  |                                                                                                         988,544 (20.9%) |
-| Failed with a preventable code                          |                                                                                               101,363 (10.3% of failed) |
-| Top preventable codes                                   | op_underfunded 67,202, op_no_trust 28,866, op_low_reserve 4,618, op_line_full 899, op_no_destination 331, tx_bad_auth 1 |
-| Failure clusters                                        |                        533 (429 op_underfunded, 55 op_low_reserve, 38 op_no_trust, 7 op_no_destination, 4 op_line_full) |
-| Anchor domains tested                                   |                                                                                                                     202 |
-| Anchor funnel                                           |                                          toml 68, signing key 26, endpoints 21, /info 19, SEP-10 10, all anchor tests 0 |
-| 12-month rent, 2,000 sampled live instances             |                                                                     56,979 XLM total, 21.54 XLM median (XLM/USD 0.2187) |
-| Findings                                                |                                                                                                                 145,260 |
+Make execution real: give the organisation a smart account whose policy matches `Org.policy`, connect it through Stellar Wallets Kit agent mode, and turn the disabled execute and approve buttons into a signed submission within policy and an owner approval above it. Until then, extend Escrow and Registry on testnet before they archive if the demo needs them live, or keep them as the archived case.
