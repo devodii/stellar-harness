@@ -26,7 +26,7 @@ const CENSUS_OF_EXPORT: Record<string, string> = {
 
 const countTable = (counts: Record<string, number>, label: string): string =>
   table(
-    Object.entries(counts).sort(([, a], [, b]) => b - a),
+    Object.entries(counts).sort(([keyA, a], [keyB, b]) => b - a || keyA.localeCompare(keyB)),
     [
       { header: label, value: ([key]) => key },
       { header: 'Count', value: ([, value]) => formatInt(value), align: 'right' },
