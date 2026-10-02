@@ -24,8 +24,41 @@ importers:
         specifier: 5.0.3
         version: 5.0.3(@types/node@22.20.5)(vite@8.3.2(@types/node@22.20.5)(esbuild@0.28.2)(tsx@4.23.15))
 
+  apps/scan-cli:
+    dependencies:
+      '@harness/scanner':
+        specifier: workspace:*
+        version: link:../../packages/scanner
+
+  packages/agent:
+    dependencies:
+      '@harness/schema':
+        specifier: workspace:*
+        version: link:../schema
+      zod:
+        specifier: 4.6.5
+        version: 4.6.5
+
+  packages/scanner:
+    dependencies:
+      '@harness/schema':
+        specifier: workspace:*
+        version: link:../schema
+      zod:
+        specifier: 4.6.5
+        version: 4.6.5
+
   packages/schema:
     dependencies:
+      zod:
+        specifier: 4.6.5
+        version: 4.6.5
+
+  packages/stellar-tools:
+    dependencies:
+      '@harness/schema':
+        specifier: workspace:*
+        version: link:../schema
       zod:
         specifier: 4.6.5
         version: 4.6.5
