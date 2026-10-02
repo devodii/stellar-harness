@@ -87,7 +87,8 @@ const destinationTrustline = ({ destination, to, asset }: PreflightInput): Outco
 const destinationAuthorized = ({ destination, to, asset }: PreflightInput): Outcome => {
   if (asset.native) return pass('not applicable: native asset');
   if (isIssuer(asset, to)) return pass('destination is the issuer');
-  const line = destination && findBalance(destination, asset);
+  if (!destination) return block('op_no_destination', 'destination account missing');
+  const line = findBalance(destination, asset);
   if (!line) return block('op_no_trust', 'no trustline to authorize');
   return line.is_authorized === false
     ? block('op_not_authorized', `the issuer has not authorized the ${asset.code} trustline`)
@@ -124,7 +125,8 @@ const sourceReserve = ({ source, asset, amount }: PreflightInput): Outcome => {
 const destinationLimit = ({ destination, to, asset, amount }: PreflightInput): Outcome => {
   if (asset.native) return pass('not applicable: native asset');
   if (isIssuer(asset, to)) return pass('destination is the issuer');
-  const line = destination && findBalance(destination, asset);
+  if (!destination) return block('op_no_destination', 'destination account missing');
+  const line = findBalance(destination, asset);
   if (!line?.limit) return block('op_no_trust', 'no trustline limit to check');
   const headroom =
     toStroops(line.limit) - toStroops(line.balance) - toStroops(line.buying_liabilities ?? '0');
