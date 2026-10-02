@@ -4,9 +4,15 @@ import type { FindingDraft } from './ports';
 
 export const FAILURES_TAG = 'failures';
 
-const classificationEvidence = (classification: AccountClassification | undefined) => {
+const RESERVE_CLUSTER = 'OP_LOW_RESERVE_CLUSTER';
+
+const classificationEvidence = (
+  classification: AccountClassification | undefined,
+  type: ClusterCandidate['type'],
+) => {
   if (!classification) return {};
   return {
+    reserveShortfallXlm: type === RESERVE_CLUSTER ? classification.reserveShortfallXlm : undefined,
     accountExists: classification.exists,
     multisig: classification.multisig,
     medThreshold: classification.medThreshold,
@@ -35,6 +41,9 @@ export const toFindingDraft = (
   subjectKind: 'account',
   subject: cluster.account,
   severity: cluster.severity,
-  evidence: withoutUndefined({ ...cluster.evidence, ...classificationEvidence(classification) }),
+  evidence: withoutUndefined({
+    ...cluster.evidence,
+    ...classificationEvidence(classification, cluster.type),
+  }),
   tags: clusterTags(classification),
 });
