@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { fn } from 'storybook/test';
 import { ChatComposer } from './chat-composer';
+import { NetworkProvider } from './network-provider';
 
 const meta: Meta<typeof ChatComposer> = {
   component: ChatComposer,
@@ -25,3 +26,13 @@ export const Submitted: Story = { args: { status: 'submitted' } };
 export const Streaming: Story = { args: { status: 'streaming' } };
 
 export const Disabled: Story = { args: { disabled: true } };
+
+export const OnTestnet: Story = {
+  decorators: [
+    (Story) => (
+      <NetworkProvider initialNetwork="testnet" persist={async () => {}}>
+        <Story />
+      </NetworkProvider>
+    ),
+  ],
+};
