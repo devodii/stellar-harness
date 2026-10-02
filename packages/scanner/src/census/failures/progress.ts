@@ -7,24 +7,42 @@ export const FailuresCheckpoint = z.object({
   chunkLedgers: z.number().int().positive(),
   sampleEvery: z.number().int().positive(),
   completedThrough: z.number().int().nonnegative(),
+  completedChunkIds: z.array(z.number().int().nonnegative()).default([]),
 });
 export type FailuresCheckpoint = z.infer<typeof FailuresCheckpoint>;
 
-export const resumableFrom = (
+export type ChunkPlan = Pick<
+  FailuresCheckpoint,
+  'startLedger' | 'endLedger' | 'chunkLedgers' | 'sampleEvery'
+>;
+
+export type ResumeState = { completedThrough: number; completedChunkIds: number[] };
+
+export const resumeStateFor = (
   previous: FailuresCheckpoint | undefined,
-  plan: Omit<FailuresCheckpoint, 'completedThrough'>,
-): number => {
-  if (!previous) return plan.startLedger - 1;
+  plan: ChunkPlan,
+): ResumeState => {
+  const fresh = { completedThrough: plan.startLedger - 1, completedChunkIds: [] };
+  if (!previous) return fresh;
   const samePlan =
     previous.startLedger === plan.startLedger &&
     previous.endLedger === plan.endLedger &&
     previous.chunkLedgers === plan.chunkLedgers &&
     previous.sampleEvery === plan.sampleEvery;
-  return samePlan ? previous.completedThrough : plan.startLedger - 1;
+  if (!samePlan) return fresh;
+  return {
+    completedThrough: previous.completedThrough,
+    completedChunkIds: [...previous.completedChunkIds],
+  };
 };
 
-export const remainingChunks = (chunks: LedgerChunk[], completedThrough: number): LedgerChunk[] =>
-  chunks.filter((chunk) => chunk.end > completedThrough);
+export const isResuming = (state: ResumeState, plan: ChunkPlan): boolean =>
+  state.completedThrough >= plan.startLedger || state.completedChunkIds.length > 0;
+
+export const remainingChunks = (chunks: LedgerChunk[], state: ResumeState): LedgerChunk[] => {
+  const done = new Set(state.completedChunkIds);
+  return chunks.filter((chunk) => chunk.end > state.completedThrough && !done.has(chunk.id));
+};
 
 export class ContiguousProgress<T extends { chunk: LedgerChunk }> {
   private readonly order: LedgerChunk[];
@@ -58,5 +76,11 @@ export class ContiguousProgress<T extends { chunk: LedgerChunk }> {
       this.index += 1;
     }
     return ready;
+  }
+
+  drain(): T[] {
+    const rest = [...this.pending.values()].sort((a, b) => a.chunk.start - b.chunk.start);
+    this.pending.clear();
+    return rest;
   }
 }
