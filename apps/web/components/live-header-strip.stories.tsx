@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { liveQueryKey } from '@/hooks/use-live';
 import type { LiveResponse } from '@/lib/api-schemas';
 import { LiveHeaderStrip } from './live-header-strip';
+import { NetworkProvider } from './network-provider';
 import { QueryStory } from './query-story';
 
 const SCANNED: LiveResponse = {
@@ -29,9 +31,11 @@ const meta: Meta<{ live: LiveResponse }> = {
   title: 'shell/LiveHeaderStrip',
   args: { live: SCANNED },
   render: ({ live }) => (
-    <QueryStory seed={[[['live'], live]]}>
-      <LiveHeaderStrip />
-    </QueryStory>
+    <NetworkProvider initialNetwork={live.network} persist={async () => {}}>
+      <QueryStory seed={[[liveQueryKey(live.network), live]]}>
+        <LiveHeaderStrip />
+      </QueryStory>
+    </NetworkProvider>
   ),
 };
 export default meta;
