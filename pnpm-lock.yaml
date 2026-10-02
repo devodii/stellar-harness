@@ -57,6 +57,12 @@ importers:
       '@harness/schema':
         specifier: workspace:*
         version: link:../schema
+      '@harness/stellar-tools':
+        specifier: workspace:*
+        version: link:../stellar-tools
+      '@harness/storage':
+        specifier: workspace:*
+        version: link:../storage
       zod:
         specifier: 4.6.5
         version: 4.6.5

@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@harness/schema": "workspace:*",
+    "@harness/stellar-tools": "workspace:*",
+    "@harness/storage": "workspace:*",
     "zod": "4.6.5"
   }
 }
