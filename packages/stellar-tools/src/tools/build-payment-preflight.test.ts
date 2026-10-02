@@ -70,6 +70,16 @@ describe('buildPaymentPreflight', () => {
     expect(result.ok && result.data.alternative).toBeUndefined();
   });
 
+  it('applies the context policy to the alternative plan', async () => {
+    const { port } = fakeHorizon(accounts);
+    const result = await invokeTool(
+      buildPaymentPreflight,
+      { from: fundedHolder.id, to: noTrustline.id, asset: USDC, amount: '25' },
+      { horizon: port, policy: { spendCapXlm: 0.1 } },
+    );
+    expect(result.ok && result.data.alternative?.boundary?.rule).toBe('spend_cap');
+  });
+
   it('rejects invalid input and surfaces Horizon errors', async () => {
     const { port } = fakeHorizon(accounts, new Set([noTrustline.id]));
     const invalid = await invokeTool(
