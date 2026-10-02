@@ -35,7 +35,6 @@ const latestLedger = (network: Network) => {
 export const GET = apiHandler({
   name: 'live.get',
   rateLimit: { limit: 240, windowSeconds: 60 },
-  cacheControl: 'private, max-age=5',
   handler: async () => {
     const network = await getRequestNetwork();
     const [ledger, summary] = await Promise.all([
