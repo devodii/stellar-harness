@@ -9,6 +9,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [tsconfigPaths()],
+  oxc: { jsx: { runtime: 'automatic' } },
   resolve: {
     alias: { 'server-only': path.join(dirname, 'node_modules/server-only/empty.js') },
   },
@@ -19,7 +20,7 @@ export default defineConfig({
         test: {
           name: 'unit',
           environment: 'node',
-          include: ['**/*.test.ts'],
+          include: ['**/*.test.{ts,tsx}'],
           exclude: ['node_modules/**', '.next/**'],
         },
       },
