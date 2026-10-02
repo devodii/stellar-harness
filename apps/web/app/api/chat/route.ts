@@ -3,12 +3,7 @@ import { convertToModelMessages, safeValidateUIMessages, stepCountIs, streamText
 import { z } from 'zod';
 import { getAgentTools, systemPromptFor } from '@/lib/agent';
 import { apiHandler } from '@/lib/api-handler';
-import {
-  dataPartSchemas,
-  dataPartToModelText,
-  type HarnessUIMessage,
-  planDecisions,
-} from '@/lib/chat';
+import { dataPartSchemas, dataPartToModelText, type HarnessUIMessage } from '@/lib/chat';
 import { getChatEnv } from '@/lib/env';
 import { logger } from '@/lib/log';
 import { createChatModel } from '@/lib/model';
@@ -49,11 +44,6 @@ export const POST = apiHandler({
     });
     if (!validated.success) throw appError('INVALID_INPUT', validated.error.message);
     const messages = validated.data;
-
-    const decisions = planDecisions(messages.slice(-1));
-    if (Object.keys(decisions).length > 0) {
-      logger.info({ requestId, decisions }, 'plan approval received');
-    }
 
     const tools = getAgentTools(network);
     const result = streamText({

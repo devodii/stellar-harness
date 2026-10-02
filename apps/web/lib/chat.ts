@@ -1,32 +1,25 @@
 import type { DataUIPart, TextPart, UIMessage, UITools } from 'ai';
 import { ChatContext, contextToModelText } from './chat-context';
-import {
-  type PlanApproval,
-  PlanApproval as PlanApprovalSchema,
-  type PlanDecision,
-} from './plan-approval';
 
-export type HarnessDataParts = { 'plan-approval': PlanApproval; context: ChatContext };
+export type HarnessDataParts = { context: ChatContext };
 
 export type HarnessUIMessage = UIMessage<unknown, HarnessDataParts, UITools>;
 
 export type HarnessPart = HarnessUIMessage['parts'][number];
 
-export const dataPartSchemas = { 'plan-approval': PlanApprovalSchema, context: ChatContext };
+export const dataPartSchemas = { context: ChatContext };
 
-export const planDecisions = (messages: HarnessUIMessage[]): Record<string, PlanDecision> => {
-  const decisions: Record<string, PlanDecision> = {};
-  for (const message of messages) {
-    if (message.role !== 'user') continue;
-    for (const part of message.parts) {
-      if (part.type === 'data-plan-approval') decisions[part.data.planId] = part.data.decision;
-    }
-  }
-  return decisions;
-};
+const DATA_PREFIX = 'data-';
+
+const isKnownPart = (part: { type: string }): boolean =>
+  !part.type.startsWith(DATA_PREFIX) ||
+  Object.hasOwn(dataPartSchemas, part.type.slice(DATA_PREFIX.length));
+
+export const withKnownDataParts = <TMessage extends { parts: { type: string }[] }>(
+  message: TMessage,
+): TMessage => ({ ...message, parts: message.parts.filter(isKnownPart) });
 
 export const dataPartToModelText = (part: DataUIPart<HarnessDataParts>): TextPart | undefined => {
-  if (part.type === 'data-plan-approval') return { type: 'text', text: JSON.stringify(part.data) };
   if (part.type === 'data-context') return { type: 'text', text: contextToModelText(part.data) };
   return undefined;
 };

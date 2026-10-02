@@ -15,7 +15,7 @@ import { ChatComposer, focusChatInput } from '@/components/chat-composer';
 import { ChatEmpty } from '@/components/chat-empty';
 import { ChatMessage } from '@/components/chat-message';
 import { InlineAlert } from '@/components/inline-alert';
-import { dataPartSchemas, type HarnessUIMessage, messageText, planDecisions } from '@/lib/chat';
+import { dataPartSchemas, type HarnessUIMessage, messageText } from '@/lib/chat';
 import {
   addContext,
   type ChatContext,
@@ -25,7 +25,6 @@ import {
 } from '@/lib/chat-context';
 import { chatErrorMessage } from '@/lib/chat-errors';
 import { IMAGE_ONLY_PROMPT, prepareImages } from '@/lib/images';
-import { approvalText, type PlanDecision, planApproval } from '@/lib/plan-approval';
 import type { ChatSuggestion } from '@/lib/suggestions';
 
 export interface ChatViewProps {
@@ -99,24 +98,11 @@ export function ChatView({
 
   const actions = React.useMemo<ChatActions>(
     () => ({
-      decisions: planDecisions(messages),
-      busy,
       sendPrompt,
-      onDecide: (planId: string, decision: PlanDecision) => {
-        const data = planApproval(planId, decision);
-        clearError();
-        void sendMessage({
-          role: 'user',
-          parts: [
-            { type: 'text', text: approvalText(data) },
-            { type: 'data-plan-approval', data },
-          ],
-        });
-      },
       onFinding: (finding: Finding) =>
         setContexts((current) => addContext(current, contextFromFinding(finding))),
     }),
-    [messages, busy, sendPrompt, sendMessage, clearError],
+    [sendPrompt],
   );
 
   const reply = React.useCallback((message: HarnessUIMessage) => {

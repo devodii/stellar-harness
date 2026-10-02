@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { firstUserText, type HarnessUIMessage } from './chat';
+import { firstUserText, type HarnessUIMessage, withKnownDataParts } from './chat';
 
 export const CONVERSATIONS_KEY = 'harness:conversations:v1';
 export const MAX_CONVERSATIONS = 50;
@@ -26,7 +26,11 @@ export const sanitizeConversations = (value: unknown): Conversation[] => {
   if (!Array.isArray(value)) return [];
   return value.flatMap((item) => {
     const parsed = StoredConversation.safeParse(item);
-    return parsed.success ? [parsed.data as unknown as Conversation] : [];
+    if (!parsed.success) return [];
+    const messages = parsed.data.messages.map((message) =>
+      withKnownDataParts(message as { parts: { type: string }[] }),
+    );
+    return [{ ...parsed.data, messages } as unknown as Conversation];
   });
 };
 

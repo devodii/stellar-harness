@@ -4,7 +4,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { ToolOutput } from './tool-renderers';
 
 const meta = { tool: 'getContractTtl', ms: 12 };
-const ctx = { decisions: {} };
+const ctx = {};
 
 const render = (toolName: string, output: unknown) =>
   renderToStaticMarkup(
