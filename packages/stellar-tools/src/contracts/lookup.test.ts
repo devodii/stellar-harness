@@ -57,4 +57,13 @@ describe('lookupContract', () => {
     const result = await lookupContract(deps([], false), ROUTER, { withExpert: true });
     expect(result).toMatchObject({ ok: false, error: { code: 'NOT_FOUND' } });
   });
+
+  it('names the selected network when the contract is missing', async () => {
+    const mainnet = await lookupContract(deps([], false), ROUTER, { withExpert: true });
+    const testnet = await lookupContract({ ...deps([], false), network: 'testnet' }, ROUTER, {
+      withExpert: true,
+    });
+    expect(mainnet.ok ? null : mainnet.error.message).toMatch(/not found on mainnet$/);
+    expect(testnet.ok ? null : testnet.error.message).toMatch(/not found on testnet$/);
+  });
 });
