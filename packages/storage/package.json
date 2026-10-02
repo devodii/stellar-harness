@@ -4,12 +4,19 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./pg": "./src/pg.ts",
+    "./pilot": "./src/pilot.ts"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@harness/schema": "workspace:*"
+    "@harness/schema": "workspace:*",
+    "postgres": "3.4.9"
+  },
+  "devDependencies": {
+    "vitest": "5.0.3"
   }
 }
