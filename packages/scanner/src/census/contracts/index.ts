@@ -3,6 +3,7 @@ import type { ExpertContract } from '@harness/stellar-tools/contracts';
 import { enumerateContracts } from './enumerate';
 import {
   archivedExportRows,
+  archivedMeaningfulExportRows,
   type ContractExportRow,
   expiring30dExportRows,
   type ScfExportRow,
@@ -52,6 +53,7 @@ export type ContractsCensusResult = {
   summary: ContractsSummary;
   exports: {
     archived: ContractExportRow[];
+    archivedMeaningful: ContractExportRow[];
     expiring30d: ContractExportRow[];
     scfFunded: ScfExportRow[];
   };
@@ -134,6 +136,7 @@ export const runContractsCensus = async (
     summary: contractsSummary(rows, scf.projects, options.previousActivity),
     exports: {
       archived: archivedExportRows(rows),
+      archivedMeaningful: archivedMeaningfulExportRows(rows),
       expiring30d: expiring30dExportRows(rows),
       scfFunded: scfFundedExportRows(rows),
     },

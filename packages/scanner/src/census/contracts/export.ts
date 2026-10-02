@@ -1,4 +1,5 @@
 import type { ContractRow } from './schemas';
+import { isArchivedMeaningful } from './summary';
 
 export const CONTRACT_EXPORT_COLUMNS = [
   'contract',
@@ -16,6 +17,7 @@ export const SCF_EXPORT_COLUMNS = [...CONTRACT_EXPORT_COLUMNS, 'scf_name', 'stat
 
 export const CONTRACT_EXPORT_FILES = {
   archived: 'contracts_archived.csv',
+  archivedMeaningful: 'contracts_archived_meaningful.csv',
   expiring30d: 'contracts_expiring_30d.csv',
   scfFunded: 'contracts_scf_funded.csv',
 } as const;
@@ -57,6 +59,9 @@ export const archivedExportRows = (rows: ContractRow[]): ContractExportRow[] =>
     .filter((row) => row.instance?.archived)
     .sort(byInvocationsDesc)
     .map(toExportRow);
+
+export const archivedMeaningfulExportRows = (rows: ContractRow[]): ContractExportRow[] =>
+  rows.filter(isArchivedMeaningful).sort(byInvocationsDesc).map(toExportRow);
 
 export const expiring30dExportRows = (rows: ContractRow[]): ContractExportRow[] =>
   rows
