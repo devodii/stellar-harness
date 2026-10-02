@@ -36,4 +36,7 @@ export const formatPercent = (part: number, whole: number): string =>
   whole === 0 ? '0%' : `${((part / whole) * 100).toFixed(1)}%`;
 
 export const sections = (...blocks: (string | false | null | undefined)[]): string =>
-  `${blocks.filter(Boolean).join('\n\n')}\n`;
+  `${blocks
+    .filter((block): block is string => Boolean(block))
+    .map((block) => block.trimEnd())
+    .join('\n\n')}\n`;
