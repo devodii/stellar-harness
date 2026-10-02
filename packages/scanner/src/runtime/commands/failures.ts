@@ -1,4 +1,3 @@
-import { createPortDecoders } from '@harness/stellar-tools';
 import { ANCHOR_DOMAINS_FILE } from '../../census/anchors/census';
 import { runFailuresCensus } from '../../census/failures/census';
 import {
@@ -8,6 +7,7 @@ import {
   failureClusterRows,
 } from '../../census/failures/export';
 import { FailuresCheckpoint } from '../../census/failures/progress';
+import { createPortDecoders } from '../../decode';
 import { writeCensusRecord, writeExport } from '../artifacts';
 import type { ScanContext } from '../context';
 import type { ScanPersistence } from '../persistence';
