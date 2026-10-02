@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { BracketTag } from './bracket-tag';
-import { ResultCard } from './result-card';
+import { ResultSection } from './result-section';
 
-const meta: Meta<typeof ResultCard> = {
-  component: ResultCard,
-  title: 'components/ResultCard',
+const meta: Meta<typeof ResultSection> = {
+  component: ResultSection,
+  title: 'components/ResultSection',
   args: {
     title: 'getAccount',
     children: <p className="text-muted-foreground">Synthetic result body.</p>,
@@ -12,7 +12,7 @@ const meta: Meta<typeof ResultCard> = {
 };
 export default meta;
 
-type Story = StoryObj<typeof ResultCard>;
+type Story = StoryObj<typeof ResultSection>;
 
 export const Default: Story = {};
 
