@@ -1,6 +1,7 @@
 import 'server-only';
 import { appError } from '@harness/schema';
 import { z } from 'zod';
+import { fetchUpstream } from './upstream';
 
 const LedgersPage = z.object({
   _embedded: z.object({
@@ -13,33 +14,12 @@ export interface LatestLedger {
   closedAt: string;
 }
 
-const TIMEOUT_MS = 5000;
-
 export const fetchLatestLedger = async (horizonUrl: string): Promise<LatestLedger> => {
   const url = new URL('/ledgers', horizonUrl);
   url.searchParams.set('order', 'desc');
   url.searchParams.set('limit', '1');
-
-  let response: Response;
-  try {
-    response = await fetch(url, {
-      headers: { accept: 'application/json' },
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-      cache: 'no-store',
-    });
-  } catch (error) {
-    const timedOut = error instanceof Error && error.name === 'TimeoutError';
-    throw appError(
-      timedOut ? 'UPSTREAM_TIMEOUT' : 'UPSTREAM_FAILED',
-      `Horizon ledgers request failed: ${error instanceof Error ? error.message : 'unknown'}`,
-    );
-  }
-  if (!response.ok) {
-    throw appError('UPSTREAM_FAILED', `Horizon ledgers returned ${response.status}`, {
-      status: response.status,
-    });
-  }
-  const record = LedgersPage.parse(await response.json())._embedded.records[0];
+  const page = LedgersPage.parse(await fetchUpstream('Horizon ledgers', url));
+  const record = page._embedded.records[0];
   if (!record) throw appError('UPSTREAM_FAILED', 'Horizon returned no ledgers');
   return { sequence: record.sequence, closedAt: record.closed_at };
 };
