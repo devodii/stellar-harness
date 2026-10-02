@@ -1,7 +1,7 @@
 import { appError, err, ok } from '@harness/schema';
 import { Networks, type Transaction, TransactionBuilder } from '@stellar/stellar-sdk';
 import { describe, expect, it } from 'vitest';
-import { accountLedgerKey } from '../core/account-entry';
+import circle from '../core/__fixtures__/rpc-account-circle-testnet.json';
 import account from './__fixtures__/horizon-account-circle.json';
 import extend365 from './__fixtures__/rpc-simulate-extend-365d.json';
 import extendArchived from './__fixtures__/rpc-simulate-extend-archived.json';
@@ -16,9 +16,6 @@ const ROUTER_WASM = '4c3db3ebd2d6a2ab23de1f622eaabb39501539b4611b68622ec4e47f76c
 const IDLE = 'CDZZZADKQPBUEBSTLON3M666R2Z73EMERP5KUBY6YETA76XZKSLSFDD4';
 const IDLE_WASM = '07097f83dae3b746db7dba3263d9cc334efb88a9a7d5450fb96ca19f33d284b0';
 const RECORDED_EXTEND_TO = 5_437_241;
-const TESTNET_SOURCE = 'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5';
-const TESTNET_SOURCE_ENTRY =
-  'AAAAAAAAAABCPn0F8uyvv+wZKyFaPxvpau242OcCVKvjQT4CB95WsgAAAKJ1e2fpAAACqAAAABoAAAACAAAAAAAAAAIAAAAJY2VudHJlLmlvAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAADAAAAAAAfYIMAAAAAad/52A==';
 const source = {
   accountId: account.id,
   sequence: '144373126631784461',
@@ -145,13 +142,17 @@ describe('fetchSimulationSource', () => {
       account: async () => err(appError('UPSTREAM_FAILED', 'connect ECONNREFUSED')),
     };
     const rpc = fakeRpc({
-      entries: [{ key: accountLedgerKey(TESTNET_SOURCE), xdr: TESTNET_SOURCE_ENTRY }],
+      entries: [{ key: circle.key, xdr: circle.xdr }],
     });
-    const result = await fetchSimulationSource({ horizon, rpc }, TESTNET_SOURCE, Networks.TESTNET);
+    const result = await fetchSimulationSource(
+      { horizon, rpc },
+      circle.accountId,
+      Networks.TESTNET,
+    );
     expect(result).toEqual({
       ok: true,
       value: {
-        accountId: TESTNET_SOURCE,
+        accountId: circle.accountId,
         sequence: '2920577761306',
         networkPassphrase: Networks.TESTNET,
       },

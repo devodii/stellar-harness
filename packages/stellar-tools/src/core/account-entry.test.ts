@@ -2,6 +2,7 @@ import { appError, err, ok } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
 import { fakeHorizon, fakeRpc } from '../contracts/fakes';
 import type { HorizonAccount } from '../ports';
+import circle from './__fixtures__/rpc-account-circle-testnet.json';
 import {
   accountLedgerKey,
   accountWithRpcFallback,
@@ -10,9 +11,8 @@ import {
   withRpcAccountFallback,
 } from './account-entry';
 
-const CIRCLE_TESTNET = 'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5';
-const CIRCLE_TESTNET_ENTRY =
-  'AAAAAAAAAABCPn0F8uyvv+wZKyFaPxvpau242OcCVKvjQT4CB95WsgAAAKJ1e2fpAAACqAAAABoAAAACAAAAAAAAAAIAAAAJY2VudHJlLmlvAAAAAQAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAADAAAAAAAfYIMAAAAAad/52A==';
+const CIRCLE_TESTNET = circle.accountId;
+const CIRCLE_TESTNET_ENTRY = circle.xdr;
 
 const entry = { key: accountLedgerKey(CIRCLE_TESTNET), xdr: CIRCLE_TESTNET_ENTRY };
 const horizonAccount = (sequence: string): HorizonAccount => ({
@@ -57,6 +57,10 @@ describe('decodeAccountEntry', () => {
 });
 
 describe('readAccountFromRpc', () => {
+  it('builds the recorded ledger key', () => {
+    expect(accountLedgerKey(CIRCLE_TESTNET)).toBe(circle.key);
+  });
+
   it('reads the account entry by its ledger key', async () => {
     const rpc = fakeRpc({ entries: [entry] });
     const result = await readAccountFromRpc(rpc, CIRCLE_TESTNET);
