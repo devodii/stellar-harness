@@ -1,13 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { checkEndpoints, endpointHosts } from './endpoints';
-import { readFixture } from './testing';
-import { parseToml } from './toml';
-
-const toml = (name: string) => {
-  const parsed = parseToml(readFixture(`toml/${name}.toml`));
-  if (!parsed.ok) throw new Error(`${name} should parse`);
-  return parsed.value;
-};
+import { tomlFixture as toml } from './testing';
 
 describe('checkEndpoints', () => {
   it('lists the sep endpoints present in the toml', () => {

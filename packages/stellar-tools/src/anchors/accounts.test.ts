@@ -2,14 +2,9 @@ import { appError } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
 import { accountTargets, homeDomainMismatches, probeAccounts } from './accounts';
 import type { HorizonAccount } from './ports';
-import { fakeHorizon, readFixture, readJsonFixture } from './testing';
-import { parseToml } from './toml';
+import { fakeHorizon, readJsonFixture, tomlFixture } from './testing';
 
-const anclapToml = () => {
-  const parsed = parseToml(readFixture('toml/anclap.com.toml'));
-  if (!parsed.ok) throw new Error('fixture should parse');
-  return parsed.value;
-};
+const anclapToml = () => tomlFixture('anclap.com');
 const ars = readJsonFixture<HorizonAccount>('horizon/account-anclap-ars.json');
 const ARS = 'GCYE7C77EB5AWAA25R5XMWNI2EDOKTTFTTPZKM2SR5DI4B4WFD52DARS';
 const PEN = 'GA4TDPNUCZPTOHB3TKUYMDCRVATXKEADH7ZEYEBWJKQKE2UBFCYNBPEN';

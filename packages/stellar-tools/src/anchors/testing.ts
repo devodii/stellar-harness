@@ -1,9 +1,17 @@
 import { readFileSync } from 'node:fs';
 import { type AppError, appError, err, ok } from '@harness/schema';
 import type { Fetcher, HorizonAccount, HorizonPort, HttpRequest, HttpResponse } from './ports';
+import type { AnchorToml } from './schemas';
+import { parseToml } from './toml';
 
 export const readFixture = (relative: string): string =>
   readFileSync(new URL(`./__fixtures__/${relative}`, import.meta.url), 'utf8');
+
+export const tomlFixture = (name: string): AnchorToml => {
+  const parsed = parseToml(readFixture(`toml/${name}.toml`));
+  if (!parsed.ok) throw new Error(`fixture ${name} should parse`);
+  return parsed.value;
+};
 
 export const readJsonFixture = <T = unknown>(relative: string): T =>
   JSON.parse(readFixture(relative)) as T;
