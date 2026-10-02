@@ -86,6 +86,14 @@ describe('caches', () => {
     expect(await cache.get(key)).toEqual(entry);
   });
 
+  it('survives concurrent writes of the same key', async () => {
+    const dataDir = await mkdtemp(join(tmpdir(), 'harness-cache-'));
+    const cache = new DiskCache(dataDir);
+    const key = cacheKey({ method: 'GET', url: entry.url });
+    await Promise.all(Array.from({ length: 8 }, () => cache.set(key, entry)));
+    expect(await cache.get(key)).toEqual(entry);
+  });
+
   it('treats a missing or corrupt disk entry as a miss', async () => {
     const dataDir = await mkdtemp(join(tmpdir(), 'harness-cache-'));
     const cache = new DiskCache(dataDir);
