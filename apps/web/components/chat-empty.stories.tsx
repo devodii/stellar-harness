@@ -23,3 +23,5 @@ type Story = StoryObj<typeof ChatEmpty>;
 export const LiveMainnet: Story = {};
 
 export const FromScan: Story = { args: { scanned: true } };
+
+export const LiveTestnet: Story = { args: { network: 'testnet' } };
