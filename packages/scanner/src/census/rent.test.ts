@@ -1,5 +1,10 @@
-import { ok } from '@harness/schema';
-import { DEFAULT_SIMULATION_SOURCE, type HorizonAccount } from '@harness/stellar-tools/contracts';
+import { NETWORK_PROFILES, ok } from '@harness/schema';
+import { decodeEnvelopeSummary } from '@harness/stellar-tools';
+import {
+  DEFAULT_SIMULATION_SOURCE,
+  type HorizonAccount,
+  SIMULATION_SOURCES,
+} from '@harness/stellar-tools/contracts';
 import { fakeFetcher, fakeHorizon, fakeRpc } from '@harness/stellar-tools/contracts/testing';
 import { describe, expect, it } from 'vitest';
 import coingecko from './__fixtures__/coingecko-xlm-usd.json';
@@ -126,6 +131,23 @@ describe('runRentCensus', () => {
       source: 'rpc:simulateTransaction',
       error: { code: 'UPSTREAM_FAILED', meta: { failed: 2 } },
     });
+  });
+});
+
+describe('runRentCensus on testnet', () => {
+  it('simulates from the testnet source account', async () => {
+    const testnetSource = { ...source, id: SIMULATION_SOURCES.testnet };
+    const { deps: d, rpc } = deps({
+      snapshot: { ...snapshot, network: 'testnet' },
+      horizon: fakeHorizon([testnetSource]),
+    });
+    const result = await runRentCensus(d, contracts);
+    expect(result.stats.simulated).toBe(2);
+    const tx = decodeEnvelopeSummary(
+      rpc.calls.simulate[0] ?? '',
+      NETWORK_PROFILES.testnet.passphrase,
+    );
+    expect(tx.source).toBe(SIMULATION_SOURCES.testnet);
   });
 });
 
