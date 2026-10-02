@@ -2,6 +2,7 @@ import { cn } from 'cn';
 import type * as React from 'react';
 import type * as RHF from 'react-hook-form';
 import { Label } from '@/components/ui/label';
+import { TONE_TEXT } from '@/lib/tone';
 
 export interface FieldLayoutProps {
   htmlFor: string;
@@ -32,7 +33,7 @@ export function FieldLayout({
       )}
       {children}
       {description && !error && <p className="text-xs text-muted-foreground">{description}</p>}
-      {error && <p className="text-xs text-destructive">{error.message}</p>}
+      {error && <p className={cn('text-xs', TONE_TEXT.destructive)}>{error.message}</p>}
     </div>
   );
 }

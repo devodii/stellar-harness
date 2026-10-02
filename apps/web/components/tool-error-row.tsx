@@ -1,5 +1,6 @@
 import { cn } from 'cn';
 import { BracketTag } from '@/components/bracket-tag';
+import { TONE_TEXT } from '@/lib/tone';
 
 export interface ToolErrorRowProps {
   message: string;
@@ -17,7 +18,7 @@ export function ToolErrorRow({ message, code, className }: ToolErrorRowProps) {
       )}
     >
       <BracketTag label="error" tone="destructive" emphasis />
-      {code && <span className="shrink-0 text-destructive">{code}</span>}
+      {code && <span className={cn('shrink-0', TONE_TEXT.destructive)}>{code}</span>}
       <span className="min-w-0 truncate text-foreground" title={message}>
         {message}
       </span>

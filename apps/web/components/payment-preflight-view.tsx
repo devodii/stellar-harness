@@ -1,9 +1,11 @@
 'use client';
 
+import { cn } from 'cn';
 import { BracketTag } from '@/components/bracket-tag';
 import { PlanView, type PlanViewProps } from '@/components/plan-view';
 import { ResultCard } from '@/components/result-card';
 import { StatLabel } from '@/components/stat';
+import { TONE_TEXT } from '@/lib/tone';
 import type { PaymentPreflightView as PaymentPreflightData } from '@/lib/tool-views';
 
 export interface PaymentPreflightViewProps extends Omit<PlanViewProps, 'plan' | 'className'> {
@@ -50,7 +52,9 @@ export function PaymentPreflightView({ preflight, ...planProps }: PaymentPreflig
                   key={blocker.code}
                   className="rounded-md border border-destructive/40 bg-destructive/5 p-2"
                 >
-                  <code className="font-mono text-xs text-destructive">{blocker.code}</code>
+                  <code className={cn('font-mono text-xs', TONE_TEXT.destructive)}>
+                    {blocker.code}
+                  </code>
                   <p className="text-xs text-foreground">{blocker.fix}</p>
                 </li>
               ))}
