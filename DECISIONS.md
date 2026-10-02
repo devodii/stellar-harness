@@ -129,3 +129,11 @@ Every call made without explicit direction is tagged `@decision` so it can be re
 - `@decision` AI Elements no longer ships `Loader`; `Shimmer` is used instead. The chat route passes `instructions` because `system` is deprecated in AI SDK 7.
 - `@decision` The web app renders tool results against the canonical tool schemas through client-safe entries (`@harness/stellar-tools/schemas`, `@harness/agent/protocol`), so the browser bundle never includes network clients.
 - `@decision` Suggestion fallbacks are real mainnet values checked live (a failed `op_no_trust` transaction, an anchor with a broken SEP-24 host, a USDC holder, an account without a USDC trustline, a live contract).
+
+## Postgres
+
+- `@decision` Postgres (compose service, `postgres:17-alpine`) holds the HTTP cache, findings, summaries, snapshots, derived census rows and artifacts, every row keyed by network. Plain SQL migrations under `packages/storage/migrations`, applied by `pnpm db:migrate`; queries use the `postgres` driver's tagged templates, no ORM. Chats are not stored.
+- `@decision` Files stay the fallback: without `DATABASE_URL`, storage and cache use `data/` (mainnet) and `data-testnet/` (testnet) exactly as before. CSV exports always stay on disk.
+- `@decision` `pnpm db:import` copies an existing data directory into Postgres without modifying a single file (verified by byte and mtime checks); it is idempotent and resumable.
+- `@decision` `http_cache` stores the request url so a row rebuilds the full cache entry. jsonb cannot hold NUL characters: bodies with NUL are not cached, and NUL inside findings or rows becomes U+FFFD.
+- `@decision` The compose host port is `${POSTGRES_PORT:-5432}`; this machine already uses 5432, so local `.env` sets 55432.
