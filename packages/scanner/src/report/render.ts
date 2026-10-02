@@ -18,6 +18,7 @@ const CENSUS_OF_EXPORT: Record<string, string> = {
   anchors_failing: 'anchors',
   anchors_funnel: 'anchors',
   contracts_archived: 'contracts',
+  contracts_archived_meaningful: 'contracts',
   contracts_expiring_30d: 'contracts',
   contracts_scf_funded: 'contracts',
   rent_top100: 'rent',
@@ -69,7 +70,15 @@ export const renderHeadline = (summary: Summary): string => {
     keyValueTable([
       ['Contracts enumerated', formatInt(contracts.total)],
       ['Contract instances archived', formatInt(contracts.archivedInstances)],
+      [
+        'Contract instances archived (active: 100+ invocations or SCF-funded)',
+        formatInt(contracts.archivedMeaningful),
+      ],
       ['Contract instances expiring within 30 days', formatInt(contracts.expiring30d)],
+      [
+        'Contract instances expiring within 30 days (active)',
+        formatInt(contracts.expiring30dMeaningful),
+      ],
       ['SCF-funded contracts archived', formatInt(contracts.scfFunded.archived)],
       ['SCF-funded contracts expiring within 30 days', formatInt(contracts.scfFunded.expiring30d)],
       ['Transactions scanned in window', formatInt(failures.txScanned)],
@@ -112,7 +121,12 @@ const renderContracts = ({ contracts }: Summary, exports: readonly ExportPreview
       ['Contracts', formatInt(contracts.total)],
       ['Wasm families', formatInt(contracts.families)],
       ['Archived instances', formatInt(contracts.archivedInstances)],
+      [
+        'Archived instances (active: 100+ invocations or SCF-funded)',
+        formatInt(contracts.archivedMeaningful),
+      ],
       ['Expiring within 30 days', formatInt(contracts.expiring30d)],
+      ['Expiring within 30 days (active)', formatInt(contracts.expiring30dMeaningful)],
       ['Expiring within 90 days', formatInt(contracts.expiring90d)],
       ['Live and idle', formatInt(contracts.liveIdle)],
       ['SCF-funded contracts', formatInt(contracts.scfFunded.total)],

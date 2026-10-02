@@ -85,6 +85,36 @@ describe('renderReport', () => {
     expect(report).toContain('64,722,632');
   });
 
+  it('headlines the archived and expiring contracts that matter', () => {
+    const report = renderReport({
+      summary: {
+        ...summary,
+        contracts: {
+          ...summary.contracts,
+          archivedInstances: 65_140,
+          archivedMeaningful: 240,
+          expiring30dMeaningful: 123,
+        },
+      },
+      exports: [
+        {
+          name: 'contracts_archived_meaningful',
+          path: 'data/exports/contracts_archived_meaningful.csv',
+          columns: ['contract'],
+          rowCount: 1,
+          rows: [{ contract: 'CABC' }],
+        },
+      ],
+      methodology: [],
+      runs: [],
+    });
+    expect(report).toContain(
+      '| Contract instances archived (active: 100+ invocations or SCF-funded) | 240 |',
+    );
+    expect(report).toContain('| Contract instances expiring within 30 days (active) | 123 |');
+    expect(report).toContain('### contracts_archived_meaningful (1 rows)');
+  });
+
   it('formats percentages safely', () => {
     expect(formatPercent(1, 0)).toBe('0%');
     expect(formatPercent(1, 8)).toBe('12.5%');
