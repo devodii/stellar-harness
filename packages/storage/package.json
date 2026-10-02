@@ -4,21 +4,12 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./sqlite": "./src/sqlite.ts"
+    ".": "./src/index.ts"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run"
+    "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@harness/schema": "workspace:*",
-    "postgres": "3.4.9",
-    "zod": "4.6.5"
-  },
-  "devDependencies": {
-    "@types/better-sqlite3": "^7.6.13",
-    "better-sqlite3": "12.4.1"
+    "@harness/schema": "workspace:*"
   }
 }
