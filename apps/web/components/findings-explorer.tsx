@@ -13,8 +13,7 @@ import { ResponsiveSheet } from '@/components/responsive-sheet';
 import { Button } from '@/components/ui/button';
 import { type FindingsFilter, useFindings } from '@/hooks/use-findings';
 import { FINDINGS_PAGE_SIZE } from '@/lib/api-schemas';
-import { promptHref } from '@/lib/routes';
-import { planFixPrompt } from '@/lib/suggestions';
+import { findingChatHref } from '@/lib/routes';
 
 const FilterSchema = z.object({
   type: z.array(z.string()),
@@ -87,14 +86,7 @@ export function FindingsExplorer() {
         }
         footer={
           selected && (
-            <Button
-              type="button"
-              onClick={() =>
-                router.push(
-                  promptHref(planFixPrompt(selected.findingId, selected.type, selected.subject)),
-                )
-              }
-            >
+            <Button type="button" onClick={() => router.push(findingChatHref(selected.findingId))}>
               <ChatsIcon className="size-4" />
               Open in chat
             </Button>
