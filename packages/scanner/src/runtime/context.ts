@@ -27,6 +27,7 @@ import {
 } from '../core/findings';
 import { formatProgress, runTasks } from '../core/runner';
 import { createStateStore, snapshotStore, writeJsonAtomic } from '../core/state';
+import { type HorizonStatus, probeHorizon, unavailableHorizon } from './horizon';
 
 export type ScanOptions = {
   dataDir: string;
@@ -67,6 +68,8 @@ export type ScanContext = {
   readCheckpoint: (census: string) => Promise<Record<string, unknown> | null>;
   stats: () => HostStats;
   log: (line: string) => void;
+  horizon: HorizonStatus;
+  notes: string[];
 };
 
 async function* readJsonlLines(path: string): AsyncIterable<unknown> {
@@ -96,13 +99,18 @@ const resolveSnapshot = async (
   clients: NetworkClients,
   dataDir: string,
   fresh: boolean,
+  horizon: HorizonStatus,
 ): Promise<Snapshot> => {
   const network = clients.config.NETWORK;
   const store = snapshotStore(dataDir);
   const existing = fresh ? null : await store.read();
   if (existing?.network === network) return existing;
   await resetForSnapshot(dataDir);
-  const taken = await takeSnapshot(clients, { gitSha: process.env.GIT_SHA, network });
+  const taken = await takeSnapshot(clients, {
+    gitSha: process.env.GIT_SHA,
+    network,
+    skipHorizon: !horizon.available,
+  });
   if (!taken.ok) throw new Error(`Could not take a snapshot: ${taken.error.message}`);
   await store.write(taken.value);
   return taken.value;
@@ -135,9 +143,13 @@ export const selectCache = ({ noCache, cache, dataDir }: ScanOptions): Cache => 
   return cache ?? new DiskCache(dataDir);
 };
 
-export const scanPorts = (clients: NetworkClients): Ports => {
+export const scanPorts = (
+  clients: NetworkClients,
+  status: HorizonStatus = { available: true },
+): Ports => {
   const ports = createPorts(clients);
-  return { ...ports, horizon: withRpcAccountFallback(ports.horizon, ports.rpc) };
+  const horizon = status.available ? ports.horizon : unavailableHorizon(status.note);
+  return { ...ports, horizon: withRpcAccountFallback(horizon, ports.rpc) };
 };
 
 export const createScanContext = async (options: ScanOptions): Promise<ScanContext> => {
@@ -150,7 +162,14 @@ export const createScanContext = async (options: ScanOptions): Promise<ScanConte
     limits: options.concurrency,
     onGap: (gap) => gaps.push(gap),
   });
-  const snapshot = await resolveSnapshot(clients, options.dataDir, options.newSnapshot ?? false);
+  const horizon = await probeHorizon(clients);
+  if (!horizon.available) log(`[scan] ${horizon.note}`);
+  const snapshot = await resolveSnapshot(
+    clients,
+    options.dataDir,
+    options.newSnapshot ?? false,
+    horizon,
+  );
   const sink = createFindingSink(options.dataDir);
   const stores = new Map<string, ReturnType<typeof createStateStore<typeof CheckpointState>>>();
   const store = (census: string) => {
@@ -165,7 +184,7 @@ export const createScanContext = async (options: ScanOptions): Promise<ScanConte
     options,
     config,
     clients,
-    ports: scanPorts(clients),
+    ports: scanPorts(clients, horizon),
     snapshot,
     sink,
     gaps,
@@ -190,5 +209,7 @@ export const createScanContext = async (options: ScanOptions): Promise<ScanConte
     readCheckpoint: (census) => store(census).read(),
     stats: () => clients.http.stats.totals(),
     log,
+    horizon,
+    notes: horizon.available ? [] : [horizon.note],
   };
 };
