@@ -49,7 +49,7 @@ export function NetworkSelect({
           className,
         )}
       >
-        {pending && <Spinner className="size-3" />}
+        {pending && <Spinner size={12} />}
         <SelectValue />
       </SelectTrigger>
       <SelectContent position="popper" align="start" className="min-w-36">
