@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { fakeRpc } from '../contracts/fakes';
+import circle from '../core/__fixtures__/rpc-account-circle-testnet.json';
 import type { HorizonAccount } from '../ports';
 import { invokeTool } from '../tool';
 import holderFixture from './__fixtures__/horizon-account-usdc-holder.json';
@@ -61,5 +63,24 @@ describe('getAccount', () => {
   it('surfaces Horizon errors', async () => {
     const result = await invokeTool(getAccount, { address: 'GBROKEN'.padEnd(56, 'A') }, ctx);
     expect(result).toMatchObject({ ok: false, error: { code: 'UPSTREAM_TIMEOUT' } });
+  });
+
+  it('reads the account from RPC when Horizon fails and RPC is available', async () => {
+    const { port } = fakeHorizon({}, new Set([circle.accountId]));
+    const rpc = fakeRpc({ entries: [{ key: circle.key, xdr: circle.xdr }] });
+    const result = await invokeTool(
+      getAccount,
+      { address: circle.accountId },
+      { horizon: port, rpc },
+    );
+    expect(result).toMatchObject({
+      ok: true,
+      data: {
+        exists: true,
+        sequence: '2920577761306',
+        homeDomain: 'centre.io',
+        balances: [{ asset: 'XLM', balance: '69775.5723753' }],
+      },
+    });
   });
 });
