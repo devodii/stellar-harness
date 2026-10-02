@@ -6,11 +6,13 @@ An operator agent for one organisation on Stellar. Think of it as a company card
 
 ```bash
 pnpm install
-echo "OPENAI_API_KEY=sk-..." > .env    # OPENAI_MODEL is optional, default gpt-4.1
+cp .env.example .env                   # set OPENAI_API_KEY; OPENAI_MODEL defaults to gpt-4.1
+docker compose up -d postgres          # pilot requests are stored here (DATABASE_URL)
 pnpm dev                               # http://localhost:3000
+pnpm --filter web storybook            # component catalogue
 ```
 
-`pnpm build && pnpm lint && pnpm test` checks everything; `pnpm knip` and `pnpm depcheck` check for unused files, exports and dependencies.
+`pnpm build && pnpm lint && pnpm test` checks everything; `pnpm knip` and `pnpm depcheck` check for unused files, exports and dependencies. Every API route goes through `apiHandler` (validation, rate limits, error masking, request logging); migrations are plain SQL applied on first use.
 
 ## The demo organisation
 
@@ -47,8 +49,8 @@ Not real: execution. Proposed actions are stored in memory and the execute and a
 apps/web                Next.js app: one screen, the chat route and the pilot route
 packages/agent          the eight tools the model can call and the system prompt
 packages/stellar-tools  six read and simulate tools on @stellar/stellar-sdk
-packages/storage        the organisation and its proposed actions, in memory
-packages/schema         Org and Action
+packages/storage        the organisation and proposed actions in memory, pilot requests in Postgres
+packages/schema         Org, Action, Result and the env loader
 packages/scanner        the network-wide census behind REPORT.md (run with pnpm scan)
 apps/scan-cli           its command line
 ```
