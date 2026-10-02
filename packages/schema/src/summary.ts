@@ -17,8 +17,10 @@ export const ContractsSummary = z.object({
   total: count,
   families: count,
   archivedInstances: count,
+  archivedMeaningful: count.default(0),
   archivedByFamily: counts,
   expiring30d: count,
+  expiring30dMeaningful: count.default(0),
   expiring90d: count,
   liveIdle: count,
   scfFunded: z.object({
