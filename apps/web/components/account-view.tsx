@@ -56,13 +56,13 @@ export function AccountView({ account }: { account: AccountViewData }) {
       {account.balances.length > 0 && (
         <div className="space-y-1">
           <StatLabel>balances</StatLabel>
-          <ul className="divide-y divide-border rounded-md border border-border">
+          <ul className="divide-y divide-border">
             {account.balances.map((balance) => {
               const { code, issuer } = assetLabel(balance.asset);
               return (
                 <li
                   key={balance.asset}
-                  className="flex items-center justify-between gap-3 px-2 py-1 font-mono text-xs"
+                  className="flex items-center justify-between gap-3 py-1.5 font-mono text-xs"
                 >
                   <span className="flex min-w-0 items-center gap-1.5">
                     <span className="text-foreground">{code}</span>
