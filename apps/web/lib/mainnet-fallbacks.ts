@@ -5,7 +5,7 @@ export const MAINNET_FALLBACKS = {
   failedTxHash: 'e2173f4a7f63a3d57bbbf442e72511938aae136e802045d26e564418878c5662',
   // stellar.toml resolves, but TRANSFER_SERVER and TRANSFER_SERVER_SEP0024 point at a host that
   // does not resolve, so /info is unreadable.
-  failingAnchorDomain: 'mykobo.co',
+  anchorDomain: 'mykobo.co',
   // Holds over 20M USDC (Circle issuer) and XLM.
   usdcHolder: 'GAPV2C4BTHXPL2IVYDXJ5PUU7Q3LAXU7OAQDP7KVYHLCNM2JTAJNOQQI',
   // Holds only XLM, no USDC trustline.
