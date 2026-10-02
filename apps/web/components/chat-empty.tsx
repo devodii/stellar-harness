@@ -28,9 +28,9 @@ export function ChatEmpty({
           What is going wrong on {network}?
         </h1>
         <p className="max-w-xl text-sm text-muted-foreground">
-          An operator agent that reads Stellar {network}, explains failures, and proposes
-          policy-gated plans. Every network fact comes from a tool call. Nothing is signed or
-          broadcast.
+          An operator agent that reads Stellar {network}, explains failures, simulates fixes and
+          says who would have to act. Every network fact comes from a tool call. Nothing is signed
+          or broadcast.
         </p>
       </div>
       <div className="space-y-2">
