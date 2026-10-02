@@ -40,4 +40,5 @@ export * from './tools/simulate-restore';
 export * from './ports';
 export * from './tools/amount';
 export * from './tools/decoder-schemas';
+export * from './tools/reserve';
 export * from './tools/result-fee';
