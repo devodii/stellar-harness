@@ -6,4 +6,7 @@ export const SIMULATE_HINT =
 export const HANDOFF_HINT =
   'Who must act and what it would cost; the harness hands this over and does not execute it.';
 
-export const KIND_HINT: Partial<Record<PlanStepKind, string>> = { simulate: SIMULATE_HINT };
+export const KIND_HINT: Partial<Record<PlanStepKind, string>> = {
+  simulate: SIMULATE_HINT,
+  handoff: HANDOFF_HINT,
+};

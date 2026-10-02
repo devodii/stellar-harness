@@ -1,31 +1,24 @@
-import type { Plan } from '@harness/schema';
+import { ok, type Plan, ROADMAP_NOTE } from '@harness/schema';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import * as React from 'react';
-import { fn } from 'storybook/test';
-import type { PlanDecision } from '@/lib/plan-approval';
+import { expect, fn, userEvent, within } from 'storybook/test';
+import { HANDOFF_HINT, SIMULATE_HINT } from '@/lib/plan-copy';
+import { ConnectSheetProvider } from './connect-sheet';
 import { PlanView } from './plan-view';
+import { fakeContract } from './story-ids';
 
-const FAKE_CONTRACT = 'CFAKECONTRACTFORSTORYBOOK0000000000000000000000000000ABC';
+const CONTRACT = fakeContract('plan');
 
 const PLAN: Plan = {
   planId: 'plan-story-1',
   title: 'Extend instance TTL to 12 months',
-  subject: FAKE_CONTRACT,
-  requiresApproval: true,
-  estimatedCostXlm: 12.5,
-  boundary: {
-    rule: 'spend.xlm <= 5',
-    reason: 'Estimated rent exceeds the spend cap.',
-    requested: '12.5 XLM',
-    threshold: '5 XLM',
-  },
+  subject: CONTRACT,
   steps: [
     {
       id: 's1',
       kind: 'read',
       description: 'Read current instance and code TTL',
       tool: 'getContractTtl',
-      args: { contractId: FAKE_CONTRACT },
+      args: { contractId: CONTRACT },
       status: 'done',
     },
     {
@@ -33,57 +26,107 @@ const PLAN: Plan = {
       kind: 'simulate',
       description: 'Simulate ExtendFootprintTTL for 365 days',
       tool: 'simulateExtendTtl',
-      args: { contractId: FAKE_CONTRACT, days: 365 },
-      status: 'pending',
+      args: { contractId: CONTRACT, days: 365 },
+      status: 'done',
     },
     {
       id: 's3',
-      kind: 'build',
-      description: 'Build the unsigned transaction',
-      tool: 'simulateExtendTtl',
-      args: { contractId: FAKE_CONTRACT, days: 365 },
+      kind: 'handoff',
+      description: 'Hand the extension to whoever pays for it',
+      tool: 'handoff',
+      args: {},
       status: 'pending',
     },
-    {
-      id: 's4',
-      kind: 'submit',
-      description: 'Submit after approval',
-      tool: 'submit',
-      args: {},
-      status: 'blocked',
-    },
   ],
+  handoff: {
+    summary:
+      'Anyone can pay to extend the instance and wasm TTL by 365 days; the contract admin decides whether it is worth keeping.',
+    requiredAuthority: 'any_payer',
+    estimatedCostXlm: 1.8350421,
+    roadmapNote: ROADMAP_NOTE,
+  },
 };
 
 const meta: Meta<typeof PlanView> = {
   component: PlanView,
   title: 'components/PlanView',
-  args: { plan: PLAN, onDecide: fn() },
+  args: { plan: PLAN },
+  decorators: [
+    (Story) => (
+      <ConnectSheetProvider requestPilot={fn(async () => ok({ count: 9 }))}>
+        <div className="max-w-2xl">
+          <Story />
+        </div>
+      </ConnectSheetProvider>
+    ),
+  ],
 };
 export default meta;
 
 type Story = StoryObj<typeof PlanView>;
 
-export const AwaitingApproval: Story = {};
+export const ReadSimulateHandoff: Story = {};
 
-export const Approved: Story = { args: { decision: 'approve' } };
-
-export const Declined: Story = { args: { decision: 'decline' } };
-
-export const NoApprovalNeeded: Story = {
+export const SimulationFailed: Story = {
   args: {
     plan: {
       ...PLAN,
-      requiresApproval: false,
-      boundary: undefined,
-      steps: PLAN.steps.slice(0, 2),
+      steps: PLAN.steps.map((step) => (step.id === 's2' ? { ...step, status: 'error' } : step)),
+      handoff: { ...PLAN.handoff, estimatedCostXlm: undefined },
     },
   },
 };
 
-function InteractiveDemo() {
-  const [decision, setDecision] = React.useState<PlanDecision>();
-  return <PlanView plan={PLAN} decision={decision} onDecide={(_id, next) => setDecision(next)} />;
-}
+export const AnchorOperator: Story = {
+  args: {
+    plan: {
+      planId: 'plan-story-anchor',
+      title: 'Fix the SEP-10 signing key',
+      subject: 'anchor.example.org',
+      steps: [
+        {
+          id: 's1',
+          kind: 'read',
+          description: 'Probe stellar.toml and the SEP-10 challenge',
+          tool: 'probeAnchor',
+          args: { domain: 'anchor.example.org' },
+          status: 'done',
+        },
+        {
+          id: 's2',
+          kind: 'handoff',
+          description: 'Hand the fix to the anchor operator',
+          tool: 'handoff',
+          args: {},
+          status: 'pending',
+        },
+      ],
+      handoff: {
+        summary: 'The anchor operator must publish a SIGNING_KEY that signs the SEP-10 challenge.',
+        requiredAuthority: 'anchor_operator',
+        roadmapNote: ROADMAP_NOTE,
+      },
+    },
+  },
+};
 
-export const Interactive: Story = { render: () => <InteractiveDemo /> };
+export const Collapsed: Story = { args: { defaultOpen: false } };
+
+export const ExplainsSteps: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(document.body);
+    await expect(canvas.getByText('[read]')).toBeVisible();
+    await expect(canvas.getByText('[handoff]')).toBeVisible();
+    await expect(canvas.getByText(ROADMAP_NOTE)).toBeVisible();
+    await expect(canvas.getByText(/est\. 1\.8350421 XLM/)).toBeVisible();
+    await expect(canvas.queryByRole('button', { name: /approve|decline/i })).toBeNull();
+    await userEvent.hover(canvas.getByText('[simulate]'));
+    await expect(await page.findByRole('tooltip')).toHaveTextContent(SIMULATE_HINT);
+    await userEvent.unhover(canvas.getByText('[simulate]'));
+    await userEvent.hover(canvas.getByRole('region', { name: 'handoff' }));
+    await expect(await page.findByRole('tooltip', {}, { timeout: 2000 })).toHaveTextContent(
+      HANDOFF_HINT,
+    );
+  },
+};
