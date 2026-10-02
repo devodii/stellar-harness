@@ -15,7 +15,16 @@ export const FindingContext = z.object({
 });
 export type FindingContext = z.infer<typeof FindingContext>;
 
-export const ChatContext = z.discriminatedUnion('kind', [FindingContext]);
+export const REPLY_EXCERPT_LENGTH = 180;
+
+export const ReplyContext = z.object({
+  kind: z.literal('reply'),
+  messageId: z.string(),
+  excerpt: z.string().max(REPLY_EXCERPT_LENGTH + 1),
+});
+export type ReplyContext = z.infer<typeof ReplyContext>;
+
+export const ChatContext = z.discriminatedUnion('kind', [FindingContext, ReplyContext]);
 export type ChatContext = z.infer<typeof ChatContext>;
 
 const trimEvidence = (evidence: Record<string, unknown>): Record<string, unknown> => {
@@ -44,17 +53,39 @@ export const contextFromFinding = (finding: Finding): FindingContext => ({
   evidence: trimEvidence(finding.evidence),
 });
 
-export const contextKey = (context: ChatContext): string => `${context.kind}:${context.findingId}`;
+export const contextKey = (context: ChatContext): string =>
+  context.kind === 'finding' ? `finding:${context.findingId}` : `reply:${context.messageId}`;
+
+const plainText = (markdown: string): string =>
+  markdown
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/[`*_#>|[\]]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+export const excerptOf = (text: string, length = REPLY_EXCERPT_LENGTH): string => {
+  const plain = plainText(text);
+  return plain.length > length ? `${plain.slice(0, length).trimEnd()}…` : plain;
+};
+
+export const replyContext = (messageId: string, text: string): ReplyContext => ({
+  kind: 'reply',
+  messageId,
+  excerpt: excerptOf(text),
+});
 
 export const DEFAULT_CONTEXT_PROMPT: Record<ChatContext['kind'], string> = {
   finding: 'Plan a fix for this finding.',
+  reply: 'Tell me more about this.',
 };
 
 export const contextToModelText = (context: ChatContext): string =>
-  [
-    `Attached ${context.kind} (use findingId ${context.findingId} with planFix or queryFindings):`,
-    JSON.stringify(context),
-  ].join('\n');
+  context.kind === 'finding'
+    ? [
+        `Attached finding (use findingId ${context.findingId} with planFix or queryFindings):`,
+        JSON.stringify(context),
+      ].join('\n')
+    : `Replying to this part of your earlier answer:\n> ${context.excerpt}`;
 
 export const addContext = (contexts: ChatContext[], next: ChatContext): ChatContext[] =>
   contexts.some((context) => contextKey(context) === contextKey(next))
