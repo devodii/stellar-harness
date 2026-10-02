@@ -2,6 +2,7 @@
 
 import { useChat } from '@ai-sdk/react';
 import type { Finding, Network } from '@harness/schema';
+import type { FileUIPart } from 'ai';
 import * as React from 'react';
 import {
   Conversation,
@@ -23,6 +24,7 @@ import {
   replyContext,
 } from '@/lib/chat-context';
 import { chatErrorMessage } from '@/lib/chat-errors';
+import { IMAGE_ONLY_PROMPT, prepareImages } from '@/lib/images';
 import { approvalText, type PlanDecision, planApproval } from '@/lib/plan-approval';
 import type { ChatSuggestion } from '@/lib/suggestions';
 
@@ -65,19 +67,23 @@ export function ChatView({
   contextsRef.current = contexts;
 
   const sendPrompt = React.useCallback(
-    (text: string) => {
+    async (text: string, files: FileUIPart[] = []) => {
       clearError();
       const attached = contextsRef.current;
-      if (attached.length === 0) {
-        void sendMessage({ text });
-        return;
-      }
-      setContexts([]);
+      const images = await prepareImages(files);
+      if (attached.length > 0) setContexts([]);
+      const fallback =
+        attached[0] !== undefined
+          ? DEFAULT_CONTEXT_PROMPT[attached[0].kind]
+          : images.length > 0
+            ? IMAGE_ONLY_PROMPT
+            : '';
       void sendMessage({
         role: 'user',
         parts: [
           ...attached.map((data) => ({ type: 'data-context' as const, data })),
-          { type: 'text', text: text || DEFAULT_CONTEXT_PROMPT[attached[0]?.kind ?? 'finding'] },
+          ...images,
+          { type: 'text', text: text || fallback },
         ],
       });
     },
@@ -88,7 +94,7 @@ export function ChatView({
   React.useEffect(() => {
     if (!initialPrompt || sentInitial.current || initialMessages.length > 0) return;
     sentInitial.current = true;
-    sendPrompt(initialPrompt);
+    void sendPrompt(initialPrompt);
   }, [initialPrompt, initialMessages.length, sendPrompt]);
 
   const actions = React.useMemo<ChatActions>(
