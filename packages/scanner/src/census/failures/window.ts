@@ -1,4 +1,5 @@
-import { appError, err, ok, type Result, type Snapshot } from '@harness/schema';
+import { appError, err, ok, type Result } from '@harness/schema';
+import type { Snapshot } from '../../schema';
 import type { RpcPort } from './ports';
 
 const UNIT_SECONDS = { s: 1, m: 60, h: 3600, d: 86_400 } as const;

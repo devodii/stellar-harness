@@ -1,4 +1,4 @@
-import type { Snapshot } from '@harness/schema';
+import type { Snapshot } from '../../../schema';
 import type { FailuresCensusDeps } from '../census';
 import type { Decoders } from '../extract';
 import type { FindingDraft, HorizonPort, RpcPort, RpcTransaction } from '../ports';

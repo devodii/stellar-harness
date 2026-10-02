@@ -1,11 +1,5 @@
-import {
-  appError,
-  err,
-  type FailuresSummary,
-  ok,
-  type Result,
-  type Snapshot,
-} from '@harness/schema';
+import { appError, err, ok, type Result } from '@harness/schema';
+import type { FailuresSummary, Snapshot } from '../../schema';
 import { type FailureAggregate, FailureAggregator } from './aggregate';
 import { DEFAULT_CHUNK_LEDGERS, type LedgerChunk, planChunks, scanChunk } from './chunks';
 import { type ClassificationGap, classifyAccounts } from './classify';

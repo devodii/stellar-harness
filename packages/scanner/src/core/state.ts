@@ -1,7 +1,7 @@
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import { Snapshot } from '@harness/schema';
 import { z } from 'zod';
+import { Snapshot } from '../schema';
 
 export const statePath = (dataDir: string, name: string): string =>
   join(dataDir, 'state', `${name}.json`);

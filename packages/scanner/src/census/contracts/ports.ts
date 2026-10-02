@@ -1,4 +1,4 @@
-import type { FindingType, Severity, SubjectKind } from '@harness/schema';
+import type { FindingType, Severity, SubjectKind } from '../../schema';
 
 export type {
   Fetcher,

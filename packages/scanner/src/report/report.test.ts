@@ -1,5 +1,5 @@
-import { emptySummary } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
+import { emptySummary } from '../schema';
 import { formatPercent, renderReport, reportTitle, table } from './index';
 
 const summary = emptySummary({

@@ -1,5 +1,6 @@
-import { ANCHOR_STAGES, type AnchorStage, AnchorsSummary } from '@harness/schema';
+import { ANCHOR_STAGES, type AnchorStage } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
+import { AnchorsSummary } from '../../schema';
 import { mergeCandidates } from './domains';
 import { computeAnchorsSummary, firstFailedStage, latestStages } from './funnel';
 import type { AnchorProbeRow } from './schemas';

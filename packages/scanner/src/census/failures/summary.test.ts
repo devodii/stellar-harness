@@ -1,5 +1,5 @@
-import { FailuresSummary } from '@harness/schema';
 import { describe, expect, it } from 'vitest';
+import { FailuresSummary } from '../../schema';
 import { censusSnapshot } from './__tests__/census-harness';
 import { failedRow } from './__tests__/rows';
 import { failuresSummary } from './summary';

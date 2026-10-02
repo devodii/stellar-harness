@@ -1,4 +1,4 @@
-import type { Summary } from '@harness/schema';
+import type { Summary } from '../schema';
 import type { CensusRun, ExportPreview, MethodEntry, ReportInputs } from './inputs';
 import {
   formatInt,

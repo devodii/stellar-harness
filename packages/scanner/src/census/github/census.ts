@@ -1,4 +1,4 @@
-import type { Finding, SubjectKind } from '@harness/schema';
+import type { Finding, SubjectKind } from '../../schema';
 import {
   ISSUE_QUERIES,
   type IssueCategory,

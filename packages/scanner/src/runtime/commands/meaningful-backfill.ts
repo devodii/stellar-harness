@@ -1,6 +1,6 @@
-import type { ContractsSummary } from '@harness/schema';
 import { archivedMeaningfulExportRows } from '../../census/contracts/export';
 import { meaningfulCounts } from '../../census/contracts/summary';
+import type { ContractsSummary } from '../../schema';
 import type { ScanContext } from '../context';
 import { readContractRows, writeArchivedMeaningfulExport } from './contract-rows';
 

@@ -1,4 +1,4 @@
-import { ContractsSummary, MEANINGFUL_INVOCATIONS, type ScfProject } from '@harness/schema';
+import { ContractsSummary, MEANINGFUL_INVOCATIONS, type ScfProject } from '../../schema';
 import { isLiveIdle } from './fingerprints';
 import type { ContractRow } from './schemas';
 

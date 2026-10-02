@@ -1,4 +1,4 @@
-import { FailuresSummary, type Snapshot } from '@harness/schema';
+import { FailuresSummary, type Snapshot } from '../../schema';
 import { type FailureAggregate, FailureAggregator } from './aggregate';
 import type { FindingDraft } from './ports';
 import type { FailedTx, LedgerTotal } from './rows';

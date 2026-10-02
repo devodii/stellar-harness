@@ -1,13 +1,6 @@
 import { createHash } from 'node:crypto';
-import {
-  Finding,
-  type FindingType,
-  type Severity,
-  type Snapshot,
-  SUGGESTED_ACTION,
-  type SubjectKind,
-} from '@harness/schema';
 import { JsonFileStorage, type Storage } from '@harness/storage';
+import { Finding, type FindingType, type Severity, type Snapshot, SUGGESTED_ACTION, type SubjectKind } from '../schema';
 
 export const findingId = (type: FindingType, subject: string, snapshotLedger: number): string =>
   createHash('sha256').update(`${type}:${subject}:${snapshotLedger}`).digest('hex');

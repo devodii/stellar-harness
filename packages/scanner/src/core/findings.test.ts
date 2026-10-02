@@ -1,9 +1,9 @@
 import { mkdtemp, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { type Finding, SUGGESTED_ACTION } from '@harness/schema';
 import { MemoryStorage } from '@harness/storage';
 import { describe, expect, it } from 'vitest';
+import { type Finding, SUGGESTED_ACTION } from '../schema';
 import { createFindingSink, findingId, makeFinding } from './findings';
 
 const snapshot = { snapshotLedger: 64722901 };

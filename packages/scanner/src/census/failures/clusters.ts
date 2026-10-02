@@ -1,4 +1,4 @@
-import type { FindingType, Severity } from '@harness/schema';
+import type { FindingType, Severity } from '../../schema';
 import { failureCodes } from './aggregate';
 import type { FailedTx } from './rows';
 

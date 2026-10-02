@@ -1,5 +1,5 @@
-import type { AnchorsSummary, Severity } from '@harness/schema';
 import { tomlUrlFor } from '@harness/stellar-tools/anchors';
+import type { AnchorsSummary, Severity } from '../../schema';
 import type { AnchorDomain } from './schemas';
 
 export const ANCHORS_FAILING_CSV = 'anchors_failing.csv';
