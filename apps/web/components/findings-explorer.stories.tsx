@@ -1,5 +1,6 @@
 import { type Finding, SUGGESTED_ACTION } from '@harness/schema';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { findingsQueryKey } from '@/hooks/use-findings';
 import { FINDINGS_PAGE_SIZE, type FindingsResponse } from '@/lib/api-schemas';
 import { FindingsExplorer } from './findings-explorer';
 import { QueryStory } from './query-story';
@@ -29,7 +30,7 @@ const PAGE: FindingsResponse = {
   offset: 0,
 };
 
-const KEY = ['findings', { type: [], severity: [], tag: '' }, 0, FINDINGS_PAGE_SIZE];
+const KEY = findingsQueryKey('mainnet', { type: [], severity: [], tag: '' }, 0, FINDINGS_PAGE_SIZE);
 
 const meta: Meta<{ page: FindingsResponse }> = {
   title: 'pages/FindingsExplorer',
