@@ -1,3 +1,4 @@
+import { DEFAULT_NETWORK, NETWORK_PROFILES } from '@harness/schema';
 import type {
   AnchorSepResult,
   AnchorTestSep,
@@ -37,8 +38,6 @@ export const anchorTestsLib: AnchorTestsLib = {
       Symbol.asyncIterator
     ]() as unknown as AsyncIterator<LibRun>,
 };
-
-const PUBLIC_PASSPHRASE = 'Public Global Stellar Network ; September 2015';
 
 const key = (sep: number, group: string, assertion: string): string =>
   `${sep}|${group}|${assertion}`;
@@ -147,10 +146,14 @@ export const isSafeClosure = (
 
 const DUMMY_CUSTOMERS = { c1: {}, c2: {}, c3: {}, c4: {} };
 
-export const anchorTestsConfig = (domain: string, seps: number[]): LibConfig => ({
+export const anchorTestsConfig = (
+  domain: string,
+  seps: number[],
+  networkPassphrase: string = NETWORK_PROFILES[DEFAULT_NETWORK].passphrase,
+): LibConfig => ({
   homeDomain: `https://${domain}`,
   seps,
-  networkPassphrase: PUBLIC_PASSPHRASE,
+  networkPassphrase,
   sepConfig: {
     ...(seps.includes(12)
       ? {
@@ -195,12 +198,16 @@ const record = (perSep: Record<string, AnchorSepResult>, run: LibRun) => {
 const errorMessage = (error: unknown): string =>
   error instanceof Error ? `${error.name}: ${error.message}` : String(error);
 
-export type RunSafeOptions = { lib?: AnchorTestsLib; timeoutMs?: number };
+export type RunSafeOptions = {
+  lib?: AnchorTestsLib;
+  timeoutMs?: number;
+  networkPassphrase?: string;
+};
 
 export const runSafeAnchorTests = async (
   domain: string,
   requestedSeps: AnchorTestSep[],
-  { lib = anchorTestsLib, timeoutMs = 120_000 }: RunSafeOptions = {},
+  { lib = anchorTestsLib, timeoutMs = 120_000, networkPassphrase }: RunSafeOptions = {},
 ): Promise<AnchorTestsReport> => {
   const excludedSeps = requestedSeps.flatMap((sep) => {
     const reason = EXCLUDED_SEPS[sep];
@@ -220,7 +227,7 @@ export const runSafeAnchorTests = async (
   });
   if (ranSeps.length === 0) return report(null);
 
-  const config = anchorTestsConfig(domain, ranSeps);
+  const config = anchorTestsConfig(domain, ranSeps, networkPassphrase);
   const deadline = Date.now() + timeoutMs;
   let iterator: AsyncIterator<LibRun> | null = null;
   try {
