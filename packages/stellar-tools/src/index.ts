@@ -22,28 +22,34 @@ export * from './explain/explain';
 export * from './plan/plan-fix';
 export * from './plan/policy';
 export * from './plan/step';
-export type { Fetcher, HorizonPort, RpcPort, SimulateTransactionResult } from './ports';
+export type {
+  DecodeEnvelopeSummary,
+  DecodeResultCodes,
+  Fetcher,
+  HorizonFirstOperation,
+  HorizonPort,
+  RpcPort,
+  SimulateTransactionResult,
+} from './ports';
 export * from './tool';
+export * from './tools/amount';
+export * from './tools/assets';
+export { buildPaymentPreflight } from './tools/build-payment-preflight';
 export * from './tools/context';
 export * from './tools/define';
 export * from './tools/descriptions';
 export * from './tools/explain-failure';
+export { getAccount } from './tools/get-account';
 export * from './tools/get-contract-ttl';
 export * from './tools/get-summary';
+export { getTransaction } from './tools/get-transaction';
 export * from './tools/names';
+export type * from './tools/network-context';
 export * from './tools/plan-fix';
 export * from './tools/query-findings';
+export * from './tools/reserve';
+export * from './tools/result-fee';
 export * from './tools/schemas';
 export * from './tools/search-ecosystem';
 export * from './tools/simulate-extend-ttl';
 export * from './tools/simulate-restore';
-export * from './ports';
-export * from './tools/amount';
-export * from './tools/assets';
-export { buildPaymentPreflight } from './tools/build-payment-preflight';
-export * from './tools/decoder-schemas';
-export { getAccount } from './tools/get-account';
-export { getTransaction } from './tools/get-transaction';
-export type * from './tools/network-context';
-export * from './tools/reserve';
-export * from './tools/result-fee';
