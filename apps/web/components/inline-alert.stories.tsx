@@ -22,7 +22,7 @@ export const Destructive: Story = {
   args: {
     tone: 'destructive',
     title: 'Chat unavailable',
-    children: 'ANTHROPIC_API_KEY is not set.',
+    children: 'OPENAI_API_KEY is not set.',
   },
 };
 
