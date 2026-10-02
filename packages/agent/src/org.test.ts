@@ -1,7 +1,7 @@
 import type { Org } from '@harness/schema';
 import { MemoryStorage } from '@harness/storage';
 import { describe, expect, it } from 'vitest';
-import { isWithinPolicy, proposeAction } from './propose-action';
+import { isWithinPolicy, proposeAction } from './org';
 
 const ESCROW = 'CADKCKAZEOUXFS46JTA73DFGCWUGTZDKU5UTUAEA6OAZB7RV5CEHS47R';
 
@@ -43,6 +43,16 @@ describe('proposeAction', () => {
     const action = await proposeAction(storage, { ...extend, estimatedCostXlm: 27.3 });
     expect(action).toMatchObject({ status: 'proposed', withinPolicy: false, subject: ESCROW });
     expect(await storage.listActions()).toEqual([action]);
+  });
+
+  it('resolves a label to the subject id', async () => {
+    const action = await proposeAction(new MemoryStorage(org), { ...extend, subject: 'escrow' });
+    expect(action.subject).toBe(ESCROW);
+  });
+
+  it('resolves a label to the subject id', async () => {
+    const action = await proposeAction(new MemoryStorage(org), { ...extend, subject: 'escrow' });
+    expect(action.subject).toBe(ESCROW);
   });
 
   it('rejects a subject outside the organisation', async () => {
