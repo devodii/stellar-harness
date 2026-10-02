@@ -1,0 +1,26 @@
+{
+  "id": "fa122aa80b1379b51c1ba23a6d965ff1c326b61f0d9df032090b2c119a90377f",
+  "paging_token": "277973775205744640",
+  "successful": false,
+  "hash": "fa122aa80b1379b51c1ba23a6d965ff1c326b61f0d9df032090b2c119a90377f",
+  "ledger": 64720813,
+  "created_at": "2026-10-01T21:24:07Z",
+  "source_account": "GB7IYR44HFYQDZMCEJ2N6W64CJAIPJE4ZW5Z5JMFEFWUHSFEBRXB6KMQ",
+  "source_account_sequence": "195840793481715389",
+  "fee_account": "GB7IYR44HFYQDZMCEJ2N6W64CJAIPJE4ZW5Z5JMFEFWUHSFEBRXB6KMQ",
+  "fee_charged": "100",
+  "max_fee": "100",
+  "operation_count": 1,
+  "envelope_xdr": "AAAAAgAAAAB+jEecOXEB5YIidN9b3BJAh6SczbuepYUhbUPIpAxuHwAAAGQCt8QqAAIevQAAAAEAAAAAAAAAAAAAAABqvs+SAAAAAAAAAAEAAAAAAAAAAQAAAAAjoSJrbk1TyV7OysdzhxGubLcgmkjN5rX1/9KYvkZ19AAAAAAAAAAAx4Ow/QAAAAAAAAABpAxuHwAAAED7PEG55hxRYV6awSAme9VBrR7gZqyDkT6mqqfDwuy6jr7kqRMjG7yliiw4XYLnosdn1sE+oXcb9V6dUc/TjvAH",
+  "result_xdr": "AAAAAAAAAGT/////AAAAAQAAAAAAAAAB/////gAAAAA=",
+  "memo_type": "none",
+  "signatures": [
+    "+zxBueYcUWFemsEgJnvVQa0e4Gasg5E+pqqnw8Lsuo6+5KkTIxu8pYosOF2C56LHZ9bBPqF3G/VenVHP047wBw=="
+  ],
+  "preconditions": {
+    "timebounds": {
+      "min_time": "0",
+      "max_time": "1790889874"
+    }
+  }
+}
