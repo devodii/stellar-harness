@@ -1,6 +1,4 @@
 import type { Org } from '@harness/schema';
-import * as React from 'react';
-import { ChatHistory } from '@/components/chat-history';
 import { Hint } from '@/components/hint';
 import { PilotSheet } from '@/components/pilot-sheet';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -27,9 +25,6 @@ export function Header({ org }: { org: Org }) {
             Policy
           </button>
         </Hint>
-        <React.Suspense>
-          <ChatHistory />
-        </React.Suspense>
         <PilotSheet />
         <ThemeToggle />
       </div>
