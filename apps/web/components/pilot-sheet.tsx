@@ -40,7 +40,7 @@ export function PilotForm({ requestPilot }: { requestPilot: RequestPilot }) {
         placeholder="ops@example.org"
         mono={false}
       />
-      <Button type="submit" size="sm">
+      <Button type="submit" size="sm" isLoading={form.formState.isSubmitting}>
         request a pilot
       </Button>
     </Form>
