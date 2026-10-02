@@ -55,6 +55,9 @@ importers:
       '@harness/schema':
         specifier: workspace:*
         version: link:../../packages/schema
+      '@harness/stellar-tools':
+        specifier: workspace:*
+        version: link:../../packages/stellar-tools
       '@harness/storage':
         specifier: workspace:*
         version: link:../../packages/storage
