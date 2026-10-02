@@ -48,6 +48,7 @@ export const LiveResponse = z.object({
     preventableShare: z.number().min(0).max(1).nullable(),
   }),
   archivedContracts: z.number().int().nonnegative().nullable(),
+  archivedMeaningful: z.number().int().nonnegative().nullable(),
   anchorsFailing: z.number().int().nonnegative().nullable(),
   scanned: z.boolean(),
   horizonOk: z.boolean(),
