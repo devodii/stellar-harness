@@ -45,7 +45,7 @@ export const publishReportFiles = async (
 
 export const listReportFiles = async (sql: Sql): Promise<ReportFileInfo[]> => {
   const rows = await sql<Omit<ReportFileRow, 'body'>[]>`
-    select name, sha256, row_count, published_at from report_files order by name
+    select name, sha256, row_count, published_at from report_files order by name collate "C"
   `;
   return rows.map(toInfo);
 };
@@ -88,5 +88,5 @@ export const readReportDir = async (dir: string): Promise<Omit<ReportFile, 'publ
   const summary = toReportFile('summary.json', await readFile(join(dir, 'summary.json'), 'utf8'));
   const csvs = await readDirFiles(join(dir, 'exports'), '.csv');
   const runs = await readDirFiles(join(dir, 'derived', 'runs'), '.json', (name) => `run_${name}`);
-  return [summary, ...csvs, ...runs].sort((a, b) => a.name.localeCompare(b.name));
+  return [summary, ...csvs, ...runs].sort((a, b) => (a.name < b.name ? -1 : 1));
 };
