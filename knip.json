@@ -3,7 +3,12 @@
   "ignoreWorkspaces": ["packages/scanner", "apps/scan-cli"],
   "workspaces": {
     "apps/web": {
-      "ignore": ["components/ui/**", "components/ai-elements/**", "lib/api-handler.ts"]
+      "ignore": [
+        "components/ui/**",
+        "components/ai-elements/**",
+        "lib/api-handler.ts",
+        "lib/mixin.ts"
+      ]
     }
   },
   "ignore": [".git/**"]
