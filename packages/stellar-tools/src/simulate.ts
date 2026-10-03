@@ -21,14 +21,18 @@ export type Simulation = {
 
 type FootprintAction = { kind: 'extend'; days: number } | { kind: 'restore' };
 
+export const MAX_EXTEND_LEDGERS = 3_110_399;
+export const MAX_EXTEND_DAYS = 180;
+
 export const ledgersForDays = (days: number): number =>
-  Math.round((days * 86_400) / SECONDS_PER_LEDGER);
+  Math.min(Math.round((days * 86_400) / SECONDS_PER_LEDGER), MAX_EXTEND_LEDGERS);
 
 const describe = (action: FootprintAction, keys: number): string => {
   const entries = keys > 1 ? 'the contract instance and its wasm code' : 'the contract instance';
-  return action.kind === 'extend'
-    ? `Extend the TTL of ${entries} to ${action.days} days from now (ExtendFootprintTTL)`
-    : `Restore ${entries} from the archive (RestoreFootprint)`;
+  if (action.kind === 'restore') return `Restore ${entries} from the archive (RestoreFootprint)`;
+  const days = Math.min(action.days, MAX_EXTEND_DAYS);
+  const limit = action.days > MAX_EXTEND_DAYS ? ', the network maximum' : '';
+  return `Extend the TTL of ${entries} to ${days} days from now${limit} (ExtendFootprintTTL)`;
 };
 
 const simulateFootprint = async (

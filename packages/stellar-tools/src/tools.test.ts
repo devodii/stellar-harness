@@ -5,7 +5,7 @@ import { probeAnchor } from './anchor';
 import type { Clients, HorizonAccount } from './clients';
 import { getContractTtl, ttlOf } from './contract-ttl';
 import { buildPaymentPreflight, checkPayment } from './preflight';
-import { simulateExtendTtl, simulateRestore } from './simulate';
+import { ledgersForDays, MAX_EXTEND_LEDGERS, simulateExtendTtl, simulateRestore } from './simulate';
 
 const TREASURY = Keypair.random().publicKey();
 const DISTRIBUTION = Keypair.random().publicKey();
@@ -118,7 +118,14 @@ describe('simulateExtendTtl and simulateRestore', () => {
       estimatedCostXlm: 27.303228,
       footprintEntries: 2,
     });
-    expect(extend.operation).toContain('365 days from now (ExtendFootprintTTL)');
+    expect(extend.operation).toContain(
+      '180 days from now, the network maximum (ExtendFootprintTTL)',
+    );
+  });
+
+  it('caps an extension at the network maximum ttl', () => {
+    expect(ledgersForDays(30)).toBe(518_400);
+    expect(ledgersForDays(365)).toBe(MAX_EXTEND_LEDGERS);
   });
 
   it('describes a restore', async () => {
