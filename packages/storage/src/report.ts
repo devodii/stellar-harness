@@ -62,8 +62,18 @@ export const sha256Hex = (body: string): string =>
 
 export const countRows = (name: string, body: string): number => {
   if (!name.endsWith('.csv')) return 1;
-  const lines = body.split(/\r?\n/).filter((line) => line.trim() !== '');
-  return Math.max(lines.length - 1, 0);
+  let records = 0;
+  let quoted = false;
+  let filled = false;
+  for (const char of body) {
+    if (char === '"') quoted = !quoted;
+    if (char === '\n' && !quoted) {
+      if (filled) records++;
+      filled = false;
+    } else if (char !== '\r') filled = true;
+  }
+  if (filled) records++;
+  return Math.max(records - 1, 0);
 };
 
 const toReportFile = (name: string, body: string): Omit<ReportFile, 'publishedAt'> => ({
