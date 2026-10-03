@@ -73,14 +73,20 @@ const toReportFile = (name: string, body: string): Omit<ReportFile, 'publishedAt
   rowCount: countRows(name, body),
 });
 
+const readDirFiles = async (
+  dir: string,
+  extension: string,
+  rename: (name: string) => string = (name) => name,
+): Promise<Omit<ReportFile, 'publishedAt'>[]> => {
+  const names = (await readdir(dir).catch(() => [])).filter((name) => name.endsWith(extension));
+  return Promise.all(
+    names.map(async (name) => toReportFile(rename(name), await readFile(join(dir, name), 'utf8'))),
+  );
+};
+
 export const readReportDir = async (dir: string): Promise<Omit<ReportFile, 'publishedAt'>[]> => {
   const summary = toReportFile('summary.json', await readFile(join(dir, 'summary.json'), 'utf8'));
-  const exportsDir = join(dir, 'exports');
-  const csvNames = (await readdir(exportsDir).catch(() => [])).filter((name) =>
-    name.endsWith('.csv'),
-  );
-  const csvs = await Promise.all(
-    csvNames.map(async (name) => toReportFile(name, await readFile(join(exportsDir, name), 'utf8'))),
-  );
-  return [summary, ...csvs].sort((a, b) => a.name.localeCompare(b.name));
+  const csvs = await readDirFiles(join(dir, 'exports'), '.csv');
+  const runs = await readDirFiles(join(dir, 'derived', 'runs'), '.json', (name) => `run_${name}`);
+  return [summary, ...csvs, ...runs].sort((a, b) => a.name.localeCompare(b.name));
 };
