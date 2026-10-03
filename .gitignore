@@ -16,3 +16,4 @@ data-*/
 REPORT.*.md
 
 storybook-static
+.vercel
