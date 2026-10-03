@@ -4,8 +4,7 @@ import { ChatPage } from '@/components/chat-page';
 import { Header } from '@/components/header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { WatchPanel } from '@/components/watch-panel';
-import { DEMO_ORG } from '@/demo-org';
-import { readWatch } from '@/lib/harness';
+import { ORG, readWatch } from '@/lib/harness';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,9 +15,9 @@ export default async function Page() {
       className="h-svh min-h-0"
       style={{ '--sidebar-width': '280px' } as React.CSSProperties}
     >
-      <WatchPanel watch={watch} org={DEMO_ORG} />
+      <WatchPanel watch={watch} org={ORG} />
       <SidebarInset className="min-h-0 min-w-0">
-        <Header org={DEMO_ORG} />
+        <Header org={ORG} />
         <Suspense>
           <ChatPage />
         </Suspense>
