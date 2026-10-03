@@ -2,6 +2,7 @@
 
 import { useChat } from '@ai-sdk/react';
 import type { HarnessMessage } from '@harness/agent';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 import {
@@ -50,8 +51,14 @@ export function Chat({ id, initialMessages = [], onMessagesChange }: ChatProps) 
   return (
     <main className="flex min-h-0 flex-1 flex-col">
       {messages.length === 0 ? (
-        <div className="flex flex-1 items-center justify-center p-6">
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6">
           <ChatSuggestions onSelect={send} disabled={busy} className="w-full max-w-2xl" />
+          <Link
+            href="/about"
+            className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+          >
+            New here? Read what the harness does.
+          </Link>
         </div>
       ) : (
         <Conversation className="min-h-0">
