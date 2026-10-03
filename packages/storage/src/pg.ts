@@ -3,7 +3,8 @@ import { MIGRATIONS, type Migration } from './migrations';
 
 export type Sql = postgres.Sql;
 
-export const createSql = (url: string): Sql => postgres(url, { max: 5, idle_timeout: 20 });
+export const createSql = (url: string): Sql =>
+  postgres(url, { max: 5, idle_timeout: 20, onnotice: () => {} });
 
 export const migrate = async (
   sql: Sql,
