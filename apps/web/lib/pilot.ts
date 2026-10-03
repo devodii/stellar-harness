@@ -26,4 +26,5 @@ export const requestPilot: RequestPilot = async (body) => {
   }
 };
 
-export const waitingLabel = (count: number): string => `received · ${count} waiting`;
+export const waitingLabel = (count: number): string =>
+  `Request received, ${count} ${count === 1 ? 'organisation is' : 'organisations are'} waiting.`;
