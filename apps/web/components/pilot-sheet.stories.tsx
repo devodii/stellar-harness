@@ -27,7 +27,9 @@ export const Submits: Story = {
     await userEvent.type(canvas.getByLabelText('email'), 'ops@example.org');
     await userEvent.click(canvas.getByRole('button', { name: 'request a pilot' }));
     await expect(args.requestPilot).toHaveBeenCalledWith({ email: 'ops@example.org' });
-    await expect(await canvas.findByRole('status')).toHaveTextContent('received · 12 waiting');
+    await expect(await canvas.findByRole('status')).toHaveTextContent(
+      'Request received, 12 organisations are waiting.',
+    );
   },
 };
 
