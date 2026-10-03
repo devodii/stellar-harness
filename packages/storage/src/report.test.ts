@@ -24,6 +24,7 @@ describe('report files', () => {
     expect(countRows('a.csv', 'h1,h2\r\n1,2\r\n')).toBe(1);
     expect(countRows('a.csv', 'h1,h2\n')).toBe(0);
     expect(countRows('a.csv', '')).toBe(0);
+    expect(countRows('a.csv', 'h1,h2\n"line one\nline two",2\n3,4')).toBe(2);
     expect(countRows('summary.json', '{"a":1}')).toBe(1);
   });
 
