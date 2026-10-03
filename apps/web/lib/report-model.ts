@@ -1,5 +1,6 @@
 import type { ReportFileInfo } from '@harness/storage/report';
-import type { CsvRow } from './csv';
+
+export type CsvRow = Record<string, string>;
 
 export const CENSUSES = ['failures', 'contracts', 'anchors', 'rent', 'github'] as const;
 type Census = (typeof CENSUSES)[number];
