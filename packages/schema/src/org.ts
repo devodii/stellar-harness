@@ -34,6 +34,7 @@ export const Org = z.object({
   accounts: z.array(OrgAccount),
   contracts: z.array(OrgContract),
   anchorDomain: z.string().optional(),
+  anchorDomainNote: z.string().optional(),
   policy: Policy,
 });
 export type Org = z.infer<typeof Org>;

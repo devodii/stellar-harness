@@ -6,7 +6,7 @@ import { Suggestion } from '@/components/ai-elements/suggestion';
 export const SUGGESTIONS = [
   'Check all our contracts and tell me which need attention',
   'Can we pay 25 USDC from treasury to distribution right now?',
-  'What would it cost to keep Escrow alive for a year?',
+  'What would it cost to keep Escrow alive for six months?',
   'Is our anchor passing conformance?',
 ];
 
