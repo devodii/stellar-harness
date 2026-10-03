@@ -66,7 +66,7 @@ function Row({
 
 export interface WatchPanelProps {
   watch: Watch;
-  org: Pick<Org, 'name' | 'network' | 'anchorDomain'>;
+  org: Pick<Org, 'name' | 'network' | 'anchorDomain' | 'anchorDomainNote'>;
 }
 
 const TRIGGER_CLASS =
@@ -128,6 +128,9 @@ export function WatchPanel({ watch, org }: WatchPanelProps) {
                   <li>
                     <p className="text-sm">{org.anchorDomain}</p>
                     <p className="font-mono text-xs">{anchorStatus(watch.anchor)}</p>
+                    {org.anchorDomainNote && (
+                      <p className="pt-1 text-xs text-muted-foreground">{org.anchorDomainNote}</p>
+                    )}
                   </li>
                 </Section>
               )}
