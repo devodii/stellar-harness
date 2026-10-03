@@ -26,7 +26,7 @@ export function AccountResult({ account }: { account: AccountView }) {
               const [code = line.asset, issuer = ''] = line.asset.split(':');
               return {
                 label: code,
-                value: `${formatDecimal(Number(line.balance), 2)} · ${truncateMiddle(issuer)}`,
+                value: `${formatDecimal(Number(line.balance), 2)}, issued by ${truncateMiddle(issuer)}`,
               };
             })),
       ]}
@@ -59,7 +59,7 @@ export function PreflightResult({ preflight }: { preflight: Preflight }) {
     <ul className="space-y-1 font-mono text-xs">
       {preflight.blockers.map((blocker) => (
         <li key={blocker.code}>
-          {blocker.code} · {blocker.plain} · {blocker.fix}
+          {blocker.code}: {blocker.plain}. To fix it, {blocker.fix}.
         </li>
       ))}
     </ul>
@@ -72,7 +72,7 @@ export function AnchorProbeResult({ probe }: { probe: AnchorProbe }) {
       columns={1}
       items={probe.stages.map((stage) => ({
         label: stage.name,
-        value: stage.detail ? `${stage.status} · ${stage.detail}` : stage.status,
+        value: stage.detail ? `${stage.status}, ${stage.detail}` : stage.status,
       }))}
     />
   );
