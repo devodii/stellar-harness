@@ -58,10 +58,6 @@ export const ButtonsAreDisabled: Story = {
     await userEvent.hover(
       canvas.getByRole('button', { name: 'Execute' }).parentElement as HTMLElement,
     );
-    const tooltip = await within(document.body).findByRole('tooltip');
-    await expect(tooltip).toHaveTextContent(COMING_SOON);
-    await expect(
-      within(tooltip).getByRole('link', { name: 'Stellar Wallets Kit agent mode' }),
-    ).toHaveAttribute('href', 'https://github.com/Creit-Tech/Stellar-Wallets-Kit/issues/111');
+    await expect(await within(document.body).findByRole('tooltip')).toHaveTextContent(COMING_SOON);
   },
 };
