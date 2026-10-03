@@ -21,7 +21,8 @@ export const DEMO_ORG: Org = {
     { id: 'CBRSCFRPCMKZCUTJMOVU5XQWZVXXSM66MGB4CEFRT5KWDI4XLM44DK5M', label: 'Registry' },
   ],
   anchorDomain: 'clpx.finance',
-  anchorDomainNote: 'probe is read-only; this is a public mainnet anchor, not operated by the demo org',
+  anchorDomainNote:
+    'probe is read-only; this is a public mainnet anchor, not operated by the demo org',
   policy: {
     dailySpendXlm: 50,
     allowedOperations: ['extend_ttl', 'restore', 'sponsor_trustline', 'payment'],
