@@ -1,36 +1,42 @@
-import { ReportTable } from '@/components/report-table';
-import { formatDecimal } from '@/lib/format';
-import type { Report } from '@/lib/report-model';
-import { count, fileHref, Section, TextLink } from './section';
+'use client';
 
-export function DownloadsSection({ report }: { report: Report }) {
+import type { ReportView } from '@/lib/report-view';
+import { count, fileHref, ReportDataTable, Section, TextLink } from './section';
+
+export function DownloadsSection({ files }: { files: ReportView['files'] }) {
   return (
     <Section id="downloads" title="Downloads">
-      <ReportTable
-        rows={report.files}
-        rowKey={(row) => row.name}
+      <ReportDataTable
+        data={files}
+        getRowId={(row) => row.name}
         columns={[
           {
+            accessorKey: 'name',
             header: 'file',
-            cell: (row) => <TextLink href={fileHref(row.name)}>{row.name}</TextLink>,
+            cell: ({ row }) => (
+              <TextLink href={fileHref(row.original.name)}>{row.original.name}</TextLink>
+            ),
           },
-          { header: 'rows', align: 'right', cell: (row) => count(row.rowCount) },
           {
+            accessorKey: 'rowCount',
+            header: 'rows',
+            cell: ({ row }) => count(row.original.rowCount),
+          },
+          {
+            accessorKey: 'sha256',
             header: 'sha256',
-            wrap: true,
-            cell: (row) => <span className="break-all">{row.sha256}</span>,
+            enableSorting: false,
+            cell: ({ row }) => (
+              <span className="block min-w-64 break-all whitespace-normal">
+                {row.original.sha256}
+              </span>
+            ),
           },
         ]}
       />
       <p className="text-xs text-muted-foreground">
         Check a download with <span className="font-mono">shasum -a 256 &lt;file&gt;</span>.
-        Published {report.files[0]?.publishedAt.slice(0, 16).replace('T', ' ')} UTC
-        {report.files.length > 0 &&
-          `, ${formatDecimal(
-            report.files.reduce((sum, file) => sum + file.rowCount, 0),
-            0,
-          )} rows in total`}
-        .
+        {files[0] && ` Published ${files[0].publishedAt.slice(0, 16).replace('T', ' ')} UTC.`}
       </p>
     </Section>
   );
