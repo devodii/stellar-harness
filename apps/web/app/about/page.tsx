@@ -8,7 +8,10 @@ const AGENT_SIGNING_ISSUE = 'https://github.com/Creit-Tech/Stellar-Wallets-Kit/i
 export default function AboutPage() {
   return (
     <main className="mx-auto max-w-xl space-y-8 px-4 py-12 text-sm leading-relaxed">
-      <Link href="/" className="block font-mono text-xs text-muted-foreground hover:text-foreground">
+      <Link
+        href="/"
+        className="block font-mono text-xs text-muted-foreground hover:text-foreground"
+      >
         ← back to the harness
       </Link>
       <section className="space-y-2">
