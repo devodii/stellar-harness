@@ -1,4 +1,5 @@
 import type { Operation, Org } from '@harness/schema';
+import { GithubLogoIcon } from '@phosphor-icons/react/ssr';
 import Link from 'next/link';
 import { Hint } from '@/components/hint';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,8 @@ const OPERATION_LABELS: Record<Operation, string> = {
 
 const listOf = (items: string[]): string =>
   items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items.at(-1)}` : (items[0] ?? '');
+
+const REPO_URL = 'https://github.com/devodii/stellar-harness';
 
 export const policyLine = ({ policy }: Org): string =>
   `Spends up to ${policy.dailySpendXlm} XLM a day and needs approval above ${policy.approvalAboveXlm} XLM. It may ${listOf(policy.allowedOperations.map((operation) => OPERATION_LABELS[operation]))}.`;
@@ -41,6 +44,11 @@ export function Header({ org }: { org: Org }) {
           <Link href="/about">about</Link>
         </Button>
         <PilotSheet />
+        <Button asChild variant="ghost" size="icon">
+          <a href={REPO_URL} target="_blank" rel="noreferrer" aria-label="Source on GitHub">
+            <GithubLogoIcon className="size-4" />
+          </a>
+        </Button>
         <ThemeToggle />
       </div>
     </header>
