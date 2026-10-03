@@ -41,6 +41,9 @@ export function Header({ org }: { org: Org }) {
           </button>
         </Hint>
         <Button asChild variant="link" size="sm" className="px-0">
+          <Link href="/report">report</Link>
+        </Button>
+        <Button asChild variant="link" size="sm" className="px-0">
           <Link href="/about">about</Link>
         </Button>
         <PilotSheet />
