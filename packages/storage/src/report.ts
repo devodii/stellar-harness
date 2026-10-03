@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import Papa from 'papaparse';
 import type { Sql } from './pg';
 
 export type ReportFile = {
@@ -60,21 +61,10 @@ export const getReportFile = async (sql: Sql, name: string): Promise<ReportFile 
 export const sha256Hex = (body: string): string =>
   createHash('sha256').update(body, 'utf8').digest('hex');
 
-export const countRows = (name: string, body: string): number => {
-  if (!name.endsWith('.csv')) return 1;
-  let records = 0;
-  let quoted = false;
-  let filled = false;
-  for (const char of body) {
-    if (char === '"') quoted = !quoted;
-    if (char === '\n' && !quoted) {
-      if (filled) records++;
-      filled = false;
-    } else if (char !== '\r') filled = true;
-  }
-  if (filled) records++;
-  return Math.max(records - 1, 0);
-};
+export const countRows = (name: string, body: string): number =>
+  name.endsWith('.csv')
+    ? Math.max(Papa.parse(body, { skipEmptyLines: true }).data.length - 1, 0)
+    : 1;
 
 const toReportFile = (name: string, body: string): Omit<ReportFile, 'publishedAt'> => ({
   name,

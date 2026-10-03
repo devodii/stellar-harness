@@ -15,9 +15,11 @@
   },
   "dependencies": {
     "@harness/schema": "workspace:*",
+    "papaparse": "^5.7.0",
     "postgres": "3.4.9"
   },
   "devDependencies": {
+    "@types/papaparse": "^5.5.2",
     "vitest": "5.0.3"
   }
 }
