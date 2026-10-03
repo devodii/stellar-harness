@@ -57,7 +57,7 @@ describe('seedActions', () => {
     await seedActions(storage, reads());
     const actions = await storage.listActions();
     expect(actions.map((a) => [a.title, a.operation, a.withinPolicy]).sort()).toEqual([
-      ['Extend TTL on Escrow by 365 days', 'extend_ttl', false],
+      ['Extend TTL on Escrow by 180 days', 'extend_ttl', false],
       ['Sponsor USDC trustline for Distribution', 'sponsor_trustline', true],
     ]);
     expect(actions.find((a) => a.operation === 'extend_ttl')?.why).toBe(
