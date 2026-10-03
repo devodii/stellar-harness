@@ -4,15 +4,29 @@ Resume here: read this file and `DECISIONS.md` first.
 
 ## Status
 
-| Milestone              | State                                                                                                                        |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| M0 to M7 scanner       | Done. Five censuses, `REPORT.md`, 843 tests. Kept as-is for the public report; now self-contained in `packages/scanner`.     |
-| M9 delete              | Done. See below.                                                                                                             |
-| M10 organisation model | Done. `Org`, `Action`, in-memory storage, eight agent tools, demo organisation on testnet.                                   |
-| M11 one screen         | Done. Header, watched panel with live numbers, chat with four suggestions and four result renderers, action cards, pilot.    |
-| M12 wire and document  | Done. Three chips end in action cards against the live organisation; the anchor chip reports a passing anchor (see DEMO.md). |
+| Milestone              | State                                                                                                                                 |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| M0 to M7 scanner       | Done. Five censuses, `REPORT.md`, 843 tests. Kept as-is for the public report; now self-contained in `packages/scanner`.              |
+| M9 delete              | Done. See below.                                                                                                                      |
+| M10 organisation model | Done. `Org`, `Action`, in-memory storage, eight agent tools, demo organisation on testnet.                                            |
+| M11 one screen         | Done. Header, watched panel with live numbers, chat with four suggestions and four result renderers, action cards, pilot.             |
+| M12 wire and document  | Done. Three chips end in action cards against the live organisation; the anchor chip reports a passing anchor (see DEMO.md).          |
+| M13 demo polish        | Done. Seeded actions at boot, Registry extended and Escrow left to expire, clpx.finance as a real failing anchor, chip timings below. |
 
 `pnpm build`, `pnpm lint`, `pnpm test`, the Storybook tests, `pnpm knip` and `pnpm depcheck` pass.
+
+## Chip timings (M13)
+
+Production build, fresh browser per chip, 2026-10-03, `gpt-4.1`. Time from click to the action card, and to the end of the reply.
+
+| Chip                                                        | Action card        | Reply done |
+| ----------------------------------------------------------- | ------------------ | ---------- |
+| Check all our contracts and tell me which need attention    | 8.4 s              | 10.4 s     |
+| Can we pay 25 USDC from treasury to distribution right now? | 3.9 s              | 5.7 s      |
+| What would it cost to keep Escrow alive for six months?     | 7.9 s              | 9.4 s      |
+| Is our anchor passing conformance?                          | none, reports only | 6.6 s      |
+
+Every tool showed its running state and the composer was disabled while the agent worked.
 
 ## Deleted in patch 02
 
