@@ -21,10 +21,12 @@ const anchorStatus = (probe: AnchorProbe | null): string => {
   if (!probe) return 'unavailable';
   const failing = probe.stages.find((stage) => stage.status === 'fail');
   if (failing) return `${failing.name} failed`;
-  return probe.stages
+  const passing = probe.stages
     .filter((stage) => stage.status === 'ok' && stage.name !== 'signing key')
-    .map((stage) => `${stage.name} ok`)
-    .join(' · ');
+    .map((stage) => stage.name);
+  if (passing.length === 0) return 'nothing checked yet';
+  const last = passing.pop();
+  return `${passing.length > 0 ? `${passing.join(', ')} and ${last}` : last} all pass`;
 };
 
 function ContractStatus({ ttl }: Pick<WatchedContract, 'ttl'>) {
@@ -75,7 +77,7 @@ export function WatchPanel({ watch, org }: WatchPanelProps) {
     <Sidebar>
       <SidebarHeader className="gap-2 border-b px-4 py-3 text-foreground">
         <p className="text-xs text-muted-foreground md:hidden">
-          {org.name} · {org.network}
+          {org.name} on {org.network}
         </p>
         <NewChatButton />
       </SidebarHeader>
@@ -133,7 +135,7 @@ export function WatchPanel({ watch, org }: WatchPanelProps) {
           </AccordionItem>
           <AccordionItem value="actions">
             <AccordionTrigger className={TRIGGER_CLASS}>
-              {`proposed actions · ${watch.actions.length}`}
+              {`proposed actions (${watch.actions.length})`}
             </AccordionTrigger>
             <AccordionContent>
               {watch.actions.length === 0 ? (
