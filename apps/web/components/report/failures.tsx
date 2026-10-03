@@ -1,111 +1,68 @@
+'use client';
+
 import { ExplorerLink } from '@/components/explorer-link';
-import { ReportTable } from '@/components/report-table';
-import type { CsvRow } from '@/lib/csv';
-import type { Report } from '@/lib/report-model';
-import { fixFor } from '@/lib/report-fixes';
-import { count, percent, Section, TextLink } from './section';
+import type { ReportView } from '@/lib/report-view';
+import { count, ReportDataTable, Section, TextLink, Wrap } from './section';
 
-type AccountFailures = {
-  account: string;
-  failures: number;
-  code: string;
-  classification: string;
-  domain: string;
-};
-
-const codeOf = (clusterType: string): string => clusterType.replace(/_CLUSTER$/, '').toLowerCase();
-
-const classify = (tags: string[]): string => {
-  if (tags.includes('anchor_distribution')) return 'anchor distribution';
-  if (tags.includes('channel_pattern')) return 'channel pattern';
-  if (tags.includes('multisig')) return 'multisig';
-  return 'single account';
-};
-
-const topAccounts = (clusters: CsvRow[], limit = 25): AccountFailures[] => {
-  const byAccount = new Map<string, CsvRow[]>();
-  for (const row of clusters)
-    byAccount.set(row.account ?? '', [...(byAccount.get(row.account ?? '') ?? []), row]);
-  return [...byAccount.entries()]
-    .map(([account, rows]) => {
-      const dominant = rows.reduce((top, row) =>
-        Number(row.count) > Number(top.count) ? row : top,
-      );
-      const tags = rows.flatMap((row) => (row.tags ?? '').split(';'));
-      return {
-        account,
-        failures: rows.reduce((sum, row) => sum + Number(row.count), 0),
-        code: codeOf(dominant.type ?? ''),
-        classification: classify(tags),
-        domain: dominant.home_domain ?? '',
-      };
-    })
-    .sort((a, b) => b.failures - a.failures)
-    .slice(0, limit);
-};
-
-export function FailuresSection({ report }: { report: Report }) {
-  const { failures } = report.summary;
-  const byCode = [...report.csv['failed_tx_by_code.csv']].sort(
-    (a, b) => Number(b.count) - Number(a.count),
-  );
-  const params = report.runs.failures?.method.parameters ?? {};
+export function FailuresSection({ failures }: { failures: ReportView['failures'] }) {
   return (
     <Section id="failures" title="Failed transactions">
-      <ReportTable
-        rows={byCode}
-        rowKey={(row) => row.code ?? ''}
+      <ReportDataTable
+        data={failures.codes}
+        getRowId={(row) => row.code}
         columns={[
-          { header: 'code', cell: (row) => row.code },
-          { header: 'count', align: 'right', cell: (row) => count(Number(row.count)) },
+          { accessorKey: 'code', header: 'code' },
+          { accessorKey: 'count', header: 'count', cell: ({ row }) => count(row.original.count) },
+          { accessorKey: 'share', header: 'share', enableSorting: false },
+          { accessorKey: 'preventable', header: 'preventable' },
           {
-            header: 'share',
-            align: 'right',
-            cell: (row) => percent(Number(row.count), failures.txFailed),
+            accessorKey: 'fix',
+            header: 'fix',
+            enableSorting: false,
+            cell: ({ row }) => <Wrap>{row.original.fix}</Wrap>,
           },
-          { header: 'preventable', cell: (row) => row.preventable },
-          { header: 'fix', wrap: true, cell: (row) => fixFor(row.code ?? '') },
         ]}
       />
       <h3 className="pt-2 text-sm font-medium">Top 25 source accounts by preventable failures</h3>
-      <ReportTable
-        rows={topAccounts(report.csv['failure_clusters.csv'])}
-        rowKey={(row) => row.account}
+      <ReportDataTable
+        data={failures.accounts}
+        getRowId={(row) => row.account}
         columns={[
-          { header: 'account', cell: (row) => <ExplorerLink kind="account" id={row.account} /> },
-          { header: 'failures', align: 'right', cell: (row) => count(row.failures) },
-          { header: 'dominant code', cell: (row) => row.code },
           {
+            accessorKey: 'account',
+            header: 'account',
+            enableSorting: false,
+            cell: ({ row }) => <ExplorerLink kind="account" id={row.original.account} />,
+          },
+          {
+            accessorKey: 'failures',
+            header: 'failures',
+            cell: ({ row }) => count(row.original.failures),
+          },
+          { accessorKey: 'code', header: 'dominant code' },
+          {
+            accessorKey: 'classification',
             header: 'classification',
-            cell: (row) =>
-              row.classification === 'anchor distribution' && row.domain ? (
+            cell: ({ row }) =>
+              row.original.classification === 'anchor distribution' && row.original.domain ? (
                 <>
                   anchor distribution,{' '}
-                  <TextLink href={`https://${row.domain}/.well-known/stellar.toml`}>
-                    {row.domain}
+                  <TextLink href={`https://${row.original.domain}/.well-known/stellar.toml`}>
+                    {row.original.domain}
                   </TextLink>
                 </>
               ) : (
-                row.classification
+                row.original.classification
               ),
           },
         ]}
       />
       <p className="text-xs text-muted-foreground">
         Window {failures.windowStart} to {failures.windowEnd}, ledgers{' '}
-        {params['start ledger'] ? (
-          <ExplorerLink kind="ledger" id={String(params['start ledger'])} />
-        ) : (
-          '?'
-        )}{' '}
-        to{' '}
-        {params['end ledger'] ? (
-          <ExplorerLink kind="ledger" id={String(params['end ledger'])} />
-        ) : (
-          '?'
-        )}
-        . Result codes come from each transaction&apos;s result_xdr returned by RPC getTransactions,
-        decoded with Horizon&apos;s code names; Horizon list records carry result_xdr rather than
+        {failures.startLedger ? <ExplorerLink kind="ledger" id={failures.startLedger} /> : '?'} to{' '}
+        {failures.endLedger ? <ExplorerLink kind="ledger" id={failures.endLedger} /> : '?'}. Result
+        codes come from each transaction&apos;s result_xdr returned by RPC getTransactions, decoded
+        with Horizon&apos;s code names; Horizon list records carry result_xdr rather than
         extras.result_codes.
       </p>
     </Section>

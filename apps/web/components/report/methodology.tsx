@@ -1,9 +1,10 @@
-import { ReportTable } from '@/components/report-table';
+'use client';
+
 import { Reproduce } from '@/components/reproduce';
 import { formatDecimal } from '@/lib/format';
-import { CENSUSES, type Report } from '@/lib/report-model';
 import { PREVENTABLE_FIXES } from '@/lib/report-fixes';
-import { count, Section } from './section';
+import type { ReportView } from '@/lib/report-view';
+import { count, ReportDataTable, Section } from './section';
 
 const LIMITATIONS = [
   'stellar.expert invocation counts are lifetime totals, so an active contract may be quiet today.',
@@ -14,42 +15,37 @@ const LIMITATIONS = [
   'Transaction-level codes such as tx_bad_seq are rejected at submission and never reach ledger history, so they show up rarely or never.',
 ];
 
-export function MethodologySection({ report }: { report: Report }) {
+export function MethodologySection({ methods }: { methods: ReportView['methods'] }) {
   return (
     <Section id="methodology" title="Methodology">
-      {CENSUSES.map((census) => {
-        const record = report.runs[census];
-        if (!record) return null;
-        const parameters = Object.entries(record.method.parameters).map(([name, value]) => ({
-          name,
-          value: String(value),
-        }));
-        return (
-          <div key={census} id={`method-${census}`} className="scroll-mt-8 space-y-3">
-            <h3 className="text-sm font-medium">{record.method.census}</h3>
-            <Reproduce lines={record.method.endpoints} />
-            <ReportTable
-              rows={parameters}
-              rowKey={(row) => row.name}
-              columns={[
-                { header: 'parameter', cell: (row) => row.name },
-                { header: 'value', align: 'right', cell: (row) => row.value },
-              ]}
-              empty="No parameters recorded."
-            />
-            <ul className="list-disc space-y-1 pl-5 text-xs text-muted-foreground">
-              {record.method.notes.map((note) => (
-                <li key={note}>{note}</li>
-              ))}
-              <li>
-                Measured: {formatDecimal(record.run.wallMs / 1000, 1)} s wall time,{' '}
-                {count(record.run.requests)} requests, {count(record.run.networkCalls)} network
-                calls, {count(record.run.gaps)} gaps.
-              </li>
-            </ul>
-          </div>
-        );
-      })}
+      {methods.map(({ census, record }) => (
+        <div key={census} id={`method-${census}`} className="scroll-mt-8 space-y-3">
+          <h3 className="text-sm font-medium">{record.method.census}</h3>
+          <Reproduce lines={record.method.endpoints} />
+          <ReportDataTable
+            data={Object.entries(record.method.parameters).map(([name, value]) => ({
+              name,
+              value: String(value),
+            }))}
+            getRowId={(row) => row.name}
+            empty="No parameters recorded."
+            columns={[
+              { accessorKey: 'name', header: 'parameter', enableSorting: false },
+              { accessorKey: 'value', header: 'value', enableSorting: false },
+            ]}
+          />
+          <ul className="list-disc space-y-1 pl-5 text-xs text-muted-foreground">
+            {record.method.notes.map((note) => (
+              <li key={note}>{note}</li>
+            ))}
+            <li>
+              Measured: {formatDecimal(record.run.wallMs / 1000, 1)} s wall time,{' '}
+              {count(record.run.requests)} requests, {count(record.run.networkCalls)} network calls,{' '}
+              {count(record.run.gaps)} gaps.
+            </li>
+          </ul>
+        </div>
+      ))}
       <div className="space-y-2">
         <h3 className="text-sm font-medium">Preventable codes</h3>
         <p className="font-mono text-xs">{Object.keys(PREVENTABLE_FIXES).join(', ')}</p>

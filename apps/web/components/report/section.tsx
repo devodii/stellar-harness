@@ -1,17 +1,15 @@
 import type * as React from 'react';
+import { DataTable, type DataTableProps } from '@/components/data-table';
+import { EmptyState } from '@/components/empty-state';
 import { formatDecimal } from '@/lib/format';
 
 export const fileHref = (name: string): string => `/report/files/${name}`;
 
 export const count = (value: number): string => formatDecimal(value, 0);
 
-export const percent = (part: number, whole: number): string => {
-  if (whole <= 0) return 'n/a';
-  const value = (part / whole) * 100;
-  return value > 0 && value < 0.1 ? '<0.1%' : `${formatDecimal(value, 1)}%`;
-};
-
 export const xlm = (value: number): string => `${formatDecimal(value, 2)} XLM`;
+
+const PAGE_SIZE = 10;
 
 export const TextLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
   <a
@@ -23,6 +21,19 @@ export const TextLink = ({ href, children }: { href: string; children: React.Rea
     {children}
   </a>
 );
+
+export const Wrap = ({ children }: { children: React.ReactNode }) => (
+  <span className="block min-w-64 whitespace-normal">{children}</span>
+);
+
+export function ReportDataTable<TData>(
+  props: Omit<DataTableProps<TData, unknown>, 'emptyState'> & { empty?: string },
+) {
+  const { empty = 'No rows.', ...rest } = props;
+  return (
+    <DataTable clientPageSize={PAGE_SIZE} emptyState={<EmptyState title={empty} />} {...rest} />
+  );
+}
 
 export function Section({
   id,
