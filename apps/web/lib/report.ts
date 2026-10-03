@@ -1,15 +1,19 @@
 import 'server-only';
 import { getReportFile, listReportFiles } from '@harness/storage/report';
+import Papa from 'papaparse';
 import { cache } from 'react';
-import { parseCsv } from './csv';
 import { db } from './db';
 import {
   CENSUSES,
+  type CsvRow,
   REPORT_CSVS,
   type Report,
   type ReportSummary,
   type RunRecord,
 } from './report-model';
+
+const parseCsv = (text: string): CsvRow[] =>
+  Papa.parse<CsvRow>(text, { header: true, skipEmptyLines: true }).data;
 
 const readText = async (name: string): Promise<string | null> =>
   (await getReportFile(await db(), name))?.body ?? null;
