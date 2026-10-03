@@ -85,7 +85,7 @@ export function WatchPanel({ watch, org }: WatchPanelProps) {
         <React.Suspense>
           <SidebarChats />
         </React.Suspense>
-        <Accordion type="multiple" defaultValue={['watching']}>
+        <Accordion type="multiple" defaultValue={['watching', 'actions']}>
           <AccordionItem value="watching">
             <AccordionTrigger className={TRIGGER_CLASS}>what the harness watches</AccordionTrigger>
             <AccordionContent className="space-y-5">
