@@ -1,12 +1,18 @@
 # Stellar Harness
 
-An operator agent for one organisation on Stellar. The organisation tells the harness which accounts, contracts and anchor it runs, and gives it a policy: what it may do and how much it may spend before the owner has to approve. The harness watches those things, notices problems, simulates the fix to get its real cost, and proposes it as an action that is either within policy or needs approval.
+An operator agent for one organisation on Stellar. It watches the organisation's accounts, contracts and anchor, explains what it finds, simulates each fix to get its real cost, and proposes it as an action that is either within the organisation's policy or needs approval.
+
+Live: https://stellar-harness.vercel.app
+
+![Stellar Harness](docs/screenshot.png)
 
 ## Run it
 
 ```bash
 pnpm install
-cp .env.example .env          # set OPENAI_API_KEY
+cp .env.example .env
 docker compose up -d postgres
-pnpm dev                      # http://localhost:3000
+pnpm dev
 ```
+
+Set `OPENAI_API_KEY` in `.env`. The app runs at http://localhost:3000.
