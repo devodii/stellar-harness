@@ -220,6 +220,27 @@ describe('probeAnchor', () => {
     ]);
   });
 
+  it('verifies the challenge against the passphrase the anchor declares', async () => {
+    const mainnetToml = `${toml}\nNETWORK_PASSPHRASE="${Networks.PUBLIC}"`;
+    const fetch = anchorFetch({
+      '/.well-known/stellar.toml': () => new Response(mainnetToml),
+      '/sep24/info': () => Response.json({ deposit: {} }),
+      '/auth': () =>
+        Response.json({
+          transaction: WebAuth.buildChallengeTx(
+            server,
+            Keypair.random().publicKey(),
+            domain,
+            300,
+            Networks.PUBLIC,
+            domain,
+          ),
+        }),
+    });
+    const probe = await probeAnchor(fakeClients({ fetch }), domain);
+    expect(probe.stages.find((s) => s.name === 'sep-10')?.status).toBe('ok');
+  });
+
   it('reports the failing stage', async () => {
     const fetch = anchorFetch({ '/.well-known/stellar.toml': () => new Response(toml) });
     const probe = await probeAnchor(fakeClients({ fetch }), domain);
