@@ -7,7 +7,7 @@ import { fakeContract } from './story-ids';
 const ACTION: Action = {
   id: 'a1',
   subject: fakeContract('escrow'),
-  title: 'Extend Escrow TTL to 365 days',
+  title: 'Extend TTL on Escrow by 180 days',
   why: 'Escrow has 6.9 days left before it is archived.',
   operation: 'extend_ttl',
   estimatedCostXlm: 27.31,

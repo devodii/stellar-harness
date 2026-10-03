@@ -1,12 +1,16 @@
 import { proposeAction } from '@harness/agent';
 import type { Org, OrgContract } from '@harness/schema';
-import type { ContractTtl, Preflight, Simulation } from '@harness/stellar-tools';
+import {
+  type ContractTtl,
+  MAX_EXTEND_DAYS,
+  type Preflight,
+  type Simulation,
+} from '@harness/stellar-tools';
 import type { Storage } from '@harness/storage';
 import { formatDecimal } from './format';
 
 export const SEED_EVERY_MS = 10 * 60_000;
 const ATTENTION_DAYS = 30;
-const EXTEND_DAYS = 365;
 const TRUSTLINE_RESERVE_XLM = 0.5;
 
 export type SeedReads = {
@@ -36,10 +40,10 @@ const seedContract = async (storage: Storage, reads: SeedReads, contract: OrgCon
     return;
   }
   if (ttl.instance.daysLeft >= ATTENTION_DAYS) return;
-  const simulation = await reads.simulateExtendTtl(contract.id, EXTEND_DAYS);
+  const simulation = await reads.simulateExtendTtl(contract.id, MAX_EXTEND_DAYS);
   await proposeAction(storage, {
     subject: contract.id,
-    title: `Extend TTL on ${contract.label} by ${EXTEND_DAYS} days`,
+    title: `Extend TTL on ${contract.label} by ${MAX_EXTEND_DAYS} days`,
     why: `${contract.label} expires in ${formatDecimal(ttl.instance.daysLeft, 1)} days; extending keeps it callable.`,
     operation: 'extend_ttl',
     estimatedCostXlm: simulation.estimatedCostXlm,
