@@ -20,7 +20,8 @@ export const DEMO_ORG: Org = {
     { id: 'CADKCKAZEOUXFS46JTA73DFGCWUGTZDKU5UTUAEA6OAZB7RV5CEHS47R', label: 'Escrow' },
     { id: 'CBRSCFRPCMKZCUTJMOVU5XQWZVXXSM66MGB4CEFRT5KWDI4XLM44DK5M', label: 'Registry' },
   ],
-  anchorDomain: 'testanchor.stellar.org',
+  anchorDomain: 'clpx.finance',
+  anchorDomainNote: 'probe is read-only; this is a public mainnet anchor, not operated by the demo org',
   policy: {
     dailySpendXlm: 50,
     allowedOperations: ['extend_ttl', 'restore', 'sponsor_trustline', 'payment'],
