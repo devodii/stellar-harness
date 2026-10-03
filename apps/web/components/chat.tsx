@@ -88,7 +88,7 @@ export function Chat({ id, initialMessages = [], onMessagesChange }: ChatProps) 
             {error.message}
           </InlineAlert>
         )}
-        <ChatComposer onSubmit={send} onStop={() => void stop()} status={status} />
+        <ChatComposer onSubmit={send} onStop={() => void stop()} status={status} disabled={busy} />
       </div>
     </main>
   );

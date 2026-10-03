@@ -41,7 +41,7 @@ const WATCH: Watch = {
     {
       id: 'a1',
       subject: fakeContract('escrow'),
-      title: 'Extend Escrow TTL to 365 days',
+      title: 'Extend TTL on Escrow by 180 days',
       why: 'Escrow has 6.9 days left.',
       operation: 'extend_ttl',
       estimatedCostXlm: 27.31,

@@ -55,7 +55,8 @@ const sep10Stage = async (
     url.searchParams.set('account', Keypair.random().publicKey());
     const body = await getJson(clients, url.toString());
     if (typeof body.transaction !== 'string') throw new Error('no challenge transaction');
-    WebAuth.readChallengeTx(body.transaction, signingKey, clients.passphrase, domain, url.host);
+    const passphrase = text(toml, 'NETWORK_PASSPHRASE') ?? clients.passphrase;
+    WebAuth.readChallengeTx(body.transaction, signingKey, passphrase, domain, url.host);
     return stage('sep-10', 'ok');
   } catch (error) {
     return stage('sep-10', 'fail', reason(error));
