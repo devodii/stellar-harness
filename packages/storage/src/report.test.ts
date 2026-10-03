@@ -27,20 +27,30 @@ describe('report files', () => {
     expect(countRows('summary.json', '{"a":1}')).toBe(1);
   });
 
-  it('reads summary.json and exported csvs sorted by name', async () => {
+  it('reads summary.json, exported csvs and run records sorted by name', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'report-'));
     await mkdir(join(dir, 'exports'));
     await writeFile(join(dir, 'summary.json'), '{"ok":true}');
     await writeFile(join(dir, 'exports', 'b.csv'), 'x\n1\n2\n');
     await writeFile(join(dir, 'exports', 'a.csv'), 'x\n1\n');
     await writeFile(join(dir, 'exports', 'notes.txt'), 'skip');
+    await mkdir(join(dir, 'derived', 'runs'), { recursive: true });
+    await writeFile(join(dir, 'derived', 'runs', 'failures.json'), '{"census":"failures"}');
     const files = await readReportDir(dir);
     expect(files.map((file) => [file.name, file.rowCount])).toEqual([
       ['a.csv', 1],
       ['b.csv', 2],
+      ['run_failures.json', 1],
       ['summary.json', 1],
     ]);
-    expect(files[2]?.sha256).toBe(sha256Hex('{"ok":true}'));
+    expect(files[3]?.sha256).toBe(sha256Hex('{"ok":true}'));
+    await rm(dir, { recursive: true });
+  });
+
+  it('reads a dir with only summary.json', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'report-'));
+    await writeFile(join(dir, 'summary.json'), '{}');
+    expect((await readReportDir(dir)).map((file) => file.name)).toEqual(['summary.json']);
     await rm(dir, { recursive: true });
   });
 
