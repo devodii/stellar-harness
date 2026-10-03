@@ -9,8 +9,6 @@ Registry was extended to the network maximum (about 180 days) on 2026-10-03 and 
 - While Escrow is live, the seed and suggestion 1 propose `Extend TTL on Escrow by 180 days`, which needs approval because the simulated cost is above 10 XLM.
 - Once Escrow archives (around 2026-10-09), they propose `Restore Escrow` instead.
 
-`scripts/demo-org-keepalive.md` has the commands to extend or restore either contract.
-
 ## 1. Check all our contracts and tell me which need attention
 
 The agent reads both contracts, simulates extending Escrow and proposes it. The card replaces the seeded one rather than adding a second copy.
