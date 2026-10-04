@@ -45,6 +45,5 @@ export const emptySummary = (snapshot: Snapshot): Summary => ({
     scfFundedXlm12m: 0,
     xlmUsd: { price: 0, source: 'none', at: snapshot.snapshotTime },
   },
-  github: { byCategory: {}, recent: [] },
   findingsCount: {},
 });
