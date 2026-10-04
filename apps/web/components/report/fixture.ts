@@ -1,15 +1,6 @@
 import type { Report } from '@/lib/report-model';
 import { fakeAccount, fakeContract, fakeHash } from '../story-ids';
 
-const method = (
-  census: string,
-  endpoints: string[],
-  parameters: Record<string, string | number>,
-) => ({
-  run: { census, wallMs: 220_800, requests: 2002, networkCalls: 2145, gaps: 0 },
-  method: { census, endpoints, parameters, notes: ['Nothing is signed or submitted.'] },
-});
-
 export const REPORT_FIXTURE: Report = {
   summary: {
     snapshot: {
@@ -42,19 +33,6 @@ export const REPORT_FIXTURE: Report = {
       medianXlm12m: 21.54,
       xlmUsd: { price: 0.218705, source: 'coingecko:simple/price', at: '2026-10-02T00:48:10.000Z' },
     },
-  },
-  runs: {
-    failures: method(
-      'Census 2: failed transactions',
-      ['POST https://mainnet.sorobanrpc.com getTransactions (limit 200)'],
-      {
-        'start ledger': 64_706_209,
-        'end ledger': 64_723_488,
-      },
-    ),
-    rent: method('Census 4: rent', ['POST https://mainnet.sorobanrpc.com simulateTransaction'], {
-      simulated: 2000,
-    }),
   },
   files: [
     {
@@ -158,15 +136,5 @@ export const REPORT_FIXTURE: Report = {
       },
     ],
     'rent_top100.csv': [{ contract: fakeContract('e'), xlm12m: '335.6894492', usd12m: '73.42' }],
-    'github_issues.csv': [
-      {
-        url: 'https://github.com/stellar/stellar-cli/issues/1',
-        title: 'Contract archived after TTL expiry',
-        repo: 'stellar/stellar-cli',
-        state: 'open',
-        category: 'ttl',
-        createdAt: '2026-09-20T10:00:00Z',
-      },
-    ],
   },
 };

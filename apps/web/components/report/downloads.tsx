@@ -22,22 +22,8 @@ export function DownloadsSection({ files }: { files: ReportView['files'] }) {
             header: 'rows',
             cell: ({ row }) => count(row.original.rowCount),
           },
-          {
-            accessorKey: 'sha256',
-            header: 'sha256',
-            enableSorting: false,
-            cell: ({ row }) => (
-              <span className="block min-w-64 break-all whitespace-normal">
-                {row.original.sha256}
-              </span>
-            ),
-          },
         ]}
       />
-      <p className="text-xs text-muted-foreground">
-        Check a download with <span className="font-mono">shasum -a 256 &lt;file&gt;</span>.
-        {files[0] && ` Published ${files[0].publishedAt.slice(0, 16).replace('T', ' ')} UTC.`}
-      </p>
     </Section>
   );
 }
