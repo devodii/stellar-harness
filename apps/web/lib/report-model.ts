@@ -2,19 +2,6 @@ import type { ReportFileInfo } from '@harness/storage/report';
 
 export type CsvRow = Record<string, string>;
 
-export const CENSUSES = ['failures', 'contracts', 'anchors', 'rent', 'github'] as const;
-type Census = (typeof CENSUSES)[number];
-
-export type RunRecord = {
-  run: { census: string; wallMs: number; requests: number; networkCalls: number; gaps: number };
-  method: {
-    census: string;
-    endpoints: string[];
-    parameters: Record<string, string | number | boolean>;
-    notes: string[];
-  };
-};
-
 export type ReportSummary = {
   snapshot: { snapshotLedger: number; snapshotTime: string; ledgerCloseSeconds: number };
   contracts: {
@@ -52,13 +39,11 @@ export const REPORT_CSVS = [
   'anchors_funnel.csv',
   'anchors_failing.csv',
   'rent_top100.csv',
-  'github_issues.csv',
 ] as const;
 type ReportCsv = (typeof REPORT_CSVS)[number];
 
 export type Report = {
   summary: ReportSummary;
-  runs: Partial<Record<Census, RunRecord>>;
   files: ReportFileInfo[];
   csv: Record<ReportCsv, CsvRow[]>;
 };
