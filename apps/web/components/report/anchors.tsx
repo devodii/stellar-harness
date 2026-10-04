@@ -8,24 +8,24 @@ export function AnchorsSection({ anchors }: { anchors: ReportView['anchors'] }) 
     <Section id="anchors" title="Anchors">
       <ReportDataTable
         data={anchors.funnel}
-        getRowId={(row) => row.step}
+        getRowId={(row) => row.stage}
         columns={[
-          { accessorKey: 'step', header: 'stage', enableSorting: false },
+          { accessorKey: 'stage', header: 'stage', enableSorting: false },
+          {
+            accessorKey: 'reached',
+            header: 'reached',
+            enableSorting: false,
+            cell: ({ row }) => count(row.original.reached),
+          },
           {
             accessorKey: 'passed',
             header: 'passed',
             enableSorting: false,
             cell: ({ row }) => count(row.original.passed),
           },
-          {
-            accessorKey: 'failed',
-            header: 'failed',
-            enableSorting: false,
-            cell: ({ row }) => count(row.original.failed),
-          },
         ]}
       />
-      <h3 className="pt-2 text-sm font-medium">Failing domains</h3>
+      <h3 className="pt-2 text-sm font-medium">Domains by first failing stage</h3>
       <ReportDataTable
         data={anchors.failing}
         getRowId={(row) => row.domain}
