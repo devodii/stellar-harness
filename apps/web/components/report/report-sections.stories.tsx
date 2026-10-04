@@ -7,9 +7,7 @@ import { DownloadsSection } from './downloads';
 import { FailuresSection } from './failures';
 import { REPORT_FIXTURE } from './fixture';
 import { HeadlineSection } from './headline';
-import { MethodologySection } from './methodology';
 import { RentSection } from './rent';
-import { SignalsSection } from './signals';
 
 const meta: Meta = { title: 'report/Sections' };
 export default meta;
@@ -23,9 +21,6 @@ export const Failures: Story = { render: () => <FailuresSection failures={VIEW.f
 export const Contracts: Story = { render: () => <ContractsSection contracts={VIEW.contracts} /> };
 export const Anchors: Story = { render: () => <AnchorsSection anchors={VIEW.anchors} /> };
 export const Rent: Story = { render: () => <RentSection rent={VIEW.rent} /> };
-export const Signals: Story = { render: () => <SignalsSection issues={VIEW.issues} /> };
-export const SignalsEmpty: Story = { render: () => <SignalsSection issues={[]} /> };
-export const Methodology: Story = { render: () => <MethodologySection methods={VIEW.methods} /> };
 export const Downloads: Story = { render: () => <DownloadsSection files={VIEW.files} /> };
 
 export const PaginatesTenRows: Story = {
