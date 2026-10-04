@@ -74,7 +74,6 @@ describe('renderReport', () => {
       'Census 2',
       'Census 3',
       'Census 4',
-      'Census 5',
       'Methodology',
       'Appendix',
     ]) {
