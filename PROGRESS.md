@@ -15,6 +15,22 @@ Resume here: read this file and `DECISIONS.md` first.
 
 `pnpm build`, `pnpm lint`, `pnpm test`, the Storybook tests, `pnpm knip` and `pnpm depcheck` pass.
 
+## Report (M14, M15)
+
+Published to the report database on 2026-10-04 from snapshot ledger 64,756,250, 2026-10-03 22:37 UTC. Every census ran fresh against that snapshot.
+
+| Headline                                                      | Value                                        |
+| ------------------------------------------------------------- | -------------------------------------------- |
+| Preventable failures in 24 hours                              | 79,181 of 1,163,430 failed, 5,009,956 total  |
+| Active contracts archived, expiring within 30 days            | 240, 120                                     |
+| Anchor domains tested, serving a stellar.toml, passing SEP-10 | 202, 68, 10                                  |
+| 12-month rent for 2,000 sampled live contracts                | 55,533.91 XLM at 0.21572 XLM/USD, 2026-10-04 |
+
+- Page: https://stellarharness.xyz/report
+- https://stellarharness.xyz/report/files/failed_tx_by_code.csv
+- https://stellarharness.xyz/report/files/contracts_archived_meaningful.csv
+- https://stellarharness.xyz/report/files/anchors_failing.csv
+
 ## Chip timings (M13)
 
 Production build, fresh browser per chip, 2026-10-03, `gpt-4.1`. Time from click to the action card, and to the end of the reply.
