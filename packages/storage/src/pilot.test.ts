@@ -21,7 +21,7 @@ describe.skipIf(!url)('pilot requests in postgres', () => {
   });
 
   it('migrates once and counts requests', async () => {
-    expect(await migrate(sql)).toEqual(['0001_pilot_requests']);
+    expect(await migrate(sql)).toEqual(['0001_pilot_requests', '0002_report_files']);
     expect(await migrate(sql)).toEqual([]);
     expect(await addPilotRequest(sql, { email: 'a@example.org', userAgent: 'test' })).toBe(1);
     expect(await addPilotRequest(sql, { email: 'b@example.org', userAgent: 'test' })).toBe(2);

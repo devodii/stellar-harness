@@ -12,4 +12,16 @@ export const MIGRATIONS: Migration[] = [
       );
     `,
   },
+  {
+    id: '0002_report_files',
+    sql: `
+      create table report_files (
+        name text primary key,
+        body text not null,
+        sha256 text not null,
+        row_count integer not null,
+        published_at timestamptz not null default now()
+      );
+    `,
+  },
 ];
