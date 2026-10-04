@@ -3,7 +3,7 @@
 Measures operational failures across Stellar mainnet from public, read-only data and writes the numbers behind the report at https://stellarharness.xyz/report.
 
 ```bash
-pnpm scan all --new-snapshot --window 1d   # anchors, contracts, rent, failures, github, report
+pnpm scan all --new-snapshot --window 1d   # anchors, contracts, rent, failures, report
 pnpm report:publish                        # upload data/ to the report database
 ```
 
@@ -114,11 +114,6 @@ GET https://api.coingecko.com/api/v3/simple/price?ids=stellar&vs_currencies=usd
 - Rent is the minimum resource fee returned by simulation; nothing is signed or submitted.
 - Totals sum simulated contracts only, with no population weighting.
 - Run on 2026-10-02: 220.8 s wall time, 2,002 requests, 2,145 network calls, 0 gaps.
-
-### Census 5: GitHub issues
-
-- Skipped: GITHUB_TOKEN not set.
-- Run on 2026-10-02: 0.0 s wall time, 0 requests, 0 network calls, 0 gaps.
 
 ### Limitations
 
