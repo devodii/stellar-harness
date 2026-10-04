@@ -1,15 +1,13 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { ExplorerLink } from '@/components/explorer-link';
 import { AnchorsSection } from '@/components/report/anchors';
 import { ContractsSection } from '@/components/report/contracts';
 import { DownloadsSection } from '@/components/report/downloads';
 import { FailuresSection } from '@/components/report/failures';
 import { HeadlineSection } from '@/components/report/headline';
-import { MethodologySection } from '@/components/report/methodology';
 import { RentSection } from '@/components/report/rent';
 import { fileHref, TextLink } from '@/components/report/section';
-import { SignalsSection } from '@/components/report/signals';
+import { Wordmark } from '@/components/wordmark';
 import { loadReport } from '@/lib/report';
 import { REPORT_CSVS } from '@/lib/report-model';
 import { buildReportView } from '@/lib/report-view';
@@ -18,7 +16,7 @@ export const revalidate = 3600;
 
 const TITLE = 'Stellar Harness mainnet operations report';
 const PAGE_URL = 'https://stellarharness.xyz/report';
-const REPO_URL = 'https://github.com/devodii/stellar-harness';
+const SOURCE_URL = 'https://github.com/devodii/stellar-harness/tree/main/packages/scanner#method';
 const CONTACT = 'emmanuelodii80@gmail.com';
 
 const SECTIONS = [
@@ -27,8 +25,6 @@ const SECTIONS = [
   ['contracts', 'Contracts'],
   ['anchors', 'Anchors'],
   ['rent', 'Rent'],
-  ['signals', 'Ecosystem signals'],
-  ['methodology', 'Methodology'],
   ['downloads', 'Downloads'],
 ] as const;
 
@@ -60,19 +56,13 @@ export default async function ReportPage() {
   return (
     <main className="mx-auto max-w-4xl space-y-8 px-4 py-10 text-sm">
       <header className="space-y-3">
-        <Link
-          href="/"
-          className="block font-mono text-xs text-muted-foreground hover:text-foreground"
-        >
-          ← back to the harness
-        </Link>
-        <h1 className="text-lg font-medium">{TITLE}</h1>
+        <Wordmark className="font-mono text-sm" />
+        <h1 className="text-lg font-medium">Mainnet operations report</h1>
         {view && (
           <p className="font-mono text-xs text-muted-foreground">
-            snapshot ledger <ExplorerLink kind="ledger" id={view.snapshot.snapshotLedger} />,{' '}
-            {view.snapshot.snapshotTime.slice(0, 16).replace('T', ' ')} UTC, measured close{' '}
-            {view.snapshot.ledgerCloseSeconds}s, reproducible from{' '}
-            <TextLink href={REPO_URL}>github.com/devodii/stellar-harness</TextLink>
+            ledger <ExplorerLink kind="ledger" id={view.snapshot.snapshotLedger} />,{' '}
+            {view.snapshot.snapshotTime.slice(0, 16).replace('T', ' ')} UTC,{' '}
+            <TextLink href={SOURCE_URL}>source</TextLink>
           </p>
         )}
         <nav className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
@@ -90,15 +80,15 @@ export default async function ReportPage() {
           <ContractsSection contracts={view.contracts} />
           <AnchorsSection anchors={view.anchors} />
           <RentSection rent={view.rent} />
-          <SignalsSection issues={view.issues} />
-          <MethodologySection methods={view.methods} />
           <DownloadsSection files={view.files} />
         </>
       ) : (
         <p className="text-muted-foreground">The report has not been published yet.</p>
       )}
       <footer className="border-t pt-6 text-xs text-muted-foreground">
-        Data is read-only and public. No keys, no submissions. Questions: {CONTACT}.
+        <a href={`mailto:${CONTACT}`} className="hover:text-foreground">
+          {CONTACT}
+        </a>
       </footer>
     </main>
   );
