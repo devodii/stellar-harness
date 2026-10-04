@@ -86,6 +86,7 @@ export default async function ReportPage() {
         <p className="text-muted-foreground">The report has not been published yet.</p>
       )}
       <footer className="border-t pt-6 text-xs text-muted-foreground">
+        If you have any questions, please contact
         <a href={`mailto:${CONTACT}`} className="hover:text-foreground">
           {CONTACT}
         </a>
