@@ -79,13 +79,7 @@ export function ContractsSection({ contracts }: { contracts: ReportView['contrac
         getRowId={(row) => row.contract}
         columns={EXPIRING_COLUMNS}
       />
-      <p className="text-xs text-muted-foreground">
-        Raw totals including mass-deployed families: {count(contracts.archivedTotal)} archived and{' '}
-        {count(contracts.expiringTotal)} expiring within 30 days, of {count(contracts.total)}{' '}
-        contracts. The tables keep only active contracts (100 or more lifetime invocations, or
-        SCF-funded), which removes families deployed in bulk and never called. The scanner has no
-        labels for these contracts.
-      </p>
+      <p className="text-xs text-muted-foreground">{contracts.note}</p>
     </Section>
   );
 }
