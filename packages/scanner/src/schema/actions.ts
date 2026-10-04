@@ -74,7 +74,4 @@ export const SUGGESTED_ACTION: Record<FindingType, string> = {
   ANCHOR_TESTS_FAILED: 'Run stellar-anchor-tests in CI and fix the failing SEP checks.',
   ANCHOR_TLS_OR_CORS_BROKEN:
     'Serve stellar.toml and /info with valid TLS and Access-Control-Allow-Origin: *.',
-  REPO_TTL_ISSUE: 'Schedule TTL extension and restore instead of fixing by hand.',
-  REPO_TX_FAILURE_ISSUE: 'Add pre-flight checks and sequence management before submission.',
-  REPO_ANCHOR_CONFORMANCE_ISSUE: 'Run anchor conformance probes on every release.',
 };

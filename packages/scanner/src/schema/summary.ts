@@ -99,28 +99,12 @@ export const RentSummary = z.object({
 });
 export type RentSummary = z.infer<typeof RentSummary>;
 
-export const GithubIssue = z.object({
-  url: z.url(),
-  title: z.string(),
-  createdAt: z.iso.datetime(),
-  state: z.enum(['open', 'closed']),
-  category: z.string(),
-});
-export type GithubIssue = z.infer<typeof GithubIssue>;
-
-export const GithubSummary = z.object({
-  byCategory: z.record(z.string(), z.object({ total: count, open: count })),
-  recent: z.array(GithubIssue),
-});
-export type GithubSummary = z.infer<typeof GithubSummary>;
-
 export const Summary = z.object({
   snapshot: Snapshot,
   contracts: ContractsSummary,
   failures: FailuresSummary,
   anchors: AnchorsSummary,
   rent: RentSummary,
-  github: GithubSummary,
   findingsCount: z.partialRecord(FindingType, count),
 });
 export type Summary = z.infer<typeof Summary>;
