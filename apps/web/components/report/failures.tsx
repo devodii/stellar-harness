@@ -44,9 +44,9 @@ export function FailuresSection({ failures }: { failures: ReportView['failures']
             accessorKey: 'classification',
             header: 'classification',
             cell: ({ row }) =>
-              row.original.classification === 'anchor distribution' && row.original.domain ? (
+              row.original.classification === 'anchor' && row.original.domain ? (
                 <>
-                  anchor distribution,{' '}
+                  anchor,{' '}
                   <TextLink href={`https://${row.original.domain}/.well-known/stellar.toml`}>
                     {row.original.domain}
                   </TextLink>
@@ -57,14 +57,6 @@ export function FailuresSection({ failures }: { failures: ReportView['failures']
           },
         ]}
       />
-      <p className="text-xs text-muted-foreground">
-        Window {failures.windowStart} to {failures.windowEnd}, ledgers{' '}
-        {failures.startLedger ? <ExplorerLink kind="ledger" id={failures.startLedger} /> : '?'} to{' '}
-        {failures.endLedger ? <ExplorerLink kind="ledger" id={failures.endLedger} /> : '?'}. Result
-        codes come from each transaction&apos;s result_xdr returned by RPC getTransactions, decoded
-        with Horizon&apos;s code names; Horizon list records carry result_xdr rather than
-        extras.result_codes.
-      </p>
     </Section>
   );
 }

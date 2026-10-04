@@ -1,7 +1,7 @@
 const FEE_AND_TIMEBOUND = 'Fee-bump (CAP-15) and send again within a fee cap.';
 const RESERVE = 'Top up the XLM reserve before structural operations.';
 
-export const PREVENTABLE_FIXES: Record<string, string> = {
+const PREVENTABLE_FIXES: Record<string, string> = {
   op_underfunded: 'Monitor the float and rebalance from treasury before paying.',
   op_low_reserve: RESERVE,
   op_no_trust: 'Check the trustline first; sponsor it (CAP-33) or use a claimable balance.',
@@ -14,7 +14,4 @@ export const PREVENTABLE_FIXES: Record<string, string> = {
 };
 
 export const fixFor = (code: string): string =>
-  PREVENTABLE_FIXES[code] ??
-  (code === 'tx_failed'
-    ? 'Envelope code for a failed operation; see the operation codes.'
-    : 'Not preventable before submission: a market or contract condition at execution.');
+  PREVENTABLE_FIXES[code] ?? 'Not preventable before submission: a market or contract condition.';

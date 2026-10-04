@@ -1,18 +1,11 @@
 import { parseArgs } from 'node:util';
 import { parseDuration } from './duration';
 
-export const CENSUSES = ['anchors', 'failures', 'contracts', 'rent', 'github', 'report'] as const;
+export const CENSUSES = ['anchors', 'failures', 'contracts', 'rent', 'report'] as const;
 export type Census = (typeof CENSUSES)[number];
 export type Command = Census | 'all';
 
-export const ALL_ORDER: readonly Census[] = [
-  'anchors',
-  'contracts',
-  'rent',
-  'failures',
-  'github',
-  'report',
-];
+export const ALL_ORDER: readonly Census[] = ['anchors', 'contracts', 'rent', 'failures', 'report'];
 
 export type ScanArgs = {
   command: Command;

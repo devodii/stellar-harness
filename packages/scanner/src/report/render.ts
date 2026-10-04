@@ -22,7 +22,6 @@ const CENSUS_OF_EXPORT: Record<string, string> = {
   contracts_expiring_30d: 'contracts',
   contracts_scf_funded: 'contracts',
   rent_top100: 'rent',
-  github_issues: 'github',
 };
 
 const countTable = (counts: Record<string, number>, label: string): string =>
@@ -60,11 +59,7 @@ export const renderSnapshot = ({ snapshot }: Summary): string =>
   );
 
 export const renderHeadline = (summary: Summary): string => {
-  const { contracts, failures, anchors, rent, github } = summary;
-  const githubTotal = Object.values(github.byCategory).reduce(
-    (sum, bucket) => sum + bucket.total,
-    0,
-  );
+  const { contracts, failures, anchors, rent } = summary;
   return sections(
     heading(2, 'Headline'),
     keyValueTable([
@@ -89,7 +84,6 @@ export const renderHeadline = (summary: Summary): string => {
       ['Anchor domains tested', formatInt(anchors.domainsTested)],
       ['Anchor domains passing anchor tests', formatInt(anchors.funnel.testsPassed)],
       ['12-month rent for live instances (XLM)', formatXlm(rent.totalXlm12m)],
-      ['GitHub issues and PRs matched', formatInt(githubTotal)],
     ]),
   );
 };
@@ -173,17 +167,6 @@ const renderRent = ({ rent }: Summary, exports: readonly ExportPreview[]): strin
     ...previewsFor('rent', exports),
   );
 
-const renderGithub = ({ github }: Summary, exports: readonly ExportPreview[]): string =>
-  sections(
-    heading(2, 'Census 5: GitHub issues'),
-    table(Object.entries(github.byCategory), [
-      { header: 'Category', value: ([category]) => category },
-      { header: 'Total', value: ([, b]) => formatInt(b.total), align: 'right' },
-      { header: 'Open', value: ([, b]) => formatInt(b.open), align: 'right' },
-    ]),
-    ...previewsFor('github', exports),
-  );
-
 const renderRuns = (runs: readonly CensusRun[]): string =>
   table(runs, [
     { header: 'Census', value: (run) => run.census },
@@ -225,7 +208,6 @@ export const renderReport = (inputs: ReportInputs): string =>
     renderContracts(inputs.summary, inputs.exports),
     renderAnchors(inputs.summary, inputs.exports),
     renderRent(inputs.summary, inputs.exports),
-    renderGithub(inputs.summary, inputs.exports),
     renderMethodology(inputs),
     renderAppendix(inputs.exports),
   );

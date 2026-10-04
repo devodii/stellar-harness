@@ -7,7 +7,6 @@ import {
   emptySummary,
   FailuresSummary,
   FINDING_TYPES,
-  GithubSummary,
   RentSummary,
   Summary,
 } from '../../schema';
@@ -24,10 +23,9 @@ const EXPORT_ORDER = [
   'contracts_expiring_30d',
   'contracts_scf_funded',
   'rent_top100',
-  'github_issues',
 ];
 
-const RUN_ORDER = ['anchors', 'contracts', 'rent', 'failures', 'github'];
+const RUN_ORDER = ['anchors', 'contracts', 'rent', 'failures'];
 
 const summaryOf = <S extends z.ZodType>(
   records: CensusRecord<unknown>[],
@@ -54,7 +52,6 @@ export const buildSummary = async (ctx: ScanContext): Promise<Summary> => {
     failures: summaryOf(records, 'failures', FailuresSummary, empty.failures),
     anchors: summaryOf(records, 'anchors', AnchorsSummary, empty.anchors),
     rent: summaryOf(records, 'rent', RentSummary, empty.rent),
-    github: summaryOf(records, 'github', GithubSummary, empty.github),
     findingsCount,
   });
 };
