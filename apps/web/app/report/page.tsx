@@ -15,6 +15,8 @@ import { buildReportView } from '@/lib/report-view';
 export const revalidate = 3600;
 
 const TITLE = 'Stellar Harness mainnet operations report';
+const DESCRIPTION =
+  'Failed transactions, archived contracts, anchor conformance and rent on Stellar mainnet, every row linked to Stellar Expert.';
 const PAGE_URL = 'https://stellarharness.xyz/report';
 const SOURCE_URL = 'https://github.com/devodii/stellar-harness/tree/main/packages/scanner#method';
 const CONTACT = 'emmanuelodii80@gmail.com';
@@ -33,23 +35,15 @@ const loadView = async () => {
   return report ? buildReportView(report) : null;
 };
 
-export async function generateMetadata(): Promise<Metadata> {
-  const view = await loadView();
-  const description = view
-    ? view.headlines
-        .slice(0, 3)
-        .map((headline) => headline.value)
-        .join('. ')
-    : 'Measured operational failures on Stellar mainnet.';
-  return {
-    title: TITLE,
-    description,
-    openGraph: { title: TITLE, description, url: PAGE_URL, type: 'article' },
-    alternates: {
-      types: { 'text/csv': REPORT_CSVS.map((name) => ({ url: fileHref(name), title: name })) },
-    },
-  };
-}
+export const metadata: Metadata = {
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: { title: TITLE, description: DESCRIPTION, url: PAGE_URL, type: 'article' },
+  twitter: { title: TITLE, description: DESCRIPTION },
+  alternates: {
+    types: { 'text/csv': REPORT_CSVS.map((name) => ({ url: fileHref(name), title: name })) },
+  },
+};
 
 export default async function ReportPage() {
   const view = await loadView();
