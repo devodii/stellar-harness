@@ -2,7 +2,7 @@
 
 An operator agent for one organisation on Stellar. It watches the organisation's accounts, contracts and anchor, explains what it finds, simulates each fix to get its real cost, and proposes it as an action that is either within the organisation's policy or needs approval.
 
-Live: https://stellar-harness.vercel.app
+Live: https://stellarharness.xyz
 
 ![Stellar Harness](docs/screenshot.png)
 
