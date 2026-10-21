@@ -107,7 +107,7 @@ export function Chat({ id, welcome, initialMessages = [], onMessagesChange }: Ch
       )}
       <div className="mx-auto w-full max-w-3xl space-y-2 px-4 pb-4">
         {error && (
-          <InlineAlert tone="destructive" title="Chat request failed">
+          <InlineAlert tone="destructive" title="The harness couldn't answer that">
             {error.message}
           </InlineAlert>
         )}
