@@ -1,5 +1,7 @@
+import { ArrowLeftIcon } from '@phosphor-icons/react/ssr';
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
+import Link from 'next/link';
 import { ApiSection } from '@/components/report/api-section';
 import { ContractsSection } from '@/components/report/contracts-section';
 import { LastDay } from '@/components/report/last-day';
@@ -8,6 +10,7 @@ import { LiveLine } from '@/components/report/live-line';
 import { Section, Waiting } from '@/components/report/section';
 import { WAITING_LEDGERS } from '@/components/report/terms';
 import { TopAccounts } from '@/components/report/top-accounts';
+import { Button } from '@/components/ui/button';
 import { Wordmark } from '@/components/wordmark';
 import { getReport } from '@/lib/live';
 import { yesterdayUtc } from '@/lib/live-view';
@@ -46,7 +49,15 @@ export default async function ReportPage() {
   return (
     <main className="mx-auto max-w-4xl space-y-8 px-4 py-10 text-sm">
       <header className="space-y-4">
-        <Wordmark className="font-mono text-sm" />
+        <div className="flex items-center justify-between gap-4">
+          <Button asChild variant="ghost" size="sm" className="-ml-2">
+            <Link href="/">
+              <ArrowLeftIcon aria-hidden />
+              Back to the demo
+            </Link>
+          </Button>
+          <Wordmark className="font-mono text-sm" />
+        </div>
         <div className="space-y-2">
           <h1 className="text-2xl font-medium">Mainnet operations report</h1>
           <p className="text-muted-foreground">
