@@ -2,7 +2,7 @@ export const TERMS = {
   ledger: 'One page of the shared Stellar record. A new one closes every few seconds.',
   preventable: 'A check before sending would have found the cause, so it could be fixed first.',
   retryable:
-    'The cause was temporary, so sending again with a fresh price, fee or time window works.',
+    'The cause was temporary, so it can be sent again with a fresh price, fee or time window.',
   active: 'Contracts with 100+ lifetime calls, or funded by the Stellar Community Fund.',
   archived: "The contract's data expired. It stops working until someone restores it.",
   expiring: 'The contract will be archived within 30 days unless someone renews it.',
