@@ -2,7 +2,15 @@
 
 An ops agent that keeps a business's Stellar accounts and contracts working. It watches them, catches what's about to break, and prepares the fix with its real cost. The live report shows what is breaking on Stellar mainnet right now, and the demo runs the agent against a sample company on testnet.
 
-Live: https://stellarharness.xyz
+Live mainnet: https://www.stellarharness.xyz
+
+Live mainnet report: https://www.stellarharness.xyz/report
+
+Example url: 
+
+```bash
+curl -X GET "https://www.stellarharness.xyz/api/v1/summary"
+```
 
 ![Stellar Harness](docs/screenshot.png)
 

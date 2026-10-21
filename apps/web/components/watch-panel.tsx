@@ -25,7 +25,7 @@ export const WATCH_HINTS = {
 } as const;
 
 export const companyTitle = (org: Pick<Org, 'name' | 'network'>): string =>
-  `Demo company: ${org.name} (${org.network})`;
+  `${org.name} on ${org.network}`;
 
 function ContractStatus({ ttl }: Pick<WatchedContract, 'ttl'>) {
   if (!ttl) return <span className="text-muted-foreground">unavailable</span>;
