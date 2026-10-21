@@ -115,8 +115,8 @@ export function LastDay({ initial, rows }: { initial: SummaryPayload; rows: What
           value={formatCount(summary.retryable)}
           label={
             <>
-              failures that could be <HintTerm hint={TERMS.retryable}>retried</HintTerm> and
-              completed
+              failures that could be <HintTerm hint={TERMS.retryable}>retried</HintTerm> with a
+              fresh quote or fee
             </>
           }
           note="price moved, fee too low, and similar"
