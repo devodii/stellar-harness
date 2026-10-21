@@ -17,7 +17,6 @@ export const dynamic = 'force-dynamic';
 const TITLE = 'Stellar Harness mainnet operations report';
 const DESCRIPTION =
   'Live failed transactions and contract expiry on Stellar mainnet, with what an ops agent would fix.';
-const CONTACT = 'emmanuelodii80@gmail.com';
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -33,8 +32,6 @@ const NAV = [
   ['api', 'API'],
 ] as const;
 
-const LINK = 'underline decoration-border underline-offset-2 hover:decoration-foreground';
-
 const requestOrigin = async (): Promise<string> => {
   const h = await headers();
   const host = h.get('x-forwarded-host') ?? h.get('host') ?? 'localhost:3000';
@@ -45,7 +42,6 @@ const requestOrigin = async (): Promise<string> => {
 export default async function ReportPage() {
   const [report, origin] = await Promise.all([getReport(), requestOrigin()]);
   const yesterday = yesterdayUtc(Date.parse(report.summary.generatedAt));
-  const snapshotPath = `/api/v1/snapshots/${yesterday}`;
 
   return (
     <main className="mx-auto max-w-4xl space-y-8 px-4 py-10 text-sm">
@@ -90,9 +86,6 @@ export default async function ReportPage() {
       <Section id="api" title="API">
         <ApiSection origin={origin} yesterday={yesterday} />
       </Section>
-      <footer className="flex flex-wrap justify-between gap-x-6 gap-y-2 border-t pt-6 font-mono text-xs text-muted-foreground">
-
-      </footer>
     </main>
   );
 }
