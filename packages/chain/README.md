@@ -29,7 +29,7 @@ Every code falls in exactly one bucket, so `preventable + retryable + out_of_sco
 
 - `preventable`: a check before sending would have stopped it (`op_underfunded`, `op_no_trust`,
   `op_no_destination`, `op_low_reserve`, `invoke_host_function_entry_archived`, `tx_bad_seq`).
-- `retryable`: the same intent can be retried and completed (`op_over_source_max`,
+- `retryable`: the same intent can be retried with a fresh quote or fee (`op_over_source_max`,
   `op_under_dest_min`, `invoke_host_function_resource_limit_exceeded`,
   `invoke_host_function_insufficient_refundable_fee`, `tx_insufficient_fee`, `tx_too_late`).
 - `out_of_scope`: everything else, shown as "other".

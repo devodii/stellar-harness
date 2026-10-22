@@ -20,7 +20,7 @@ Local worker against Docker Postgres, caught up on 2026-10-21 at 02:51 UTC after
 | -------------------------------------------------- | ------------------------------------------------ |
 | Transactions, failed                               | 4,565,565, 997,547                               |
 | Failures a check would have prevented              | 70,961                                           |
-| Failures that could be retried and completed       | 838,427                                          |
+| Failures that could be retried with a fresh quote  | 838,427                                          |
 | Active contracts archived, expiring within 30 days | 253, 155                                         |
 | Cost to keep them alive for 180 days               | 18,013.65 XLM (about $3,286 at 0.182422 XLM/USD) |
 
