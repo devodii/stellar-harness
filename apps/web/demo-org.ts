@@ -17,7 +17,7 @@ export const DEMO_ORG: Org = {
     },
   ],
   contracts: [
-    { id: 'CADKCKAZEOUXFS46JTA73DFGCWUGTZDKU5UTUAEA6OAZB7RV5CEHS47R', label: 'Escrow' },
+    { id: 'CCWUWOL2WDOPDO2ZEDUG4T4QAYUC6C4EEXY6Y7LNVC66ZQPGGOZ572KC', label: 'Escrow' },
     { id: 'CBRSCFRPCMKZCUTJMOVU5XQWZVXXSM66MGB4CEFRT5KWDI4XLM44DK5M', label: 'Registry' },
   ],
   policy: {
