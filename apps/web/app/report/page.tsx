@@ -64,6 +64,10 @@ export default async function ReportPage() {
             What is breaking on Stellar mainnet right now, and what Stellar Harness would do about
             it.
           </p>
+          <p className="text-muted-foreground">
+            Read-only public data from Stellar mainnet. The harness only acts on accounts an
+            organisation connects and authorises.
+          </p>
         </div>
         <LiveLine initial={report.summary} />
         <nav aria-label="Sections" className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
