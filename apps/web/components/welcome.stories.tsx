@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, within } from 'storybook/test';
 import { MainnetProof } from './mainnet-proof';
-import { VALUE_LINE, Welcome } from './welcome';
+import { VALUE_LINE, Welcome, valueDetail } from './welcome';
 
 const meta: Meta<typeof Welcome> = {
   component: Welcome,
@@ -23,7 +23,14 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole('heading', { name: VALUE_LINE })).toBeVisible();
-    await expect(canvas.getByText(/sample company on testnet/)).toBeVisible();
+    await expect(canvas.getByText(valueDetail('testnet'))).toBeVisible();
+    await expect(
+      canvas.getByRole('link', { name: "See what's breaking on mainnet now →" }),
+    ).toHaveAttribute('href', '/report');
+    await expect(canvas.getByRole('link', { name: 'How it works →' })).toHaveAttribute(
+      'href',
+      '/about',
+    );
   },
 };
 

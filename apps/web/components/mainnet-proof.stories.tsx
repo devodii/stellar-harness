@@ -13,22 +13,15 @@ type Story = StoryObj<typeof MainnetProof>;
 
 export const Default: Story = {
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(canvas.getByText(/could have been prevented/)).toBeVisible();
-    await expect(canvas.getByRole('link', { name: 'See the live report' })).toHaveAttribute(
-      'href',
-      '/report',
-    );
+    await expect(within(canvasElement).getByText(/could have been prevented/)).toBeVisible();
   },
 };
 
 export const Waiting: Story = {
   args: { preventable: 0, failed: 0 },
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(canvas.queryByText(/could have been prevented/)).not.toBeInTheDocument();
     await expect(
-      canvas.getByRole('link', { name: 'See what is failing on Stellar mainnet right now' }),
-    ).toBeVisible();
+      within(canvasElement).queryByText(/could have been prevented/),
+    ).not.toBeInTheDocument();
   },
 };
