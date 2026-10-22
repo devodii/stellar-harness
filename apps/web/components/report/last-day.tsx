@@ -101,7 +101,7 @@ export function LastDay({ initial, rows }: { initial: SummaryPayload; rows: What
 
   return (
     <div className="space-y-8">
-      <div className="grid gap-8 sm:grid-cols-3 sm:gap-6">
+      <div className="grid gap-8 sm:grid-cols-2 sm:gap-6">
         <Figure
           value={formatCount(summary.preventable)}
           label={
@@ -109,17 +109,7 @@ export function LastDay({ initial, rows }: { initial: SummaryPayload; rows: What
               failures a check would have <HintTerm hint={TERMS.preventable}>prevented</HintTerm>
             </>
           }
-          note={`of ${formatCount(summary.failed)} failed transactions`}
-        />
-        <Figure
-          value={formatCount(summary.retryable)}
-          label={
-            <>
-              failures that could be <HintTerm hint={TERMS.retryable}>retried</HintTerm> with a
-              fresh quote or fee
-            </>
-          }
-          note="price moved, fee too low, and similar"
+          note={`in the last 24 hours, of ${formatCount(summary.failed)} failed transactions`}
         />
         <ContractsFigure contracts={summary.contracts} />
       </div>

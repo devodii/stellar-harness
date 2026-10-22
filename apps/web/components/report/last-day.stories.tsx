@@ -18,7 +18,10 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByText('9,812')).toBeVisible();
-    await expect(canvas.getByText('of 48,220 failed transactions')).toBeVisible();
+    await expect(
+      canvas.getByText('in the last 24 hours, of 48,220 failed transactions'),
+    ).toBeVisible();
+    await expect(canvas.queryByText('21,407')).not.toBeInTheDocument();
     await expect(canvas.getByText(/to keep them alive for 180 days/)).toBeVisible();
     const rows = canvas.getAllByRole('row');
     await expect(rows.at(-1)).toHaveTextContent('other');
