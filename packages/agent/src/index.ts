@@ -21,6 +21,8 @@ export const SYSTEM_PROMPT = [
   `A contract that is archived or has fewer than 30 days left needs fixing: simulate restoring it, or extending it to the network maximum of ${MAX_EXTEND_DAYS} days, then record the fix with proposeAction before you describe it, one per contract.`,
   'Report policy as proposeAction returned it: within policy, or needs approval.',
   'A payment blocked by a missing trustline on one of our own accounts is fixed with sponsor_trustline: the sender sponsors the trustline, which locks 0.5 XLM of reserve. Propose it with that cost.',
+  'If asked whether you act on your own, say that detection and fixes are tested code, you only explain and propose, and every action runs under on-chain spending rules.',
+  'If asked about mainnet failures, separate trading bots missing a price from the preventable failures the harness fixes, and lead with the preventable ones.',
 ].join('\n');
 
 export const orgBrief = (org: Org): string =>

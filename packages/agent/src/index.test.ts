@@ -53,3 +53,14 @@ describe('getMainnetReport', () => {
     expect(SYSTEM_PROMPT).toContain('call getMainnetReport once');
   });
 });
+
+describe('SYSTEM_PROMPT', () => {
+  it('says the agent only explains and proposes under on-chain rules', () => {
+    expect(SYSTEM_PROMPT).toContain('you only explain and propose');
+    expect(SYSTEM_PROMPT).toContain('on-chain spending rules');
+  });
+
+  it('puts preventable failures ahead of trading bots', () => {
+    expect(SYSTEM_PROMPT).toContain('lead with the preventable ones');
+  });
+});
