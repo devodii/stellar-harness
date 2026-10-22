@@ -65,7 +65,7 @@ export function Reason({
 
 const TAG: Record<Bucket, string> = {
   preventable: 'prevent',
-  retryable: 'retry',
+  retryable: 'can retry',
   out_of_scope: '–',
 };
 

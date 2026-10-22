@@ -23,6 +23,10 @@ export const Default: Story = {
     ).toBeVisible();
     await expect(canvas.queryByText('21,407')).not.toBeInTheDocument();
     await expect(canvas.getByText(/to keep them alive for 180 days/)).toBeVisible();
+    await expect(
+      canvas.getByText(/Most failed transactions on Stellar are trading bots/),
+    ).toBeVisible();
+    await expect(canvas.getAllByText('can retry').length).toBeGreaterThan(0);
     const rows = canvas.getAllByRole('row');
     await expect(rows.at(-1)).toHaveTextContent('other');
   },

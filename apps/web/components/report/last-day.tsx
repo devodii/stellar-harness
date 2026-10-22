@@ -121,6 +121,11 @@ export function LastDay({ initial, rows }: { initial: SummaryPayload; rows: What
           getRowId={(row) => row.code}
           emptyState={<Waiting>No failed transactions in the last 24 hours.</Waiting>}
         />
+        <p className="text-sm text-muted-foreground">
+          Most failed transactions on Stellar are trading bots missing a price. The harness does not
+          target those. It retries them only for organisations that convert currencies in their own
+          payments.
+        </p>
       </div>
     </div>
   );
