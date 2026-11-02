@@ -10,8 +10,8 @@ const serverShape = {
 };
 
 const chatShape = {
-  OPENAI_API_KEY: z.string().min(1, 'OPENAI_API_KEY is required for /api/chat'),
-  OPENAI_MODEL: z.string().min(1).default('gpt-4.1'),
+  ANTHROPIC_API_KEY: z.string().min(1, 'ANTHROPIC_API_KEY is required for /api/chat'),
+  ANTHROPIC_MODEL: z.string().min(1).default('claude-sonnet-5-5'),
 };
 
 const dbShape = {

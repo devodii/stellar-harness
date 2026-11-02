@@ -1,4 +1,4 @@
-import { createOpenAI } from '@ai-sdk/openai';
+import { createAnthropic } from '@ai-sdk/anthropic';
 import { orgBrief, SYSTEM_PROMPT } from '@harness/agent';
 import { appError } from '@harness/schema';
 import { convertToModelMessages, stepCountIs, streamText, type UIMessage } from 'ai';
@@ -30,7 +30,7 @@ export const POST = apiHandler({
   handler: async ({ body, requestId }) => {
     const env = loadChatEnv();
     const result = streamText({
-      model: createOpenAI({ apiKey: env.OPENAI_API_KEY })(env.OPENAI_MODEL),
+      model: createAnthropic({ apiKey: env.ANTHROPIC_API_KEY })(env.ANTHROPIC_MODEL),
       instructions: INSTRUCTIONS,
       messages: await convertToModelMessages(body.messages, { tools }),
       tools,

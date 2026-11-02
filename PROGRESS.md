@@ -8,7 +8,7 @@ Resume here: read this file first.
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | M10 to M13 demo         | Done. One testnet organisation, eight agent tools, watched panel, chat with four chips and action cards, seeded fixes. |
 | M16 live report and API | Done locally. Chain package, worker, six `/api/v1` routes, live `/report`, home page with how it works and live proof. |
-| Production              | Not yet. Worker on Railway, `DATABASE_URL` and `OPENAI_API_KEY` on Vercel, migrations on the production database.      |
+| Production              | Not yet. Worker on Railway, `DATABASE_URL` and `ANTHROPIC_API_KEY` on Vercel, migrations on the production database.      |
 
 `pnpm build`, `pnpm lint`, `pnpm test`, `pnpm format:check`, the Storybook tests, `pnpm knip` and `pnpm depcheck` pass.
 
@@ -55,4 +55,4 @@ apps/web                home page with chat, /report, /api/chat, /api/v1/*
 
 ## Next step
 
-Deploy: the worker on Railway with `DATABASE_URL`, `RPC_URL` and `SIMULATION_SOURCE`, then the web app on Vercel with `DATABASE_URL` and `OPENAI_API_KEY` pointing at the same database. After that, make execution real: a smart account whose policy matches `Org.policy`, connected through Stellar Wallets Kit, turning the disabled Connect wallet, execute and approve buttons into signed submissions.
+Deploy: the worker on Railway with `DATABASE_URL`, `RPC_URL` and `SIMULATION_SOURCE`, then the web app on Vercel with `DATABASE_URL` and `ANTHROPIC_API_KEY` pointing at the same database. After that, make execution real: a smart account whose policy matches `Org.policy`, connected through Stellar Wallets Kit, turning the disabled Connect wallet, execute and approve buttons into signed submissions.
