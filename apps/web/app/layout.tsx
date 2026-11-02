@@ -15,7 +15,8 @@ const instrumentSerif = Instrument_Serif({
 
 export const metadata: Metadata = {
   title: 'Stellar Harness',
-  description: "Stellar Harness keeps a business's Stellar accounts and contracts working. It watches them, catches what's about to break, and prepares the fix.",
+  description:
+    "Stellar Harness keeps a business's Stellar accounts and contracts working. It watches them, catches what's about to break, and prepares the fix.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

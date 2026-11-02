@@ -6,7 +6,7 @@ Live mainnet: https://www.stellarharness.xyz
 
 Live mainnet report: https://www.stellarharness.xyz/report
 
-Example url: 
+Example url:
 
 ```bash
 curl -X GET "https://www.stellarharness.xyz/api/v1/summary"

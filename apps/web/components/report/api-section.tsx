@@ -20,7 +20,8 @@ const apiEndpoints = (yesterday: string) => [
   },
   {
     path: '/api/v1/contracts?status=archived',
-    description: 'Active contracts that are archived, or expiring with status=expiring, and the fix cost.',
+    description:
+      'Active contracts that are archived, or expiring with status=expiring, and the fix cost.',
   },
   {
     path: `/api/v1/snapshots/${yesterday}`,
