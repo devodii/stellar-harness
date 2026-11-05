@@ -13,10 +13,13 @@ const listOf = (items: string[]): string =>
 
 const xlm = (value: number): string => `${formatDecimal(value, 2)} XLM`;
 
+const percent = (bps: number): string => `${formatDecimal(bps / 100, 2)}%`;
+
 export const spendingRules = (policy: Policy): string[] => [
   `Spends up to ${xlm(policy.dailySpendXlm)} a day.`,
   `Needs the owner's approval above ${xlm(policy.approvalAboveXlm)}.`,
   policy.allowedOperations.length === 0
     ? 'May not run any fix on its own.'
     : `May ${listOf(policy.allowedOperations.map((operation) => OPERATION_LABELS[operation]))}.`,
+  `Retries a mis-priced path payment up to ${percent(policy.maxSlippageBps)} of slippage.`,
 ];

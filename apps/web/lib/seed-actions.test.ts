@@ -20,6 +20,7 @@ const org: Org = {
     dailySpendXlm: 50,
     allowedOperations: ['extend_ttl', 'restore', 'sponsor_trustline'],
     approvalAboveXlm: 10,
+    maxSlippageBps: 100,
   },
 };
 

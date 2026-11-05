@@ -1,5 +1,6 @@
 import type { Org } from '@harness/schema';
 import {
+  buildPathPaymentRetry,
   buildPaymentPreflight,
   type Clients,
   getAccount,
@@ -21,6 +22,7 @@ export const SYSTEM_PROMPT = [
   `A contract that is archived or has fewer than 30 days left needs fixing: simulate restoring it, or extending it to the network maximum of ${MAX_EXTEND_DAYS} days, then record the fix with proposeAction before you describe it, one per contract.`,
   'Report policy as proposeAction returned it: within policy, or needs approval.',
   'A payment blocked by a missing trustline on one of our own accounts is fixed with sponsor_trustline: the sender sponsors the trustline, which locks 0.5 XLM of reserve. Propose it with that cost.',
+  "A path payment that missed its price (op_under_dest_min or op_over_source_max) is retried with buildPathPaymentRetry: a fresh quote, bounded by the policy's slippage cap.",
   'If asked whether you act on your own, say that detection and fixes are tested code, you only explain and propose, and every action runs under on-chain spending rules.',
   'If asked about mainnet failures, separate trading bots missing a price from the preventable failures the harness fixes, and lead with the preventable ones.',
 ].join('\n');
@@ -122,6 +124,31 @@ export const createAgentTools = (storage: Storage, clients: Clients, deps: Agent
           asset,
           amount,
         }),
+    }),
+    buildPathPaymentRetry: tool({
+      description:
+        'Simulate-only. When a path payment missed its price (op_under_dest_min or op_over_source_max), fetches a fresh quote from Horizon for the same trade and works out the retry: the new destination minimum (strict send) or source maximum (strict receive). Uses the policy slippage cap as the tolerance unless a tighter one is given; never exceeds it. Nothing is signed or submitted.',
+      inputSchema: z.object({
+        mode: z.enum(['strict_send', 'strict_receive']),
+        sendAsset: z.string().describe('XLM or CODE:ISSUER'),
+        destAsset: z.string().describe('XLM or CODE:ISSUER'),
+        amount: z
+          .number()
+          .positive()
+          .describe('The fixed side: source amount for strict send, destination amount for strict receive'),
+        requestedSlippageBps: z.number().int().nonnegative().optional(),
+      }),
+      execute: async ({ mode, sendAsset, destAsset, amount, requestedSlippageBps }) => {
+        const org = await storage.getOrg();
+        return buildPathPaymentRetry(clients, {
+          mode,
+          sendAsset,
+          destAsset,
+          amount,
+          requestedSlippageBps: requestedSlippageBps ?? org.policy.maxSlippageBps,
+          maxSlippageBps: org.policy.maxSlippageBps,
+        });
+      },
     }),
     getMainnetReport: tool({
       description:

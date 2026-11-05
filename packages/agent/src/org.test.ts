@@ -11,7 +11,12 @@ const org: Org = {
   network: 'testnet',
   accounts: [],
   contracts: [{ id: ESCROW, label: 'Escrow' }],
-  policy: { dailySpendXlm: 50, allowedOperations: ['extend_ttl', 'restore'], approvalAboveXlm: 10 },
+  policy: {
+    dailySpendXlm: 50,
+    allowedOperations: ['extend_ttl', 'restore'],
+    approvalAboveXlm: 10,
+    maxSlippageBps: 100,
+  },
 };
 
 const extend = {

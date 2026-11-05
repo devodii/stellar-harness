@@ -14,6 +14,7 @@ export const Policy = z.object({
   dailySpendXlm: z.number().nonnegative(),
   allowedOperations: z.array(Operation),
   approvalAboveXlm: z.number().nonnegative(),
+  maxSlippageBps: z.number().int().nonnegative(),
 });
 export type Policy = z.infer<typeof Policy>;
 

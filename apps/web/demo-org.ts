@@ -24,5 +24,6 @@ export const DEMO_ORG: Org = {
     dailySpendXlm: 50,
     allowedOperations: ['extend_ttl', 'restore', 'sponsor_trustline', 'payment'],
     approvalAboveXlm: 10,
+    maxSlippageBps: 100,
   },
 };

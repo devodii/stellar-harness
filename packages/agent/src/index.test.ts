@@ -10,7 +10,7 @@ const org: Org = {
   network: 'testnet',
   accounts: [],
   contracts: [],
-  policy: { dailySpendXlm: 50, allowedOperations: [], approvalAboveXlm: 10 },
+  policy: { dailySpendXlm: 50, allowedOperations: [], approvalAboveXlm: 10, maxSlippageBps: 100 },
 };
 
 const report: MainnetReport = {
@@ -62,5 +62,31 @@ describe('SYSTEM_PROMPT', () => {
 
   it('puts preventable failures ahead of trading bots', () => {
     expect(SYSTEM_PROMPT).toContain('lead with the preventable ones');
+  });
+
+  it('points path payment price misses at buildPathPaymentRetry', () => {
+    expect(SYSTEM_PROMPT).toContain('buildPathPaymentRetry');
+  });
+});
+
+describe('buildPathPaymentRetry', () => {
+  it('quotes a fresh price and caps the retry at the policy slippage limit', async () => {
+    const clients: Clients = {
+      network: 'testnet',
+      passphrase: 'x',
+      loadAccount: async () => null,
+      quotePaths: async () => [{ source_amount: '105.0000000', destination_amount: '95.0000000' }],
+      rpc: {} as Clients['rpc'],
+    };
+    const tools = createAgentTools(
+      new MemoryStorage({ ...org, policy: { ...org.policy, maxSlippageBps: 100 } }),
+      clients,
+      { readMainnetReport: async () => report },
+    );
+    const retry = await tools.buildPathPaymentRetry.execute?.(
+      { mode: 'strict_send', sendAsset: 'XLM', destAsset: 'USDC:GISSUER', amount: 100 },
+      { toolCallId: 't', messages: [], context: {} },
+    );
+    expect(retry).toMatchObject({ slippageBps: 100 });
   });
 });

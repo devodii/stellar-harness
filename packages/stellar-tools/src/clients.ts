@@ -36,10 +36,13 @@ export type HorizonAccount = {
   balances: Balance[];
 };
 
+export type PathRecord = { source_amount: string; destination_amount: string };
+
 export type Clients = {
   network: Network;
   passphrase: string;
   loadAccount(address: string): Promise<HorizonAccount | null>;
+  quotePaths(mode: 'strict_send' | 'strict_receive', params: URLSearchParams): Promise<PathRecord[]>;
   rpc: Pick<rpc.Server, 'getAccount' | 'getLedgerEntries' | 'simulateTransaction'>;
 };
 
@@ -75,6 +78,14 @@ export const createClients = (network: Network): Clients => {
         if (response.status === 404) return null;
         if (!response.ok) throw new Error(`Horizon returned ${response.status} for ${address}`);
         return (await response.json()) as HorizonAccount;
+      }),
+    quotePaths: (mode, params) =>
+      retryOnStall(async () => {
+        const path = mode === 'strict_send' ? 'strict-send' : 'strict-receive';
+        const response = await fetch(`${endpoints.horizon}/paths/${path}?${params}`);
+        if (!response.ok) throw new Error(`Horizon returned ${response.status} for /paths/${path}`);
+        const body = (await response.json()) as { _embedded: { records: PathRecord[] } };
+        return body._embedded.records;
       }),
     rpc: {
       getAccount: (address) => retryOnStall(() => server.getAccount(address)),

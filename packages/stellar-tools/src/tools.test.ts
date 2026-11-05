@@ -3,6 +3,13 @@ import { describe, expect, it, vi } from 'vitest';
 import { getAccount } from './account';
 import { type Clients, type HorizonAccount, retryOnStall } from './clients';
 import { getContractTtl, ttlOf } from './contract-ttl';
+import {
+  buildPathPaymentRetry,
+  destMinFor,
+  planPathPaymentRetry,
+  quotePathPayment,
+  sendMaxFor,
+} from './path-payment';
 import { buildPaymentPreflight, checkPayment } from './preflight';
 import { ledgersForDays, MAX_EXTEND_LEDGERS, simulateExtendTtl, simulateRestore } from './simulate';
 
@@ -67,6 +74,7 @@ const fakeClients = (overrides: Partial<Clients> = {}): Clients => {
     network: 'testnet',
     passphrase: Networks.TESTNET,
     loadAccount: async (address) => accounts[address] ?? null,
+    quotePaths: async () => [],
     rpc: rpcFake,
     ...overrides,
   };
@@ -203,5 +211,78 @@ describe('buildPaymentPreflight', () => {
     await expect(
       buildPaymentPreflight(fakeClients(), { ...payment, from: Keypair.random().publicKey() }),
     ).rejects.toThrow('does not exist');
+  });
+});
+
+describe('planPathPaymentRetry', () => {
+  const quote = { sourceAmount: 105, destAmount: 95 };
+
+  it('uses the requested tolerance for a strict send under the cap', () => {
+    const retry = planPathPaymentRetry({
+      mode: 'strict_send',
+      quote,
+      requestedSlippageBps: 50,
+      maxSlippageBps: 100,
+    });
+    expect(retry).toMatchObject({ slippageBps: 50, cappedToPolicy: false });
+    expect(retry.destMin).toBeCloseTo(destMinFor(quote, 50));
+    expect(retry.sendMax).toBeUndefined();
+  });
+
+  it('never retries past the organisation slippage cap', () => {
+    const retry = planPathPaymentRetry({
+      mode: 'strict_send',
+      quote,
+      requestedSlippageBps: 500,
+      maxSlippageBps: 100,
+    });
+    expect(retry).toMatchObject({ slippageBps: 100, cappedToPolicy: true });
+    expect(retry.destMin).toBeCloseTo(destMinFor(quote, 100));
+  });
+
+  it('computes a sendMax for a strict receive, also capped', () => {
+    const retry = planPathPaymentRetry({
+      mode: 'strict_receive',
+      quote,
+      requestedSlippageBps: 500,
+      maxSlippageBps: 100,
+    });
+    expect(retry).toMatchObject({ slippageBps: 100, cappedToPolicy: true });
+    expect(retry.sendMax).toBeCloseTo(sendMaxFor(quote, 100));
+    expect(retry.destMin).toBeUndefined();
+  });
+});
+
+describe('quotePathPayment and buildPathPaymentRetry', () => {
+  const record = { source_amount: '105.0000000', destination_amount: '95.0000000' };
+  const input = { mode: 'strict_send' as const, sendAsset: 'XLM', destAsset: USDC, amount: 100 };
+
+  it('quotes the best path from Horizon', async () => {
+    const clients = fakeClients({ quotePaths: async () => [record] });
+    await expect(quotePathPayment(clients, input)).resolves.toEqual({
+      sourceAmount: 105,
+      destAmount: 95,
+    });
+  });
+
+  it('returns null when no path exists', async () => {
+    await expect(quotePathPayment(fakeClients(), input)).resolves.toBeNull();
+  });
+
+  it('builds a retry plan from a fresh quote, capped to the policy', async () => {
+    const clients = fakeClients({ quotePaths: async () => [record] });
+    const retry = await buildPathPaymentRetry(clients, {
+      ...input,
+      requestedSlippageBps: 500,
+      maxSlippageBps: 100,
+    });
+    expect(retry).toMatchObject({ slippageBps: 100, cappedToPolicy: true });
+    expect(retry.destMin).toBeCloseTo(destMinFor({ sourceAmount: 105, destAmount: 95 }, 100));
+  });
+
+  it('fails loudly when no path is found', async () => {
+    await expect(
+      buildPathPaymentRetry(fakeClients(), { ...input, requestedSlippageBps: 50, maxSlippageBps: 100 }),
+    ).rejects.toThrow('No path found');
   });
 });
